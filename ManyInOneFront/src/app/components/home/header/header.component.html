@@ -1,0 +1,31 @@
+<nav >
+    <div>
+        <div class="flex justify-between h-16 px-10 shadow items-center">
+            <div class="flex items-center space-x-8">
+                <a routerLink="/" class="text-xl lg:text-2xl font-bold cursor-pointer">Many In One</a>
+                <div class="hidden md:flex justify-around space-x-4">
+                    <a routerLink="/home" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Home</a>
+                    <a routerLink="/paymentdetails" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Payment</a>
+                    <a routerLink="genAI/textonly" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Text Only</a>
+                    <a routerLink="genAI/textandimageonly" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Text
+                        and Image</a>
+                </div>
+            </div>
+            <div class="flex space-x-4 items-center">
+
+                @if(userStatus)
+                {
+                <button type="submit" (click)="onLogout()"
+                    class="bg-red-400 px-4 py-2 rounded text-white cursor-pointer font-bold hover:bg-indigo-500 text-sm">Log
+                    out</button>
+                }
+                @else {
+                <a routerLink="/login" class="text-gray-800 text-md font-semibold cursor-pointer">LOGIN</a>
+
+                <a routerLink="/register"
+                    class="bg-indigo-600 px-4 py-2 rounded text-white cursor-pointer hover:bg-indigo-500 text-md font-semibold">SIGNUP</a>
+                }
+            </div>
+        </div>
+    </div>
+</nav>

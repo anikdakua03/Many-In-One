@@ -1,0 +1,54 @@
+<a class="text-blue-600 font-bold underline-offset-4" routerLink="/home">Home</a><br />
+
+<form [formGroup]="myForm" (submit)="onSubmitt()" [class.submitted]="service.formSubmitted" novalidate
+    autocomplete="off">
+
+    <label class="block mb-2 text-lg font-bold text-gray-900 dark:text-white" for="file_input">Upload file</label>
+    <!--  -->
+    @if(imageUrl)
+    {
+    <img [src]="imageUrl" alt="" title="Uploaded Image" height="300px" width="300px"
+        class="justify-center rounded-md md-3 px -4" />
+    }
+    @else {<div>
+        <p class="ml-5 mr-5 mt-4 text-md">No image choosen...<br /></p>
+    </div>}
+
+    <input (change)="onFileSelected($event)" 
+        class="block w-full p-2.5 ml-5 mr-5 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+        aria-describedby="file_input_help" type="file">
+
+    <div class="ml-5 mr-5 mt-4">
+        <label class="mt-1 md-1 block mb-2 text-lg font-medium text-gray-900"> Type your query about the picture...</label>
+        <input type="text" formControlName="inputText"
+            class="bg-gray-50 ml-4 mr-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Ask your query.." required>
+    </div>
+
+    <div class="ml-5 mr-5 mt-4 d-grid">
+        <!-- [disabled]="!paymentForm.valid" -->
+        <button type="submit"
+            class="text-white bg-blue-700 hover:bg-yellow-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ask Now</button>
+    </div>
+</form>
+
+
+<div class="mb-3 ml-5 mr-5 mt-4">
+    <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer :--> </label>
+    <!-- <p> markdown [data]="response" [disableSanitizer]="true"></p> -->
+    <!-- <p> 
+        <markdown lineHighlight [line]="'6, 10-16'" [lineOffset]="5" [data]="response">
+        </markdown>
+    </p>
+    <p> 
+        <markdown linenumbers [start]="0" linehighlight [data]="res">
+        </markdown>
+    </p>
+    <p> 
+        <markdown katex [data]="res2">
+        </markdown>
+    </p> -->
+    <div class="">
+        <markdown class="" [data]="res"></markdown>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+<div class="justify-items-center mx-4 ml-4 mt-4">
+    <form [formGroup]="paymentForm" (submit)="onSubmit()" [class.submitted]="service.formSubmitted" novalidate
+        autocomplete="off">
+        <input type="hidden" name="paymentDetailId" [value]="service.formData.paymentDetailId">
+        <div class="mb-3">
+            <!-- <label>Card Owner Name</label>
+            <input class="form-control form-control-lg" placeholder="Name on Card" name="cardOwnerName"
+                formControlName="cardOwnerName"> -->
+            <label class="block mb-2 text-lg font-medium text-gray-900">Card Owner Name</label>
+            <input type="text" formControlName="cardOwnerName"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Name on Card" name="cardOwnerName" required>
+            @if(paymentForm.controls['cardOwnerName'].errors && paymentForm.controls['cardOwnerName'].touched)
+            {
+            <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card owner name is
+                    required</span> of minimium 4 length.
+            </p>
+            }
+    
+        </div>
+    
+        <div class="mb-3">
+            <!-- <label>Card Number</label> -->
+            <!-- <input class="form-control form-control-lg" placeholder="16 digit Card Number" name="cardNumber"
+                formControlName="cardNumber"> -->
+                <label class="block mb-2 text-lg font-medium text-gray-900">Card Number</label>
+                <input type="text" formControlName="cardOwnerNumber"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="16 digit Card Number" name="cardNumber"
+                formControlName="cardNumber" required>
+            @if(paymentForm.controls['cardNumber'].errors && paymentForm.controls['cardNumber'].touched)
+            {
+            <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card number is of 16
+                    digits</span>
+                required.
+            </p>
+            }
+        </div>
+    
+        <div class="row">
+            <div class="mb-3 col-6">
+                <!-- <label>Security Code</label>
+                <input class="form-control form-control-lg" placeholder="CVV" type="password" name="securityCode"
+                    formControlName="securityCode"> -->
+                    <label class="block mb-2 text-lg font-medium text-gray-900">Security Code</label>
+                    <input type="password" formControlName="cardOwnerName"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="CVV" type="password" name="securityCode"
+                    formControlName="securityCode" required>
+                @if(paymentForm.controls['securityCode'].errors && paymentForm.controls['securityCode'].touched)
+                {
+                <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> - 3 digits</span>
+                    of security code required.
+                </p>
+                }
+            </div>
+            <div class="mb-3 col-6">
+                <!-- <label>Expiry Date</label>
+                <input class="form-control form-control-lg" placeholder="MM/YY" name="expirationDate"
+                    formControlName="expirationDate"> -->
+                    <label class="block mb-2 text-lg font-medium text-gray-900">Expiry Date</label>
+                    <input type="text" formControlName="cardOwnerName"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="MM/YY" name="expirationDate"
+                    formControlName="expirationDate" required>
+                @if(paymentForm.controls['expirationDate'].errors && paymentForm.controls['expirationDate'].touched)
+                {
+                <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> - Expiry date</span>
+                    in MM/YY format required.
+                </p>
+                }
+            </div>
+        </div>
+    
+        <div class="d-grid">
+            <!-- [disabled]="!paymentForm.valid" -->
+            <button type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
+        </div>
+    </form>
+</div>
