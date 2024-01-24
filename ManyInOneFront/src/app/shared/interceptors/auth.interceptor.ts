@@ -29,7 +29,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                         // Refresh failed, revoke token
                         return authService.revokeToken().pipe(
                             tap(x => {
-                                router.navigate(['']);
+                                router.navigateByUrl('/home');
                                 toaster.show("Please login again to continue !!!");
                             }),
                             catchError(() => {

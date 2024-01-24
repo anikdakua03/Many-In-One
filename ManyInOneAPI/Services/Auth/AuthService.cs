@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ManyInOneAPI.Services.Auth
 {
@@ -20,12 +20,14 @@ namespace ManyInOneAPI.Services.Auth
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AuthConfig _authConfig;
-        public AuthService(ManyInOneDbContext dbContext, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager, IOptionsMonitor<AuthConfig> optionsMonitor)
+        private readonly SignInManager<IdentityUser> _signInManager;
+        public AuthService(ManyInOneDbContext dbContext, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager, IOptionsMonitor<AuthConfig> optionsMonitor, SignInManager<IdentityUser> signInManager)
         {
             _dbContext = dbContext;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _authConfig = optionsMonitor.CurrentValue;
+            _signInManager = signInManager;
         }
 
         public async Task<AuthResult> Register(UserRegistrationRequestDTO userRequestDTO)
@@ -99,16 +101,21 @@ namespace ManyInOneAPI.Services.Auth
                 UserName = payload.FamilyName + payload.GivenName,
                 Email = payload.Email
             };
-            // create and also add login info with provider
-            var loginInfo = new UserLoginInfo("GOOGLE", payload.Subject, "Google");
+            // create the user
+            var res = await _userManager.CreateAsync(newUser);
 
-            var res = await _userManager.AddLoginAsync(newUser, loginInfo);
-
-            if (res is null)
+            if (!res.Succeeded)
             {
                 errors.Add("Error creating the user !!");
                 return new AuthResult() { Errors = errors };
             }
+
+            // create and also add login info with provider
+            var loginInfo = new UserLoginInfo("GOOGLE", payload.Subject, "Google");
+            
+            await _userManager.AddLoginAsync(newUser, loginInfo);
+           
+
             // other wise generate token for th euser and allow to log in
             var jwttoken = GenerateJwtToken(newUser);
 
@@ -139,6 +146,13 @@ namespace ManyInOneAPI.Services.Auth
                 errors.Add("Invalid user !!");
                 return new AuthResult() { Errors = errors };
             }
+
+            // sign in the user
+            var useCookieScheme = true;
+            var isPersistent = true;
+            _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
+
+            var result = await _signInManager.PasswordSignInAsync(userRequestDTO.Email, userRequestDTO.Password, isPersistent, lockoutOnFailure: true);
 
             var jwttoken = GenerateJwtToken(existingUser);
 
@@ -188,6 +202,18 @@ namespace ManyInOneAPI.Services.Auth
         }
 
 
+        public async Task<AuthResult> SignOutUser()
+        {
+            // get prev refresh token from request cookies
+            //var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
+
+            await _signInManager.SignOutAsync();
+
+            await RevokeToken();
+
+            return new AuthResult() { Result = true, Token = " Sign out successfully !!" };
+        }
+
         public async Task<AuthResult> GetRefreshToken()
         {
             List<string> errors = new List<string>();
@@ -195,10 +221,7 @@ namespace ManyInOneAPI.Services.Auth
             // get prev refresh token from request cookies
             var refreshToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
 
-            // also need to check that refresh tokens expiration time 
-            var currTokenExpiryTime = await _dbContext.RefreshTokens.Where(a => a.Token == refreshToken).Select(b => b.ExpiryDate).FirstOrDefaultAsync();
-
-            if (currTokenExpiryTime >= DateTime.Now) // means expired
+            if(refreshToken.IsNullOrEmpty())
             {
                 errors.Add("Login expired ,, Plases log in again to conitnue ...");
                 return new AuthResult() { Errors = errors };
@@ -206,6 +229,7 @@ namespace ManyInOneAPI.Services.Auth
 
             // get the jwt token id linked with this refresh token
             var userId = await _dbContext.RefreshTokens.Where(a => a.Token == refreshToken).Select(b => b.UserId).FirstOrDefaultAsync();
+
             // get from datbase from refresh token table
             var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == userId);
 
@@ -215,11 +239,58 @@ namespace ManyInOneAPI.Services.Auth
                 return new AuthResult() { Errors = errors };
             }
             // other wiser generate refresh token
-            GenerateRefreshToken();
+            await GenerateJwtToken(user);
 
-            return new AuthResult() { Token = "Refresh token ret into cookies successfully !! ", Result = true };
+            return new AuthResult() { Token = "Refresh token set into cookies successfully !! ", Result = true };
         }
 
+        public async Task<AuthResult> CheckCurrentUser()
+        {
+            List<string> errors = new List<string>();
+            string userEmail = "";
+            var currToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
+
+            // but if there is no access token
+            // then need to get first the refresh token and then genrate set new token and refresh token also
+            if (currToken.IsNullOrEmpty())
+            {
+                var refresh = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
+                if(refresh.IsNullOrEmpty())
+                {
+                    errors.Add("All session , token expired, please log again to continue !!");
+                    return new AuthResult() { Errors = errors, Result = false };
+                }
+
+                var userId = await _dbContext.RefreshTokens.Where(a => a.Token == refresh).Select(b => b.UserId).FirstOrDefaultAsync();
+
+                var user= await _userManager.FindByIdAsync(userId!);
+                //  aslo set the access token
+                await GenerateJwtToken(user!);
+
+                userEmail = user!.Email!;
+            }
+            else
+            {
+                // other wise give the user email
+                var jwt = new JwtSecurityTokenHandler().ReadJwtToken(currToken);
+
+                // after that also verifies from user maanger
+                var isvalidUser = await _userManager.FindByEmailAsync(jwt.Subject);
+
+                // need to check what does it return
+                //var check = await _signInManager.IsSignedIn(jwt.Claims);
+
+                userEmail = isvalidUser!.Email!;
+
+                if (isvalidUser is null)
+                {
+                    errors.Add("Invalid User !!!");
+                    return new AuthResult() { Errors = errors };
+                }
+            }
+
+            return new AuthResult() { UserEmail = userEmail, Result = true };
+        }
 
         public async Task<AuthResult> RevokeToken() //string token/ should be by user id
         {
@@ -227,8 +298,14 @@ namespace ManyInOneAPI.Services.Auth
             // this is in scenarios when jwt token and refresh token both doesnt work
             // so this will be called from frontend to remove all token for that user 
             var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
+
+            if (token.IsNullOrEmpty())
+            {
+                errors.Add("All tokens expired, login afgain to continue !!");
+                return new AuthResult() { Errors = errors };
+            }
             // get the related user id first
-            var user = await _dbContext.RefreshTokens.FirstOrDefaultAsync(a => a.Token == token);
+                var user = await _dbContext.RefreshTokens.FirstOrDefaultAsync(a => a.Token == token);
             // get prev refresh token from request and remove all refresh token related to this user
             var refToken = await _dbContext.RefreshTokens.Where(a => a.UserId == user!.UserId).ToListAsync();
 
@@ -305,7 +382,7 @@ namespace ManyInOneAPI.Services.Auth
                  Secure = true,
                  HttpOnly = true,
                  IsEssential = true,
-                 SameSite = SameSiteMode.None
+                 SameSite = SameSiteMode.None // chamged to none , to check if it is working?!
              });
         }
 
@@ -318,7 +395,7 @@ namespace ManyInOneAPI.Services.Auth
                 Secure = true,
                 HttpOnly = true,
                 IsEssential = true,
-                SameSite = SameSiteMode.None
+                SameSite = SameSiteMode.None // chamged to none , to check if it is working?!
             });
 
             // also add to the database in the refresh token table
@@ -333,7 +410,7 @@ namespace ManyInOneAPI.Services.Auth
                 ExpiryDate = DateTime.UtcNow.AddDays(30)
             };
 
-            var res = await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
+            var res =  _dbContext.RefreshTokens.Update(newRefreshToken);
             await _dbContext.SaveChangesAsync();
 
             return true;

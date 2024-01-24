@@ -32,6 +32,12 @@
     </div>
 </form>
 
+<div class="justify-between">
+    <button type="button" (click)="clearAll()"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Clear
+        all</button>
+</div>
+
 
 <div class="mb-3 ml-5 mr-5 mt-4">
     <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer :--> </label>
@@ -49,6 +55,6 @@
         </markdown>
     </p> -->
     <div class="">
-        <markdown class="" [data]="res"></markdown>
+        <markdown class="" [data]="response"></markdown>
     </div>
 </div>

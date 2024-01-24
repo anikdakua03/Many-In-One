@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthResponse } from '../models/auth-response.model';
+import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -19,14 +21,7 @@ export class AuthenticationService {
   loginUrl: string = "auth/Login";
 
 
-  constructor(private http: HttpClient) {
-    // will check if token is available or not 
-    const token = this.getToken();
-    // console.log("tokennnn --< ", token)
-    if (token) {
-      this.isAuthenticated = true;
-      // this.updateToken(true);
-    }
+  constructor(private http: HttpClient, private cookie : CookieService, private route : Router) {
   }
 
   // registration
@@ -50,78 +45,100 @@ export class AuthenticationService {
     return this.http.post(`${this.baseUrl}Auth/LogInWithGoogle`, JSON.stringify(credentials), { headers: header, withCredentials: true });
   }
 
-  // signout from google
-  signOutExternal() {
-
-    localStorage.removeItem("x-access-token");
-    localStorage.removeItem("x-refresh-token");
-    window.location.reload();
-    console.log("token removed");
+  // signout
+  signOut() : Observable<any>
+  {
+    return this.http.post(`${this.baseUrl}Auth/SignOut`, { withCredentials: true });
   }
 
   // logout
   public logout() {
-    this.removeToken();
-    window.location.reload();
-    // return this.http.get(`${this.baseUrl}${this.loginUrl}`).pipe(
-    //   map((res) => {
-    //     console.log(res);
-    //     if(res)
-    //     {
-    //       this.removeToken();
-    //     }
-
-    //     return res;
-    //   })
-    // );
+    
+    this.signOut().subscribe({
+      next : res => {
+        console.log(res);
+        if(res.result)
+        {
+          this.removeToken();
+        }
+      },
+      error : err => {
+        console.log(err);
+      }
+    })
   }
 
-  // this can be sfifted to another service
-  updateToken(status: boolean) {
-    this.isAuthenticated = status;
-    var ch = this.isAuthenticated;
-    console.log("from  user status", ch)
-  }
-
-  isUserAuthenticated() {
-    return this.isAuthenticated;
-  }
-
-
-  // ================================================Token related =====================================
   refreshToken(): Observable<any> {
     const header = new HttpHeaders();
     return this.http.get(`${this.baseUrl}Auth/GetRefreshToken`, { headers: header, withCredentials: true });
   }
 
+  // this is for when user authentication fails 2 consecutive times
+  // 1st time access token expired but 2nd time some how refresh token validity expired
+  // sp clearing all cookies and need to log in again
   revokeToken(): Observable<any> {
-    // const token = localStorage.getItem("x-refresh-token");
     const header = new HttpHeaders();
     return this.http.delete(`${this.baseUrl}Auth/RevokeToken`, {headers : header, withCredentials : true});
   }
 
-  saveToken(token: string) {
-    localStorage.setItem("x-access-token", token);
+  // ================================================Token related =====================================
+  // this can be sfifted to another service
+  updateToken(status: boolean) {
+    this.isAuthenticated = status;
+    let ch = this.isAuthenticated;
+    console.log("from  user status", ch)
   }
-  isLoggegIn(): boolean {
-    if (localStorage.getItem('x-access-token')) {
+
+
+  saveToken(token: string) {
+    // get the user user email or something and set to cookie for ui interaction according to it
+    this.cookie.set("curr-app-user", encodeURIComponent(token));
+  }
+
+
+  getCurrentUser() : Observable<any>
+  {
+    return this.http.get(`${this.baseUrl}Auth/GetCurrentUser`, { withCredentials: true });
+  }
+
+  isLoggegIn():  boolean
+  {
+    this.getCurrentUser().subscribe({
+      next : res => {
+        // console.log("After checking froms erver also --> ",res);
+        this.saveToken(res.userEmail);
+        this.isAuthenticated = res.result;
+        // this.route.navigate(["/home"]);
+        // console.log("autheee -->", this.isAuthenticated);
+      },
+      error : err => {
+        // console.log("Invaliddd -->", err);
+      }
+    });
+
+    // after matchis from server also
+    if(this.isAuthenticated)
+    {
+      // window.location.reload();
       return true;
     }
-    return false;
+    else
+    {
+      return false;
+    }
   }
-  // ================================================ Token related Ends=====================================
 
   removeToken() {
-    localStorage.removeItem("token");
-  }
-
-  setToken(token: string) {
-    // this.updateToken(true);
-    localStorage.setItem("token", token); // this need to be updated with old token , when we implent refresh token
+    // deleteing only the access token bcs it is loggin out manually
+    // so next time user log s in , it only need s to get access token
+    this.cookie.delete("curr-app-user");  
+    // window.location.reload();
   }
 
   getToken(): string | null {
     // will get current token , else return null
-    return localStorage.getItem("token") || null;
+    return this.cookie.get("curr-app-user") || null;
   }
 }
+
+// ================================================ Token related Ends=====================================

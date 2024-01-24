@@ -15,25 +15,25 @@ export const routes: Routes = [
         'path': '', 'title': 'Welcome', component: WelcomeComponent, // for all users
     },
     {
-        'path': 'home', 'title': 'Home', component: HomeComponent,  // canActivate : [authGuard]
+        'path': 'home', 'title': 'Home', component: HomeComponent,   canActivate : [authGuard]
     },
     {
-        'path': 'login', 'title': 'Login', component: LoginComponent
+        'path': 'login', 'title': 'Login', component: LoginComponent , // canActivate : [authGuard]
     },
     {
         'path': 'register', 'title': 'Register', component: RegisterComponent
     },
     {
-        'path': 'paymentdetails', 'title': 'Payment Details', component: PaymentDetailsComponent, // canActivate : [authGuard]
+        'path': 'paymentdetails', 'title': 'Payment Details', component: PaymentDetailsComponent,  canActivate : [authGuard]
     },
     {
         'path': 'update-paymentdetails', 'title': 'Payment Details', component: PaymentDetailsUpdateFormComponent
     },
     {
-        'path': 'genAI/textonly', 'title': 'Text Only Input', component: TextOnlyComponent, // canActivate: [authGuard]
+        'path': 'genAI/textonly', 'title': 'Text Only Input', component: TextOnlyComponent,  canActivate: [authGuard]
     },
     {
-        'path': 'genAI/textandimageonly', 'title': 'Image & Text Only Input', component: TextAndImageOnlyComponent, // canActivate : [authGuard]
+        'path': 'genAI/textandimageonly', 'title': 'Image & Text Only Input', component: TextAndImageOnlyComponent,  canActivate : [authGuard]
     },
     {
         'path': '**', 'title': 'Page Not Found', component: PageNotFoundComponent

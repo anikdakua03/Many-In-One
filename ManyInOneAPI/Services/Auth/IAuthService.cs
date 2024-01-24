@@ -12,9 +12,10 @@ namespace ManyInOneAPI.Services.Auth
 
         public Task<AuthResult> LoginWithGoogle(string credentials);
 
+        public Task<AuthResult> SignOutUser();
         public Task<AuthResult> GetRefreshToken();
 
-
+        public Task<AuthResult> CheckCurrentUser();
         public Task<AuthResult> RevokeToken();
     }
 }

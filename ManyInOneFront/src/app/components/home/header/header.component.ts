@@ -12,17 +12,12 @@ import { AuthenticationService } from '../../../shared/services/authentication.s
 })
 export class HeaderComponent {
 
-  userStatus: boolean = false;
 
-  constructor(private authService: AuthenticationService, private router: Router) {
-    debugger
-    this.userStatus = this.authService.isLoggegIn();
-    console.log("From navbar-->", this.userStatus);
+  constructor(protected authService: AuthenticationService, private router: Router) {
   }
 
   onLogout() {
     this.authService.logout();
-    this.userStatus = false;
-    this.router.navigate(['/login']);
+    this.router.navigateByUrl('/'); // go to home
   }
 }
