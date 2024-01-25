@@ -16,7 +16,7 @@ export class TextOnlyComponent {
 
   // @ViewChild(LoaderComponent) loader?: LoaderComponent;
 
-  response: any = "";
+  response: any = "test";
 
   inputForm: FormGroup = new FormGroup({
     inputText: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(50)]),
@@ -55,5 +55,11 @@ export class TextOnlyComponent {
     else {
       console.error("Please ask your query !!");
     }
+  }
+
+  clearAll()
+  {
+    this.inputForm.reset();
+    this.response = "";
   }
 }

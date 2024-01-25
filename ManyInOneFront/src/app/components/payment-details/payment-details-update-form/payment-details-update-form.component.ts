@@ -46,7 +46,7 @@ export class PaymentDetailsUpdateFormComponent {
     });
 
     // route to details page of pament
-    this.router.navigate(["/paymentdetails"]);
+    this.router.navigateByUrl("/paymentdetails");
   }
 
   getAllPaymentDetails() {

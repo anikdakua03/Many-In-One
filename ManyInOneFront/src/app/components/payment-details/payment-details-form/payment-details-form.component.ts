@@ -82,10 +82,10 @@ export class PaymentDetailsFormComponent {
   // updating records
   updateRecord() {
     const obj = this.paymentForm.value;
-    console.log("Before patching --> ", obj);
+    // console.log("Before patching --> ", obj);
 
-    const obj1 = this.paymentForm.patchValue(obj);
-    console.log("After patching --> ", obj1);
+    // const obj1 = this.paymentForm.patchValue(obj);
+    // console.log("After patching --> ", obj1);
 
     this.service.updatePaymentDetails(obj)
       .subscribe(

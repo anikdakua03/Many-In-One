@@ -31,7 +31,7 @@ export class PaymentDetailsComponent {
     this.service.paymentFormToUpdate = selectedRecord;
     console.log("Still on payment -->", this.service.paymentFormToUpdate);
     // to update form component
-    this.router.navigate(["/update-paymentdetails"]);
+    this.router.navigateByUrl("/update-paymentdetails");
 
     // const obj = this.service.formData;
     // console.log(obj);

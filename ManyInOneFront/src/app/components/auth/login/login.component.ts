@@ -8,6 +8,7 @@ import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router, RouterLink } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +26,8 @@ export class LoginComponent {
   loginForm!: FormGroup;
 
 
-  constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) {
+  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, private cookie : CookieService) 
+  {
     this.loginForm = this.fb.group({
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
@@ -54,7 +56,7 @@ export class LoginComponent {
 
       // will send to google with all above info 
       // google will give some info and token
-      google.accounts.id.prompt((notification: PromptMomentNotification) => (console.log("Some response from google --> ", notification)));
+      google.accounts.id.prompt((notification: PromptMomentNotification) => (""));
     }
   }
 
@@ -82,12 +84,10 @@ export class LoginComponent {
         next:
           res => {
             // console.log(res);
-
-            // this.authService.isAuthenticated = true;
-
-            // localStorage.setItem("x-access-token", res.token);
+            // get the user user email or something and set to cookie for ui interaction according to it
+            this.authService.saveToken(this.loginForm.value.email);
             this.toaster.success("Login Successful !!", "User Logged in");
-            this.router.navigate(["/home"]);
+            this.router.navigateByUrl("/home");
           },
         error:
           err => {

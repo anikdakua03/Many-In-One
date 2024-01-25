@@ -53,7 +53,7 @@ export class RegisterComponent {
 
       // will send to google with all above info 
       // google will give some info and token
-      google.accounts.id.prompt((notification: PromptMomentNotification) => (console.log("Some response from google --> ", notification)));
+      google.accounts.id.prompt((notification: PromptMomentNotification) => (""));
     }
   }
 
@@ -63,7 +63,7 @@ export class RegisterComponent {
     this.authService.registerWithGoogle(response.credential).subscribe(res => {
       // localStorage.setItem("x-access-token", res.token);
       this._ngZone.run(() => {
-        this.router.navigate(['/home']);
+        this.router.navigateByUrl('/home');
         this.toaster.success("Registered with google Successful !!", "User Registered successfully !!");
       });
     },
@@ -87,6 +87,8 @@ export class RegisterComponent {
         next:
           res => {
             console.log(res);
+            // get the user user email or something and set to cookie for ui interaction according to it
+            this.authService.saveToken(this.registerForm.value.email);
             this.toaster.success("Registeration Successful !!", "User registered");
           },
         error:

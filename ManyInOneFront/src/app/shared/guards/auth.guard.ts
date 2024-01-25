@@ -12,7 +12,7 @@ export const authGuard = () =>{
     }
     else
     {
-        route.navigate(['/login']);
+        route.navigateByUrl('/login');
         return false;
     }
 }

@@ -212,6 +212,20 @@ namespace ManyInOneAPI.Controllers.Auth
         }
 
 
+        [HttpPost]
+        [Route("SignOut")]
+        public async Task<IActionResult> SignOutuser()
+        {
+            
+            var res = await _authService.SignOutUser();
+
+            if (res.Errors is null)
+            {
+                return Ok(res);
+            }
+            return Unauthorized("Invalid user !!");
+        }
+
         [HttpGet]
         [Route("GetRefreshToken")]
         public async Task<ActionResult<string>> GetRefreshToken()
@@ -245,7 +259,21 @@ namespace ManyInOneAPI.Controllers.Auth
             //// other wiser generate refresh token
             //GenerateRefreshToken();
 
-            return Unauthorized("Refresh token ret into cookies successfully !! ");
+            return Unauthorized(res.Errors);
+        }
+
+        [HttpGet]
+        [Route("GetCurrentUser")]
+        public async Task<IActionResult> CheckCurrentUser()
+        {
+
+            var res = await _authService.CheckCurrentUser();
+
+            if (res.Errors is null)
+            {
+                return Ok(res);
+            }
+            return Unauthorized(res.Errors);
         }
 
         [HttpDelete]
@@ -270,7 +298,7 @@ namespace ManyInOneAPI.Controllers.Auth
             //_dbContext.RefreshTokens.RemoveRange(refToken!);
             //await _dbContext.SaveChangesAsync();
 
-            return BadRequest($"Error while revoking ==> {res.Errors}");
+            return BadRequest($"Error while revoking ==> {res.Errors[0]}");
         }
 
 
