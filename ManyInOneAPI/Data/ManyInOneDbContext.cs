@@ -11,8 +11,14 @@ namespace ManyInOneAPI.Data
         public ManyInOneDbContext(DbContextOptions<ManyInOneDbContext> options) : base(options)
         {
                 
-        }        
+        }
 
+        // when working IdentityDbContext , this on nodek creating methods needs to be here to
+        // correctly configure all key relation mapping to identity table.
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<PaymentDetail> PaymentDetails { get; set; }

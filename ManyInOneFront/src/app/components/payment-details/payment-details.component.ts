@@ -2,18 +2,25 @@ import { Component } from '@angular/core';
 import { PaymentService } from '../../shared/services/payment.service';
 import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PaymentDetailsFormComponent } from './payment-details-form/payment-details-form.component';
 import { PaymentDetailsUpdateFormComponent } from './payment-details-update-form/payment-details-update-form.component';
+import { TableSearchFilterPipe } from "../../shared/constants/table-search-filter.pipe";
 
 @Component({
-  selector: 'app-payment-details',
-  standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent, PaymentDetailsUpdateFormComponent],
-  templateUrl: './payment-details.component.html',
-  styles: ``
+    selector: 'app-payment-details',
+    standalone: true,
+    templateUrl: './payment-details.component.html',
+    styles: ``,
+    imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent, PaymentDetailsUpdateFormComponent, TableSearchFilterPipe]
 })
 export class PaymentDetailsComponent {
+
+  // filterForm: FormGroup = new FormGroup({
+  //   searchText: new FormControl<string>('')
+  // });
+  // filterFormSubsription: Subscription;
+  searchText: string = '';
 
   constructor(public service: PaymentService, private router: Router, private toaster: ToastrService) {
 

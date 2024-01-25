@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -135,6 +136,26 @@ namespace ManyInOneAPI.Controllers.Auth
             return BadRequest("Invalid request !! ");
         }
 
+        [HttpGet]
+        [Route("ConfirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            var res = await _authService.ConfirmUserEmail(userId, code);
+
+            if(res.Result && res.Errors is null || res.Errors!.Count() == 0)
+            {
+                //string htmlContent = $"<p>Your account has been confirmed!</p><p>Click here to login: <a href='/login'>Login</a></p>";
+                return new ContentResult()
+                {
+                    Content = res.Message,
+                    ContentType = "text/html",
+                    StatusCode = 200
+                };
+                //return Ok(res);
+            }
+            return BadRequest("Invalid request !! ");
+        }
+
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDTO userRequestDTO)
@@ -143,26 +164,14 @@ namespace ManyInOneAPI.Controllers.Auth
             {
                 var res = await _authService.Login(userRequestDTO);
 
-                if(res.Errors is null)
+                if(res.Errors is null ) //&& !res.TwoFAEnabled
                 {
                     return Ok(res);
                 }
-                //var existingUser = await _userManager.FindByEmailAsync(userRequestDTO.Email);
-
-                //if (existingUser is null)
+                //else if(res.Errors is null && res.TwoFAEnabled)
                 //{
-                //    return BadRequest("User doesn't exists !!!");
+                //    return Redirect(res.Message!);
                 //}
-
-                //// then check password user
-                //var passwordMatch = await _userManager.CheckPasswordAsync(existingUser, userRequestDTO.Password!);
-
-                //if(!passwordMatch)
-                //{
-                //    return BadRequest("Invalid user !!");
-                //}
-
-                //var jwttoken = GenerateJwtToken(existingUser);
 
                 return BadRequest(res.Errors);
             }
@@ -211,6 +220,73 @@ namespace ManyInOneAPI.Controllers.Auth
             return BadRequest("Invalid request !! ");
         }
 
+        [HttpPost]
+        [Route("VerifyAndLoginWith2FA")]
+        public async Task<IActionResult> LoginWith2FA([FromBody] string code)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _authService.VerifyAndLoginWith2FA(code);
+
+                if (res.Result)
+                {
+                    return Ok(res);
+                }
+
+                return BadRequest("Error generating two factor qr code..");
+            }
+            return BadRequest("Invalid request !! ");
+        }
+
+        [HttpPost]
+        [Route("Verify2FA")]
+        public async Task<IActionResult> Verify2FA([FromBody] string code)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _authService.Verify2FA(code);
+
+                if (res.Result)
+                {
+                    return Ok(res);
+                }
+
+                return BadRequest(res.Message);
+            }
+            return BadRequest("Invalid request !! ");
+        }
+
+        [HttpPost]
+        [Route("Get2FAQRCode")]
+        public async Task<IActionResult> Enable2FAAndGetQR([FromBody] string userId)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _authService.LoadSharedKeyAndQrCodeUriAsync(userId);
+
+                if (res.Result)
+                {
+                    return Ok(res);
+                }
+
+                return BadRequest("Error generating two factor qr code..");
+            }
+            return BadRequest("Invalid request !! ");
+        }
+
+        [HttpPost]
+        [Route("Disable2FA")]
+        public async Task<IActionResult> Disable2FA()
+        {
+            var res = await _authService.Disable2FA();
+
+            if (res.Result)
+            {
+                return Ok(res);
+            }
+
+            return BadRequest(res.Errors![0]);
+        }
 
         [HttpPost]
         [Route("SignOut")]
@@ -302,6 +378,19 @@ namespace ManyInOneAPI.Controllers.Auth
         }
 
 
+        [HttpPost]
+        [Route("DeleteUserData")]
+        public async Task<ActionResult<string>> DeleteUserData()
+        {
+            var res = await _authService.DeleteAllData();
+
+            if (res.Errors is null)
+            {
+                return Ok(res);
+            }
+
+            return BadRequest($"Error while revoking ==> {res.Errors[0]}");
+        }
         //#region All Utilities
         ////=============================================== Utilities =====================================================
         //private async Task<string> GenerateJwtToken(IdentityUser user)

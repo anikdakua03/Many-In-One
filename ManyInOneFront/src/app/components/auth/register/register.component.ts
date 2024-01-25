@@ -27,6 +27,7 @@ export class RegisterComponent {
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) {
     
     this.registerForm = this.fb.group({
+      name: new FormControl("", [Validators.required,]),
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
     });

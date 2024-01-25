@@ -194,7 +194,7 @@ namespace ManyInOneAPI.Services.GenAI
             var  jsonData = JsonSerializer.Deserialize<TextOnlyResponse>(responseString)!;
             //string extractedText = jsonData.candidates[0].content.parts[0].text;
 
-            return jsonData.candidates[0].content.parts[0].text!;
+            return jsonData!.candidates![0].content!.parts![0].text!;
         }
 
         #endregion

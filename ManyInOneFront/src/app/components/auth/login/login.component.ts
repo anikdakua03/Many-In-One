@@ -21,7 +21,7 @@ export class LoginComponent {
 
   clientId: string = environment.clientId;
 
-  // loginDto: Login = new Login();
+
   authResponseDto: AuthResponse = new AuthResponse();
   loginForm!: FormGroup;
 
@@ -83,11 +83,17 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next:
           res => {
-            // console.log(res);
-            // get the user user email or something and set to cookie for ui interaction according to it
-            this.authService.saveToken(this.loginForm.value.email);
-            this.toaster.success("Login Successful !!", "User Logged in");
-            this.router.navigateByUrl("/home");
+            console.log(res.userId);
+            if (!res.twoFAEnabled) {
+              // get the user user email or something and set to cookie for ui interaction according to it
+              this.authService.saveToken(res.userId);
+              sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+              this.toaster.success("Login Successful !!", "User Logged in");
+              this.router.navigateByUrl("/home");
+            }
+            else {
+              this.router.navigateByUrl("/login/2FA");
+            }
           },
         error:
           err => {
@@ -101,9 +107,4 @@ export class LoginComponent {
     }
   }
 
-  // on login with googlw
-  onGoogleLogin() {
-    console.log("ok logged in with google");
-    return "ok logged in with google";
-  }
 }

@@ -9,6 +9,10 @@ import { PaymentDetailsUpdateFormComponent } from './components/payment-details/
 import { TextOnlyComponent } from './components/genAI/text-only/text-only.component';
 import { TextAndImageOnlyComponent } from './components/genAI/text-and-image-only/text-and-image-only.component';
 import { authGuard } from './shared/guards/auth.guard';
+import { ManageAuthComponent } from './components/auth/manage-auth/manage-auth.component';
+import { Enable2FAComponent } from './components/auth/2FA/enable2-fa/enable2-fa.component';
+import { Disable2FAComponent } from './components/auth/2FA/disable2-fa/disable2-fa.component';
+import { TwoFALoginComponent } from './components/auth/two-falogin/two-falogin.component';
 
 export const routes: Routes = [
     {
@@ -18,16 +22,33 @@ export const routes: Routes = [
         'path': 'home', 'title': 'Home', component: HomeComponent,   canActivate : [authGuard]
     },
     {
-        'path': 'login', 'title': 'Login', component: LoginComponent , // canActivate : [authGuard]
+        'path': 'login', 'title': 'Login', component: LoginComponent, 
+        // children: [
+        //     {
+        //         'path': '2FAa', 'title': 'Login | 2FA', component: TwoFALoginComponent, // canActivate : [authGuard]
+        //     },
+        // ]
+    },
+    {
+        'path': 'login/2FA', 'title': 'Login with 2FA', component: TwoFALoginComponent, // canActivate : [authGuard]
+    },
+    {
+        'path': 'manage', 'title': 'Manage', component: ManageAuthComponent, // canActivate : [authGuard]
+    },
+    {
+        'path': 'manage/enable-2FA', 'title': 'Manage', component: Enable2FAComponent, // canActivate : [authGuard]
+    },
+    {
+        'path': 'manage/disable-2FA', 'title': 'Manage', component: Disable2FAComponent, // canActivate : [authGuard]
     },
     {
         'path': 'register', 'title': 'Register', component: RegisterComponent
     },
     {
-        'path': 'paymentdetails', 'title': 'Payment Details', component: PaymentDetailsComponent,  canActivate : [authGuard]
+        'path': 'paymentdetails', 'title': 'Payment Details', component: PaymentDetailsComponent, // canActivate : [authGuard]
     },
     {
-        'path': 'update-paymentdetails', 'title': 'Payment Details', component: PaymentDetailsUpdateFormComponent
+        'path': 'update-paymentdetails', 'title': 'Payment Details', component: PaymentDetailsUpdateFormComponent, canActivate: [authGuard]
     },
     {
         'path': 'genAI/textonly', 'title': 'Text Only Input', component: TextOnlyComponent,  canActivate: [authGuard]
