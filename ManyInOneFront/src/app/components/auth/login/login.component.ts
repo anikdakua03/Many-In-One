@@ -26,8 +26,13 @@ export class LoginComponent {
   loginForm!: FormGroup;
 
 
-  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, private cookie : CookieService) 
+  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) 
   {
+    debugger
+    if(authService.currUserSignal())
+    {
+      router.navigateByUrl('/home'); // if user already logged in , why they should go to login page
+    }
     this.loginForm = this.fb.group({
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
@@ -87,7 +92,9 @@ export class LoginComponent {
             if (!res.twoFAEnabled) {
               // get the user user email or something and set to cookie for ui interaction according to it
               this.authService.saveToken(res.userId);
-              sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+              // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+              // set the user signal for whole application
+              this.authService.currUserSignal.set(res);
               this.toaster.success("Login Successful !!", "User Logged in");
               this.router.navigateByUrl("/home");
             }

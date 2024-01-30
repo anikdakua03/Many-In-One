@@ -28,7 +28,7 @@ export class PaymentDetailsUpdateFormComponent {
     // wherever this page is called it will get all the details first
     this.getAllPaymentDetails();
   }
-
+  
   onSubmit() {
     console.log("After clicking update details", this.updateForm.value);
 

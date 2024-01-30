@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -12,16 +12,16 @@ import { Router } from '@angular/router';
 export class AuthenticationService {
 
   // check user is logged in or not
-  // isAuthenticated : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  currUserSignal = signal<AuthResponse | null | undefined>(undefined);// when not null or not logged in in -> undefined , when not authenticated  -> null , when authenticated -> got response , where ther will be user id
   isAuthenticated: boolean = false;
 
   baseUrl: string = environment.apiBaseUrl;
 
-  registerUrl: string = "auth/Register";
+  registerUrl: string = "auth/Registerrrrr";
   loginUrl: string = "auth/Login";
 
 
-  constructor(private http: HttpClient, private cookie : CookieService, private route : Router) {
+  constructor(private http: HttpClient) {
   }
 
   // registration
@@ -56,6 +56,7 @@ export class AuthenticationService {
     
     this.signOut().subscribe({
       next : res => {
+        this.currUserSignal.set(null);
         console.log(res);
         if(res.result)
         {

@@ -9,12 +9,15 @@
                     <a routerLink="genAI/textonly" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Text Only</a>
                     <a routerLink="genAI/textandimageonly" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Text
                         and Image</a>
+                @if(authService.currUserSignal() !== null && authService.currUserSignal() !== undefined)
+                {
                     <a routerLink="manage" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Manage</a>
+                }
                 </div>
             </div>
             <div class="flex space-x-4 items-center">
 
-                @if(authService.isAuthenticated)
+                @if(authService.currUserSignal())
                 {
                 <button type="submit" (click)="onLogout()"
                     class="bg-red-400 px-4 py-2 rounded text-white cursor-pointer font-bold hover:bg-indigo-500 text-sm">Log
