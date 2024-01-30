@@ -19,7 +19,7 @@ export class TwoFALoginComponent {
   twoFALoginForm!: FormGroup;
 
 
-  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router) {
+  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private cookie: CookieService) {
 
     this.twoFALoginForm = this.fb.group({
       twoFACode: new FormControl("", [Validators.required, Validators.minLength(6), Validators.maxLength(6)])
@@ -33,7 +33,7 @@ export class TwoFALoginComponent {
           console.log(res);
           // get the user user email or something and set to cookie for ui interaction according to it
           this.authService.saveToken(res.userId);
-          // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+          sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
           this.toaster.success("Login Successful !!", "User Logged in");
           this.router.navigateByUrl("/home");
         }

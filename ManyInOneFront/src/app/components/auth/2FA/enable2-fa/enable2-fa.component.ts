@@ -22,15 +22,15 @@ export class Enable2FAComponent {
   twoFAForm!: FormGroup;
   constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService)
   {
-    // this.is2FAEnabled = sessionStorage.getItem("two-fa") ==  "true" ? true : false;
+    debugger
+    this.is2FAEnabled = sessionStorage.getItem("two-fa") ==  "true" ? true : false;
 
     // if two factor is not enabled , then will show and load qr and then cod eto verufy
-    // const userId  = sessionStorage.getItem("curr-app-user");
-    if(this.authService.currUserSignal()?.twoFAEnabled === false && this.authService.currUserSignal()?.userId !== null)
+    const userId  = sessionStorage.getItem("curr-app-user");
+    if(this.is2FAEnabled == false && userId != null)
     {
-      const userid = this.authService.currUserSignal()?.userId || "";
       // call the load and share qr code
-      this.authService.loadAndShareQR(userid).subscribe({
+      this.authService.loadAndShareQR(userId).subscribe({
         next : res => {
           this.sharedKey = res.sharedKey;
           this.qrURI = res.qr;
@@ -52,7 +52,7 @@ export class Enable2FAComponent {
         next : res => {
           console.log("code verification", res);
           this.toaster.success("Code verifed successfully !!", "2 FA code verification");
-          // sessionStorage.setItem("two-fa", "true");
+          sessionStorage.setItem("two-fa", "true");
         }
       });
     }

@@ -18,24 +18,17 @@ namespace ManyInOneAPI.Controllers.GenAI
         }
 
         [HttpPost("TextOnly")]
-        public async Task<IActionResult> GetTextOnlyInput([Required] TextOnly input)
+        public async Task<ActionResult<GenAIResponse>> GetTextOnlyInput([Required] TextOnly input)
         {
-            try
-            {
-                var res = await _geAIHttpClient.TextOnlyInput(input);
+            var res = await _geAIHttpClient.TextOnlyInput(input);
 
-                //if(res)
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            //if(res)
+            return Ok(res);
         }
 
         [HttpPost("TextAndImage"), DisableRequestSizeLimit]
         //[Consumes("multipart/form-data")]
-        public async Task<IActionResult> TextAndImageAsInput() // [FromForm] IFormFile formFile, string inputText
+        public async Task<ActionResult<GenAIResponse>> TextAndImageAsInput() // [FromForm] IFormFile formFile, string inputText
         {
             try
             {
@@ -48,7 +41,7 @@ namespace ManyInOneAPI.Controllers.GenAI
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest($"Message :--> {ex.Message}");
             }
         }
 
