@@ -30,7 +30,8 @@ builder.Services.AddDbContext<ManyInOneDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
-
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("MailConfig"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor(); // AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -46,11 +47,9 @@ builder.Services.AddHttpClient<IGenAIHttpClient, GenAIHttpClient>(client =>
 // for user 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
-    // currently not making it true 
-    // then we need to confirm our account to be signed in
-    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedAccount = true;
     options.SignIn.RequireConfirmedPhoneNumber = false;
-    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedEmail = true;
 
 }).AddEntityFrameworkStores<ManyInOneDbContext>();
 

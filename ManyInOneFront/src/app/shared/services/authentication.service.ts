@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -12,16 +12,16 @@ import { Router } from '@angular/router';
 export class AuthenticationService {
 
   // check user is logged in or not
-  // isAuthenticated : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  currUserSignal = signal<AuthResponse | null | undefined>(undefined);// when not null or not logged in in -> undefined , when not authenticated  -> null , when authenticated -> got response , where ther will be user id
   isAuthenticated: boolean = false;
 
   baseUrl: string = environment.apiBaseUrl;
 
-  registerUrl: string = "auth/Register";
+  registerUrl: string = "auth/Registerrrrr";
   loginUrl: string = "auth/Login";
 
 
-  constructor(private http: HttpClient, private cookie : CookieService, private route : Router) {
+  constructor(private http: HttpClient) {
   }
 
   // registration
@@ -56,6 +56,7 @@ export class AuthenticationService {
     
     this.signOut().subscribe({
       next : res => {
+        this.currUserSignal.set(null);
         console.log(res);
         if(res.result)
         {
@@ -81,6 +82,36 @@ export class AuthenticationService {
     return this.http.delete(`${this.baseUrl}Auth/RevokeToken`, {headers : header, withCredentials : true});
   }
 
+  // verify and login with 2fa
+  verifyAndLogin(twoFACode: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}Auth/VerifyAndLoginWith2FA`, twoFACode, { withCredentials: true });
+  }
+
+  // load and share qr and shared key
+  loadAndShareQR(userId: string): Observable<any> {
+    const header = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.http.post(`${this.baseUrl}Auth/Get2FAQRCodeeeeeee`, JSON.stringify(userId), { headers: header, withCredentials: true });
+  }
+
+  // verify 2 FA code
+  verifyFACode(code: string): Observable<any> {
+    const header = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.http.post(`${this.baseUrl}Auth/Verify2FA`, JSON.stringify(code), { headers: header, withCredentials: true });
+  }
+
+  // disbling authenticator
+  disableAuthenticator(): Observable<any> {
+    const header = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.http.post(`${this.baseUrl}Auth/Disable2FA`, { headers: header, withCredentials: true });
+  }
+
+  // delete all data relted to the user
+  deleteAllUserData() : Observable<any>
+  {
+    const header = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.http.post(`${this.baseUrl}Auth/DeleteUserData`, { headers: header, withCredentials: true });
+  }
+
   // ================================================Token related =====================================
   // this can be sfifted to another service
   updateToken(status: boolean) {
@@ -92,7 +123,8 @@ export class AuthenticationService {
 
   saveToken(token: string) {
     // get the user user email or something and set to cookie for ui interaction according to it
-    this.cookie.set("curr-app-user", encodeURIComponent(token));
+    console.log("first", token)
+    sessionStorage.setItem("curr-app-user", token);
   }
 
 
@@ -103,18 +135,19 @@ export class AuthenticationService {
 
   isLoggegIn():  boolean
   {
-    this.getCurrentUser().subscribe({
-      next : res => {
+    // this.getCurrentUser().subscribe({
+    //   next : res => {
         // console.log("After checking froms erver also --> ",res);
-        this.saveToken(res.userEmail);
-        this.isAuthenticated = res.result;
+    // this.saveToken(res.);
+    const check = sessionStorage.getItem("curr-app-user");
+    this.isAuthenticated = check == null || undefined ? false : true;
         // this.route.navigate(["/home"]);
         // console.log("autheee -->", this.isAuthenticated);
-      },
-      error : err => {
-        // console.log("Invaliddd -->", err);
-      }
-    });
+    //   },
+    //   error : err => {
+    //     // console.log("Invaliddd -->", err);
+    //   }
+    // });
 
     // after matchis from server also
     if(this.isAuthenticated)
@@ -131,13 +164,13 @@ export class AuthenticationService {
   removeToken() {
     // deleteing only the access token bcs it is loggin out manually
     // so next time user log s in , it only need s to get access token
-    this.cookie.delete("curr-app-user");  
+    sessionStorage.clear();  
     // window.location.reload();
   }
 
   getToken(): string | null {
     // will get current token , else return null
-    return this.cookie.get("curr-app-user") || null;
+    return sessionStorage.getItem("curr-app-user") || null;
   }
 }
 

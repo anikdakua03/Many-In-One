@@ -19,6 +19,7 @@
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/router": "^17.0.0",
     "@types/google-one-tap": "^1.2.6",
+    "angularx-qrcode": "^17.0.0",
     "clipboard": "^2.0.11",
     "katex": "^0.16.0",
     "ngx-cookie-service": "^17.0.1",

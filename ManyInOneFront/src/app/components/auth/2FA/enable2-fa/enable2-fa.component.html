@@ -1,0 +1,64 @@
+@if(!is2FAEnabled){
+    <div class="content-center pt-16 ml-[75px]">
+    <p class="font-bold text-2xl text-blue-500">Enable Two Factor Authentication</p>
+    <div>
+        <p class="mb-2 mt-4 text-lg font-semibold text-gray-900 underline">To use an authenticator app go through the following steps:</p>
+        <ul class="space-y-1 list-disc">
+            <li >
+                <p class="mb-2 w-full mt-4 text-xl">
+                    Download a two-factor authenticator app like Microsoft Authenticator for
+                    <a class="font-semibold text-blue-600 dark:text-blue-500 hover:underline" href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
+                    <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
+                    Google Authenticator for
+                    <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a>
+                    and
+                    <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
+                </p>
+            </li>
+            <li>
+                <p class="mb-2 w-full mt-4 text-xl">Scan the QR Code or enter this key <strong>{{sharedKey}}</strong>  into your two factor authenticator app.
+                    Spaces and casing do not matter. 
+                </p>
+                <div class="alert alert-info">Learn how to <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="https://go.microsoft.com/fwlink/?Linkid=852423">enable
+                        QR code generation</a>.</div>
+                <!-- <img src="{{ qrCodeUrl }}" alt="Google Authenticator QR Code"> -->
+                <qrcode [qrdata]="qrURI" alt="Qr code" ariaLabel="Auth" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+            </li>
+            <li>
+                <p class="mb-2 w-full mt-4 text-lg">
+                    Once you have scanned the QR code or input the key above, your two factor authentication app will
+                    provide you
+                    with a unique code. Enter the code in the confirmation box below.
+                </p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form [formGroup]="twoFAForm" (click)="onVerify2fa()" novalidate autocomplete="off">
+                            <div class="form-floating mb-3">
+                                <!-- <input asp-for="Input.Code" class="form-control"  -->
+                                <!-- placeholder="Please enter the code." /> -->
+                                <label class="font-semibold text-xl">Verification Code</label>
+                                <span class="text-danger"></span>
+                                    <input type="number" autocomplete="off"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="Please enter the code." name="inputCode" formControlName="faCode" required>
+                            </div>
+                            <button type="button"
+                                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Verify 2FA</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+}
+@else {
+    <div class="justify-center ml-16">
+        <p class="text-4xl text-green-500 font-semibold pt-32">Two factor Authentication setted up !!</p>
+        <div class="pt-10 items-center content-center">
+            <a routerLink="/home"
+                class="text-white bg-yellow-700 hover:bg-yellow-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-900">Home</a>
+        </div>
+    </div>
+}

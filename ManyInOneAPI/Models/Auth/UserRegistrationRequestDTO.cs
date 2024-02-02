@@ -5,8 +5,8 @@ namespace ManyInOneAPI.Models.Auth
 {
     public class UserRegistrationRequestDTO
     {
-        [Required, MinLength(3)]
-        public string Name { get; set; } = String.Empty;
+        //[Required, MinLength(3)]
+        //public string Name { get; set; } = String.Empty;
 
         [Required, EmailAddress]
         public string Email { get; set; } = String.Empty;

@@ -16,7 +16,7 @@ export class TextOnlyComponent {
 
   // @ViewChild(LoaderComponent) loader?: LoaderComponent;
 
-  response: any = "test";
+  response: any = "";
 
   inputForm: FormGroup = new FormGroup({
     inputText: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(50)]),
@@ -28,6 +28,7 @@ export class TextOnlyComponent {
   }
 
   getAnswer() {
+    debugger
     const obj = this.inputForm.value;
     console.log(" Your query is componeent --> " + this.inputForm);
 
