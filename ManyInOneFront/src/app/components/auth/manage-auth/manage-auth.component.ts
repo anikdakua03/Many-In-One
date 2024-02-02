@@ -24,9 +24,9 @@ export class ManageAuthComponent {
     if(res)
     {
       this.authService.deleteAllUserData().subscribe({
-        next : res => {
+        next: re => {
           this.route.navigateByUrl('/');
-          sessionStorage.clear();
+          this.authService.removeToken();
           this.toaster.success("User's all data deleted successfully", "User data deletion");
         }
       });

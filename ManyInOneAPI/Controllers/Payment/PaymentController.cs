@@ -1,11 +1,13 @@
 ﻿using ManyInOneAPI.Models.Payment;
 using ManyInOneAPI.Repositories.Payment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManyInOneAPI.Controllers.Payment
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentDetailRepository _paymentDeatilsRepo;
@@ -19,39 +21,60 @@ namespace ManyInOneAPI.Controllers.Payment
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDetail>>> GetPaymentDetails()
         {
-            var res = await _paymentDeatilsRepo.GetPaymentDetails();
-            if (res == null)
+          try
             {
-                return NotFound("There is no payment deatils yet !!");
-            }
+                var res = await _paymentDeatilsRepo.GetPaymentDetails();
+                if (res == null)
+                {
+                    return NotFound("There is no payment deatils yet !!");
+                }
 
-            return Ok(res.ToList());
+                return Ok(res.ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET : api/PaymentDeatils/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDetail>> GetPaymentDetailById(int id)
         {
-            var res = await _paymentDeatilsRepo.GetPaymentDetailById(id);
-            if (res == null)
+                      try
             {
-                return NotFound($"There is no payment deatils with this id {id} !!");
-            }
+                var res = await _paymentDeatilsRepo.GetPaymentDetailById(id);
+                if (res == null)
+                {
+                    return NotFound($"There is no payment deatils with this id {id} !!");
+                }
 
-            return Ok(res);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST : api/PaymentDeatils/
         [HttpPost]
         public async Task<ActionResult<PaymentDetail>> AddPaymentDetail([FromBody]PaymentDetail paymentDetail)
         {
-            var res = await _paymentDeatilsRepo.AddPaymentDetail(paymentDetail);
-            if (res == null)
+                      try
             {
-                return BadRequest("Unable to add payment deatils !!");
-            }
+                var res = await _paymentDeatilsRepo.AddPaymentDetail(paymentDetail);
+                if (res == null)
+                {
+                    return BadRequest("Unable to add payment deatils !!");
+                }
 
-            return CreatedAtAction("GetPaymentDetailById", new { id = res.PaymentDetailId }, res);
+                return CreatedAtAction("GetPaymentDetailById", new { id = res.PaymentDetailId }, res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT : api/PaymentDeatils/{id}
@@ -81,9 +104,16 @@ namespace ManyInOneAPI.Controllers.Payment
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeletePaymentDetailById(int id)
         {
-            var res = await _paymentDeatilsRepo.DeletePaymentDetailById(id);
+            try
+            {
+                var res = await _paymentDeatilsRepo.DeletePaymentDetailById(id);
 
-            return Ok(res);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ export class RegisterComponent {
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) {
     
     this.registerForm = this.fb.group({
-      name: new FormControl("", [Validators.required,]),
+      // name: new FormControl("", [Validators.required,]),
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
     });
@@ -74,23 +74,17 @@ export class RegisterComponent {
       });
   }
 
-  //user registering with google
-  onGoogleRegister() {
-    console.log("ok registered with google");
-    return "ok registered in with google";
-  }
-
   // registerDto : Register
   onRegister() {
     if (this.registerForm.valid) {
-      console.log("Register form ---> ", this.registerForm.value);
+      // console.log("Register form ---> ", this.registerForm.value);
       this.authService.register(this.registerForm.value).subscribe({
         next:
           res => {
             console.log(res);
             // get the user user email or something and set to cookie for ui interaction according to it
-            this.authService.saveToken(this.registerForm.value.email);
-            this.toaster.success("Registeration Successful !!", "User registered");
+            // this.authService.saveToken(this.registerForm.value.email);
+            this.toaster.success(res.message, "User registered");
           },
         error:
           err => {

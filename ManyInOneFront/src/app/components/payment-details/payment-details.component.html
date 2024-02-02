@@ -1,29 +1,97 @@
 <div class="row mt-5 pt-10">
     <div class="col-6">
+        @if(isOpen)
+        {
+        <div class="justify-center items-center ml-52 pt-5">
+            <div class="text-2xl font-bold text-yellow-700 underline">
+                Update Payment Details
+            </div>
+            <div class="w-72">
+                <form [formGroup]="updateForm" (submit)="onSubmit()" [class.submitted]="service.formSubmitted" novalidate
+                    autocomplete="off">
+        
+                    <input type="hidden" name="paymentDetailId" [value]="service.formData.paymentDetailId">
+                    <div class="mb-3">
+                        <label class="block mb-2 text-lg font-medium text-gray-900">Card Owner Name</label>
+                        <input type="text" formControlName="cardOwnerName"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Name on Card" name="cardOwnerName" required>
+                        @if(updateForm.controls['cardOwnerName'].errors && updateForm.controls['cardOwnerName'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card owner name
+                                is
+                                required</span> of minimium 4 length.
+                        </p>
+                        }
+        
+                    </div>
+        
+                    <div class="mb-3">
+                        <label class="block mb-2 text-lg font-medium text-gray-900">Card Number</label>
+                        <input type="text" formControlName="cardOwnerNumber"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="16 digit Card Number" name="cardNumber" formControlName="cardNumber" required>
+                        @if(updateForm.controls['cardNumber'].errors && updateForm.controls['cardNumber'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card number is
+                                of 16
+                                digits</span>
+                            required.
+                        </p>
+                        }
+                    </div>
+        
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label class="block mb-2 text-lg font-medium text-gray-900">Security Code</label>
+                            <input type="password" formControlName="cardOwnerName"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="CVV" type="password" name="securityCode" formControlName="securityCode" required>
+                            @if(updateForm.controls['securityCode'].errors && updateForm.controls['securityCode'].touched)
+                            {
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> - 3
+                                    digits</span>
+                                of security code required.
+                            </p>
+                            }
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label class="block mb-2 text-lg font-medium text-gray-900">Expiry Date</label>
+                            <input type="text" formControlName="cardOwnerName"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="MM/YY" name="expirationDate" formControlName="expirationDate" required>
+                            @if(updateForm.controls['expirationDate'].errors &&
+                            updateForm.controls['expirationDate'].touched)
+                            {
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> - Expiry
+                                    date</span>
+                                in MM/YY format required.
+                            </p>
+                            }
+                        </div>
+                    </div>
+        
+                    <div class="gap-12">
+                        <!-- [disabled]="!updateForm.valid" -->
+                        <button type="submit"
+                            class="text-white mr-12 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Update</button>
+                        <button
+                            class="text-white bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                            (click)="closePop()">Close</button>
+                    </div>
+        
+                </form>
+            </div>
+        </div>
+        }
+        @else {
         <app-payment-details-form></app-payment-details-form>
+        }
     </div>
 
 
     <div class="col-6 shadow-md sm:rounded-lg ml-4 mr-4 rounded-lg border-spacing-1">
         <div class="text-2xl font-bold bg-orange-300 text-center">Payment Details</div>
-        <!-- Table data search -->
-            <!-- <div class="pb-4 bg-white dark:bg-gray-900">
-                <label for="table-search" class="sr-only">Search</label>
-                <div class="relative mt-1">
-                    <div  class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                    </div>
-                </div> -->
-                <!-- <form [formGroup]="filterForm"> -->
-                        <!-- <input type="text" id="searchText" formControlName="searchText"
-                            class="block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Search for items">
-                <!-- </form> -->
-            <!-- </div> -->
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
@@ -59,7 +127,7 @@
                         {{pd.expirationDate}}
                     </td>
                     <td class="px-6 py-4">
-                        <a (click)="populateForm(pd)"
+                        <a (click)="openPop(pd)"
                             class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">Edit</a>
                     </td>
 

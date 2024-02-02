@@ -16,8 +16,22 @@ export class HeaderComponent {
   constructor(protected authService: AuthenticationService, private router: Router) {
   }
 
+  // logout
   onLogout() {
-    this.authService.logout();
-    this.router.navigateByUrl('/'); // go to home
+  
+    this.authService.signOut().subscribe({
+      next: res => {
+        console.log(res);
+        this.authService.currUserSignal.set(null);
+        if (res.result) {
+          this.authService.removeToken();
+          this.router.navigateByUrl('/'); // go to home
+          window.location.reload();
+        }
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
   }
 }

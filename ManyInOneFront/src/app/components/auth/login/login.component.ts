@@ -8,7 +8,6 @@ import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router, RouterLink } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login',
@@ -26,8 +25,12 @@ export class LoginComponent {
   loginForm!: FormGroup;
 
 
-  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, private cookie : CookieService) 
+  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) 
   {
+    // debugger
+    // if (authService.currUserSignal !== null && authService.currUserSignal !== undefined) {
+    //   router.navigateByUrl('/home'); // if user already logged in , why they should go to login page
+    // }
     this.loginForm = this.fb.group({
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
@@ -65,7 +68,11 @@ export class LoginComponent {
     this.authService.logInWithGoogle(response.credential).subscribe(res => {
       // localStorage.setItem("x-access-token", res.token);
       this._ngZone.run(() => {
+        // set the user signal for whole application
+        this.authService.currUserSignal.set(res);
+        this.authService.saveToken(res.userId);
         this.router.navigate(['/home']);
+        window.location.reload();
         this.toaster.success("Login Successful !!", "User Logged in");
       });
     },
@@ -87,7 +94,7 @@ export class LoginComponent {
             if (!res.twoFAEnabled) {
               // get the user user email or something and set to cookie for ui interaction according to it
               this.authService.saveToken(res.userId);
-              sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+              // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
               this.toaster.success("Login Successful !!", "User Logged in");
               this.router.navigateByUrl("/home");
             }

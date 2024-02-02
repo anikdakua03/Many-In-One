@@ -131,18 +131,18 @@ namespace ManyInOneAPI.Services.Auth
 
         private string GreetingHtmlBody()
         {
-            string emailBody = "<h1>Welcome to Many in One</h1>";
+            string emailBody = "<div style=\"text-align: center; vertical-align: middle; height: 100px;\"><h1>Welcome to Many in One</h1>";
             emailBody += "Please confirm your email !!<a href=\"#URL#\"> <strong>Click here</strong> </a>";
             emailBody += "<div style=\"width:100%;background-color:lightblue;text-align:center;margin:10px\">";
-            emailBody += "</div>";
+            emailBody += "</div></div>";
             return emailBody;
         }
         private string GetHtmlBody()
         {
-            string emailBody = "<h1>Welcome to Many in One</h1>";
+            string emailBody = "<div style=\"text-align: center; vertical-align: middle; height: 100px;\"><h1>Welcome to Many in One</h1>";
             emailBody += "Please confirm your email !!<a href=\"#URL#\"> <strong>Click here</strong> </a>";
             emailBody += "<div style=\"width:100%;background-color:lightblue;text-align:center;margin:10px\">";
-            emailBody += "</div>";
+            emailBody += "</div></div>";
             return emailBody;
         }
     }

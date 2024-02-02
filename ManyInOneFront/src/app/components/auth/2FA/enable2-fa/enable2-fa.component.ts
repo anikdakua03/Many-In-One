@@ -20,17 +20,23 @@ export class Enable2FAComponent {
   is2FAEnabled : boolean = false;
 
   twoFAForm!: FormGroup;
-  constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService)
+  constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService, private cookie : CookieService)
   {
-    debugger
-    this.is2FAEnabled = sessionStorage.getItem("two-fa") ==  "true" ? true : false;
-
     // if two factor is not enabled , then will show and load qr and then cod eto verufy
-    const userId  = sessionStorage.getItem("curr-app-user");
-    if(this.is2FAEnabled == false && userId != null)
+    // const userId  = sessionStorage.getItem("curr-app-user");
+    console.log("ghifdhgifudhg",this.authService.currUserSignal()?.userId) ;
+    // if(authService.currUserSignal() !== undefined || authService.currUserSignal() !== null)
+    // {
+    //   this.is2FAEnabled = authService.currUserSignal()?.twoFAEnabled ?? false;
+    // }
+
+    // if (this.authService.currUserSignal)
+    if (this.authService.isAuthenticated)
     {
-      // call the load and share qr code
-      this.authService.loadAndShareQR(userId).subscribe({
+      // call the load and share qr 
+      // const userid = this.authService.currUserSignal || "";
+      const userid = this.cookie.get("curr-app-user") || "";
+      this.authService.loadAndShareQR(userid).subscribe({
         next : res => {
           this.sharedKey = res.sharedKey;
           this.qrURI = res.qr;
@@ -52,7 +58,9 @@ export class Enable2FAComponent {
         next : res => {
           console.log("code verification", res);
           this.toaster.success("Code verifed successfully !!", "2 FA code verification");
-          sessionStorage.setItem("two-fa", "true");
+        },
+        error : err => {
+          this.toaster.error("Invalid code, try again ", " Two Factor code verifiaction");
         }
       });
     }
