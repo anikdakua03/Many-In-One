@@ -13,6 +13,7 @@ import { ManageAuthComponent } from './components/auth/manage-auth/manage-auth.c
 import { Enable2FAComponent } from './components/auth/2FA/enable2-fa/enable2-fa.component';
 import { Disable2FAComponent } from './components/auth/2FA/disable2-fa/disable2-fa.component';
 import { TwoFALoginComponent } from './components/auth/two-falogin/two-falogin.component';
+import { ClashingComponent } from './components/clashing/clashing.component';
 
 export const routes: Routes = [
     {
@@ -47,6 +48,9 @@ export const routes: Routes = [
     },
     {
         'path': 'genAI/textandimageonly', 'title': 'Image & Text Only Input', component: TextAndImageOnlyComponent,  canActivate : [authGuard]
+    },
+    {
+        'path': 'clashOfClans', 'title': 'Clashing', component: ClashingComponent,  //canActivate : [authGuard]
     },
     {
         'path': '**', 'title': 'Page Not Found', component: PageNotFoundComponent

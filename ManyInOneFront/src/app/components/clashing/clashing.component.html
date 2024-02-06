@@ -1,0 +1,45 @@
+<div class="pt-12 px-4">
+    <!-- Now all divssion can be started -->
+    <h1 class="text-center text-yellow-400 font-bold text-2xl">Clashing Informations </h1>
+
+    <button
+        class="text-white bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        (click)="fetchAllLocations()">Get All Locations</button>
+
+            <div class="col-6 shadow-md sm:rounded-lg ml-4 mr-4 rounded-lg border-spacing-1">
+                <div class="text-2xl font-bold bg-orange-300 text-center">Payment Details</div>
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 font-bold text-yellow-500">
+                                Country name
+                            </th>
+                            <th scope="col" class="px-6 py-3 font-bold text-yellow-500">
+                                Country or Not
+                            </th>
+                        </tr>
+                    </thead>
+                    @for (loc of locations  ; track loc.id )
+                    {
+                    <tbody>
+                        <tr
+                            class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{loc.name}}
+                            </th>
+                            <td class="px-6 py-4">
+                                {{ loc.isCountry}}
+                            </td>
+            
+                        </tr>
+                    </tbody>
+                    }
+                    @empty {
+                    <div>
+                        <h1 class="px-6 py-4 font-extrabold items-center content-center text-red-500"> No payment details added
+                            yet !!</h1>
+                    </div>
+                    }
+                </table>
+            </div>
+</div>

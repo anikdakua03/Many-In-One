@@ -12,6 +12,7 @@ namespace ManyInOneAPI.Services.GenAI
         private readonly GenAIConfig _genAiConfig;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly HttpClient _httpClient;
+
         public GenAIHttpClient(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IOptionsMonitor<GenAIConfig> optionsMonitor)
         {
             _httpClient = httpClient;

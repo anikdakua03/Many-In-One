@@ -2,6 +2,7 @@ using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
 using ManyInOneAPI.Repositories.Payment;
 using ManyInOneAPI.Services.Auth;
+using ManyInOneAPI.Services.Clasher;
 using ManyInOneAPI.Services.GenAI;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -24,24 +25,24 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // adding configurations
 builder.Services.Configure<AuthConfig>(builder.Configuration.GetSection("Auth"));
 builder.Services.Configure<GenAIConfig>(builder.Configuration.GetSection("GenAI"));
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("MailConfig"));
+builder.Services.Configure<ClasherConfig>(builder.Configuration.GetSection("Clasher"));
 
 builder.Services.AddDbContext<ManyInOneDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("MailConfig"));
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor(); // AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-builder.Services.AddHttpClient<IGenAIHttpClient, GenAIHttpClient>(client =>
+builder.Services.AddHttpClient<IGenAIHttpClient, GenAIHttpClient>();
+builder.Services.AddHttpClient<IClashingHttpClient, ClashingHttpClient>(client =>
 {
-    //var baseUrl = builder.Configuration.GetSection("GeminiAI").GetValue<string>("GenAIBaseUrl");
-    ////var visionBaseUrl = builder.Configuration.GetSection("GeminiAI").GetValue<string>("ProVisionUrl"); 
-    //client.BaseAddress = new Uri(baseUrl!);
-    ////client.BaseAddress = new Uri(visionBaseUrl!);
+    var baseUrl = builder.Configuration.GetSection("Clasher").GetValue<string>("ClasherAPIURL");
+    client.BaseAddress = new Uri(baseUrl!);
 });
 
 // for user 

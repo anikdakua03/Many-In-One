@@ -1,6 +1,6 @@
 ﻿using ManyInOneAPI.Models.GenAI;
 using ManyInOneAPI.Services.GenAI;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,21 +8,22 @@ namespace ManyInOneAPI.Controllers.GenAI
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class GenAIController : ControllerBase
     {
-        private readonly IGenAIHttpClient _geAIHttpClient;
+        private readonly IGenAIHttpClient _genAIHttpClient;
 
-        public GenAIController(IGenAIHttpClient geAIHttpClient)
+        public GenAIController(IGenAIHttpClient genAIHttpClient)
         {
-            _geAIHttpClient = geAIHttpClient;
+            _genAIHttpClient = genAIHttpClient;
         }
 
         [HttpPost("TextOnly")]
         public async Task<IActionResult> GetTextOnlyInput([Required] TextOnly input)
         {
-                        try
+            try
             {
-                var res = await _geAIHttpClient.TextOnlyInput(input);
+                var res = await _genAIHttpClient.TextOnlyInput(input);
 
                 //if(res)
                 return Ok(res);
@@ -43,7 +44,7 @@ namespace ManyInOneAPI.Controllers.GenAI
                 var file = Request.Form.Files[0];
                 string text = Request.Form["textInput"]!; // Access text input from FormData
 
-                var res = await _geAIHttpClient.TextAndImageAsInput(file, text);
+                var res = await _genAIHttpClient.TextAndImageAsInput(file, text);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -58,14 +59,14 @@ namespace ManyInOneAPI.Controllers.GenAI
         [HttpGet("GetModelByName")]
         public async Task<GenAIModelInfo> GetModelByName(string modelName)
         {
-            return await _geAIHttpClient.GetModelByName(modelName);
+            return await _genAIHttpClient.GetModelByName(modelName);
         }
 
         //Get list of all models
         [HttpGet]
         public async Task<List<GenAIModelInfo>> GetAllModels()
         {
-            return await _geAIHttpClient.GetAllModels();
+            return await _genAIHttpClient.GetAllModels();
         }
 
         #endregion
