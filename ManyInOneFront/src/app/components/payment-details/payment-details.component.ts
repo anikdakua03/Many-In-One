@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PaymentService } from '../../shared/services/payment.service';
 import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -14,15 +14,14 @@ import { TableSearchFilterPipe } from "../../shared/constants/table-search-filte
     styles: ``,
     imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent, PaymentDetailsUpdateFormComponent, TableSearchFilterPipe]
 })
-export class PaymentDetailsComponent {
+export class PaymentDetailsComponent implements OnInit {
 
   // filterForm: FormGroup = new FormGroup({
   //   searchText: new FormControl<string>('')
   // });
   // filterFormSubsription: Subscription;
   searchText: string = '';
-
-  oldForm : any = "";
+  oldForm: any = "";
   // pop up testing
   isOpen: boolean = false;
 
@@ -44,14 +43,15 @@ export class PaymentDetailsComponent {
     // this.loader?.showLoader(false);
   }
 
-  
+
   populateForm(selectedRecord: any) {
-    
+
     this.updateForm.patchValue(selectedRecord);
   }
-  
+
   // pop up testing
-  openPop(oldDetails : any) {
+  openPop(oldDetails: any) {
+    debugger
     this.isOpen = true;
     this.populateForm(oldDetails);
   }
@@ -70,11 +70,7 @@ export class PaymentDetailsComponent {
         console.log(err);
       }
     });
-
-    // route to details page of pament
-    this.router.navigateByUrl("/paymentdetails");
   }
-
 
   onDelete(id: any) {
     // before deleting need to confirm from user

@@ -18,10 +18,8 @@ export class Disable2FAComponent {
 
   onDisable2FA() 
   {
-    debugger
     this.authService.disableAuthenticator().subscribe({
       next: res => {
-        // sessionStorage.setItem("two-fa", "false");
         this.toaster.success("Disabled successfully !!", "2 FA code disable");
       },
       error: err => {

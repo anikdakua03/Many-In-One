@@ -4,6 +4,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import { HeaderComponent } from './components/home/header/header.component';
 import { RouterOutlet } from '@angular/router';
+import { Enable2FAComponent } from "./components/auth/2FA/enable2-fa/enable2-fa.component";
 import { AuthenticationService } from './shared/services/authentication.service';
 
 @Component({
@@ -11,29 +12,25 @@ import { AuthenticationService } from './shared/services/authentication.service'
   standalone: true,
   templateUrl: './app.component.html',
   styles: [],
-  imports: [CommonModule, RouterOutlet, HttpClientModule, HeaderComponent, ToastrModule]
+  imports: [CommonModule, RouterOutlet, HttpClientModule, HeaderComponent, ToastrModule, Enable2FAComponent]
 })
 export class AppComponent implements OnInit {
-// 
-  constructor(private authService :  AuthenticationService)
-  {
+  title = 'Many In One';
+  constructor(private authService: AuthenticationService) {
 
   }
 
   // any time user reloads the page will get the user based on token from server
   ngOnInit(): void {
     this.authService.getCurrentUser().subscribe({
-      next : res => {
+      next: res => {
         // and set the curruserSignal and will be avalibale for whole application
-        console.log(res);
-        this.authService.currUserSignal.set(res.userId);
+        // console.log(res);
+        this.authService.currUserSignal.set(res);
       },
-      error : err =>
-      {
+      error: err => {
         this.authService.currUserSignal.set(null);
       }
     });
   }
-
-  title = 'Many In One';
 }

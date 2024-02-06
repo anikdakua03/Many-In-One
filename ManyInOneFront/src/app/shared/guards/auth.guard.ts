@@ -6,7 +6,9 @@ export const authGuard = () =>{
     const authService = inject(AuthenticationService);
     const route = inject(Router);
 
-    if(authService.currUserSignal())
+    // if(authService.currUserSignal !== null && authService.currUserSignal !== undefined)
+    debugger
+    if(authService.isLoggegIn())
     {
         return true;
     }
@@ -18,17 +20,16 @@ export const authGuard = () =>{
 }
 
 /** Login guard  is to protect already logged in user going to login page again */
-export const loginGuard = () =>{
+// Need to check this
+export const loggedInUserGuard = () => {
     const authService = inject(AuthenticationService);
     const route = inject(Router);
 
-    if(authService.currUserSignal())
-    {
+    if (authService.isAuthenticated) {
         route.navigateByUrl('/home');
         return false;
     }
-    else
-    {
+    else {
         return true;
     }
 }

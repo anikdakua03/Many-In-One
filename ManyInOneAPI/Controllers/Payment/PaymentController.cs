@@ -1,11 +1,13 @@
 ﻿using ManyInOneAPI.Models.Payment;
 using ManyInOneAPI.Repositories.Payment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManyInOneAPI.Controllers.Payment
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentDetailRepository _paymentDeatilsRepo;
@@ -19,7 +21,7 @@ namespace ManyInOneAPI.Controllers.Payment
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDetail>>> GetPaymentDetails()
         {
-            try
+          try
             {
                 var res = await _paymentDeatilsRepo.GetPaymentDetails();
                 if (res == null)
@@ -39,7 +41,7 @@ namespace ManyInOneAPI.Controllers.Payment
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDetail>> GetPaymentDetailById(int id)
         {
-            try
+                      try
             {
                 var res = await _paymentDeatilsRepo.GetPaymentDetailById(id);
                 if (res == null)
@@ -59,7 +61,7 @@ namespace ManyInOneAPI.Controllers.Payment
         [HttpPost]
         public async Task<ActionResult<PaymentDetail>> AddPaymentDetail([FromBody]PaymentDetail paymentDetail)
         {
-            try
+                      try
             {
                 var res = await _paymentDeatilsRepo.AddPaymentDetail(paymentDetail);
                 if (res == null)

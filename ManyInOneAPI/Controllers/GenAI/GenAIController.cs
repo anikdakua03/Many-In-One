@@ -20,7 +20,7 @@ namespace ManyInOneAPI.Controllers.GenAI
         [HttpPost("TextOnly")]
         public async Task<IActionResult> GetTextOnlyInput([Required] TextOnly input)
         {
-            try
+                        try
             {
                 var res = await _geAIHttpClient.TextOnlyInput(input);
 
@@ -48,7 +48,7 @@ namespace ManyInOneAPI.Controllers.GenAI
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest($"Message :--> {ex.Message}");
             }
         }
 

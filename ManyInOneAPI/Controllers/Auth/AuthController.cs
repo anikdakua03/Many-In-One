@@ -42,7 +42,7 @@ namespace ManyInOneAPI.Controllers.Auth
                 {
                     var res = await _authService.Register(userRequestDTO);
 
-                    if (res.Errors is null)
+                    if (res.Result)
                     {
                         return Ok(res);
                     }
@@ -68,7 +68,7 @@ namespace ManyInOneAPI.Controllers.Auth
                 {
                     var res = await _authService.RegisterWithGoogle(credentials);
 
-                    if (res.Errors is null)
+                    if (res.Result)
                     {
                         return Ok(res);
                     }
@@ -101,7 +101,7 @@ namespace ManyInOneAPI.Controllers.Auth
                         StatusCode = 200
                     };
                 }
-                return BadRequest("Invalid request !! ");
+                return BadRequest(res.Errors);
             }
             catch (Exception ex)
             {
@@ -165,34 +165,9 @@ namespace ManyInOneAPI.Controllers.Auth
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!code.IsNullOrEmpty())
                 {
                     var res = await _authService.VerifyAndLoginWith2FA(code);
-
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest("Error generating two factor qr code..");
-                }
-                return BadRequest("Invalid request !! ");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("Verify2FA")]
-        public async Task<IActionResult> Verify2FA([FromBody] string code)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var res = await _authService.Verify2FA(code);
 
                     if (res.Result)
                     {
@@ -210,12 +185,37 @@ namespace ManyInOneAPI.Controllers.Auth
         }
 
         [HttpPost]
+        [Route("Verify2FA")]
+        public async Task<IActionResult> Verify2FA([FromBody] string code)
+        {
+            try
+            {
+                if (!code.IsNullOrEmpty())
+                {
+                    var res = await _authService.Verify2FA(code);
+
+                    if (res.Result)
+                    {
+                        return Ok(res);
+                    }
+
+                    return BadRequest(res.Errors);
+                }
+                return BadRequest("Invalid request !! ");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
         [Route("Get2FAQRCode")]
         public async Task<IActionResult> Enable2FAAndGetQR([FromBody] string userId)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!userId.IsNullOrEmpty())
                 {
                     var res = await _authService.LoadSharedKeyAndQrCodeUriAsync(userId);
 
@@ -224,7 +224,7 @@ namespace ManyInOneAPI.Controllers.Auth
                         return Ok(res);
                     }
 
-                    return BadRequest("Error generating two factor qr code..");
+                    return BadRequest(res.Message);
                 }
                 return BadRequest("Invalid request !! ");
             }
@@ -247,7 +247,7 @@ namespace ManyInOneAPI.Controllers.Auth
                     return Ok(res);
                 }
 
-                return BadRequest(res.Errors![0]);
+                return BadRequest(res.Errors);
             }
             catch (Exception ex)
             {
@@ -267,7 +267,7 @@ namespace ManyInOneAPI.Controllers.Auth
                 {
                     return Ok(res);
                 }
-                return Unauthorized("Invalid user !!");
+                return Unauthorized(res.Errors);
             }
             catch (Exception ex)
             {
@@ -277,7 +277,7 @@ namespace ManyInOneAPI.Controllers.Auth
 
         [HttpGet]
         [Route("GetRefreshToken")]
-        public async Task<ActionResult<string>> GetRefreshToken()
+        public async Task<IActionResult> GetRefreshToken()
         {
             try
             { 
@@ -319,17 +319,17 @@ namespace ManyInOneAPI.Controllers.Auth
 
         [HttpDelete]
         [Route("RevokeToken")]
-        public async Task<ActionResult<string>> RevokeToken()
+        public async Task<IActionResult> RevokeToken() //string token/ should be by user id
         {
             try
             {
                 var res = await _authService.RevokeToken();
 
-                if (res.Errors is null)
+                if (res.Result)
                 {
                     return Ok(res);
                 }
-                return BadRequest($"Error while revoking ==> {res.Errors[0]}");
+                return BadRequest(res.Errors);
             }
             catch (Exception ex)
             {
@@ -340,25 +340,23 @@ namespace ManyInOneAPI.Controllers.Auth
 
         [HttpPost]
         [Route("DeleteUserData")]
-        public async Task<ActionResult<string>> DeleteUserData()
+        public async Task<IActionResult> DeleteUserData()
         {
             try
             {
                 var res = await _authService.DeleteAllData();
 
-                if (res.Errors is null)
+                if (res.Result)
                 {
                     return Ok(res);
                 }
 
-                return BadRequest($"Error while revoking ==> {res.Errors[0]}");
+                return BadRequest(res.Errors);
             }
             catch (Exception ex)
             {
-
                 return BadRequest(ex.Message);
             }
         }
-        
     }
 }

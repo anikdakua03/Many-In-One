@@ -28,7 +28,6 @@ export class TextOnlyComponent {
   }
 
   getAnswer() {
-    debugger
     const obj = this.inputForm.value;
     console.log(" Your query is componeent --> " + this.inputForm);
 

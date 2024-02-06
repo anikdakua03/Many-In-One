@@ -23,11 +23,10 @@ export class ManageAuthComponent {
     var res = confirm("Do you really want to delete all data ??");
     if(res)
     {
-      debugger
       this.authService.deleteAllUserData().subscribe({
-        next : re => {
+        next: re => {
           this.route.navigateByUrl('/');
-          // sessionStorage.clear();
+          this.authService.removeToken();
           this.toaster.success("User's all data deleted successfully", "User data deletion");
         }
       });

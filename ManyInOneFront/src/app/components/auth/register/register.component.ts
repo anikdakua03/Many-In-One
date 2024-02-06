@@ -74,7 +74,6 @@ export class RegisterComponent {
       });
   }
 
-
   // registerDto : Register
   onRegister() {
     if (this.registerForm.valid) {
@@ -84,7 +83,7 @@ export class RegisterComponent {
           res => {
             console.log(res);
             // get the user user email or something and set to cookie for ui interaction according to it
-            this.authService.saveToken(this.registerForm.value.email);
+            // this.authService.saveToken(this.registerForm.value.email);
             this.toaster.success(res.message, "User registered");
           },
         error:
