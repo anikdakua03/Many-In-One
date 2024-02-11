@@ -31,5 +31,10 @@ export class AppComponent implements OnInit {
         this.authService.currUserSignal.set(null);
       }
     });
+
+    if(this.authService.isLoggegIn())
+    {
+      
+    }
   }
 }

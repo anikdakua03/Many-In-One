@@ -21,6 +21,6 @@ export class TextAndImageOnlyService {
   askQuestion(askQuery: any): Observable<any> {
     this.formSubmitted = true;
 
-    return this.http.post<any>(this.url, askQuery); //, { headers } automatically sets its appropiate headers
+    return this.http.post<any>(this.url, askQuery, {  withCredentials: true }); //, { headers } automatically sets its appropiate headers
   }
 }

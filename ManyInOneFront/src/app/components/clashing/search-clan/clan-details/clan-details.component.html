@@ -1,0 +1,172 @@
+<div class="pt-12 px-4">
+    @if(clanData !== null && clanData !== undefined)
+    {
+    <div class="mt-16">
+        <h2 class="text-xl font-bold text-center">Clan details</h2>
+        <div>
+            <ul
+                class="hidden text-lg font-bold text-center text-gray-500 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
+                <li class="w-full">
+                    <a href="clashOfClans/search-clan/clan-details"
+                        class="inline-block w-full p-4 text-gray-900 bg-gray-100 border-r border-gray-200 dark:border-gray-700 rounded-s-lg focus:ring-4 focus:ring-blue-300 active focus:outline-none dark:bg-gray-700 dark:text-white"
+                        aria-current="page">General Stats</a>
+                </li>
+                <li class="w-full">
+                    <button (click)="onClickMemeberList()"
+                        class="inline-block w-full p-4 bg-white border-r border-gray-200 dark:border-gray-700 hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer">
+                        Members</button>
+                </li>
+                <li class="w-full ">
+                    <button (click)="onClickWarStats()"
+                        class="inline-block w-full p-4 bg-white border-r rounded-e-lg border-gray-200 dark:border-gray-700 hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700">War
+                        Stats</button>
+                </li>
+                <!-- <li class="w-full">
+                        <button (click)="onClickAchievement()"
+                            class="inline-block w-full p-4 bg-white border-s-0 border-gray-200 dark:border-gray-700 rounded-e-lg hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700">Achievements</button>
+                    </li> -->
+            </ul>
+        </div>
+
+        <div class="w-auto py-4 mx-auto grid grid-cols-3 gap-4 divide-x-4 divide-black">
+            <div class="text-center text-lg font-bold align-baseline">
+                <div class="ml-32 "><img [src]="clanData.badgeUrls.small" alt="image" /></div>
+                <li>Clan Name : {{clanData.name}}</li>
+                <li>Clan Tag : {{clanData.tag}}</li>
+                <li>Clan Level : {{clanData.clanLevel}}</li>
+                <li> Clan type : {{clanData.type}}</li>
+                <li>Description : {{clanData.description}}</li>
+                <li>Family Friendly : {{clanData.isFamilyFriendly}}</li>
+                <li>Clan Location : {{clanData.location.name}}</li>
+                <li>Clan Points : {{clanData.clanPoints}}</li>
+            </div>
+            <div class="text-center text-lg font-bold">
+                <li>Wars won : {{clanData.warWins}}</li>
+                <li>Wars ties : {{clanData.warTies}}</li>
+                <li>Wars Loses : {{clanData.warLosses}}</li>
+                <li>War League : {{clanData.warLeague.name}}</li>
+                <li>Total Members : {{clanData.members}}</li>
+                <li>Required TH Level : {{clanData.requiredTownhallLevel}}</li>
+                <li>Required BuilderBase Trophies : {{clanData.requiredBuilderBaseTrophies}}</li>
+
+
+                @for(tr of clanData.labels; track tr.id)
+                {
+                <div class="bg-teal-400 p-1 w-[350px] m-1 ml-16 relative rounded-md">
+                    <label class="mr-12">{{tr.name}}</label>
+                    <img [src]=tr.iconUrls.small alt="tr.name"
+                        style="display: flex; align-items: center; justify-content: center;" height=[350px]
+                        width=[350px] />
+                </div>
+                }
+
+            </div>
+            <div class="text-center text-lg font-bold content-between">
+                <li>Clan CapitalHall Level : {{clanData.clanCapital.capitalHallLevel}}</li>
+
+            </div>
+        </div>
+        <hr class="w-72 h-1.5 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
+
+        @if(isMembersListOpen)
+        {
+        <div>
+            <h1 class="text-center font-bold text-xl underline">All Members details</h1>
+
+            <div class="flex flex-wrap -mx-3 mb-5 bg-transparent">
+                <div class="w-full max-w-full px-3 mb-6  mx-auto">
+                    <div
+                        class="relative flex-[1_auto] flex flex-col break-words min-w-0 bg-clip-border rounded-[.95rem] bg-slate-800 m-5">
+                        <div
+                            class="relative flex flex-col min-w-0 break-words border border-dashed bg-clip-border rounded-2xl text-yellow-500 border-stone-200 bg-light/30">
+                            <!-- card header -->
+                            <div
+                                class="px-9 pt-5 flex justify-between items-stretch flex-wrap min-h-[70px] pb-0 bg-transparent">
+                                <h3
+                                    class="flex flex-col items-start justify-center m-2 ml-0 font-medium text-xl/tight text-dark">
+                                    <span class="mr-3 font-semibold text-dark">Clan Members</span>
+                                    <!-- <span class="mt-1 font-medium text-secondary-dark text-lg/normal">All projects from
+                                        the Loopple
+                                        team</span> -->
+                                </h3>
+                            </div>
+                            <!-- end card header -->
+                            <!-- card body  -->
+                            <div class="flex-auto block py-8 pt-6 px-9">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full my-0 align-middle text-dark border-neutral-200">
+                                        <thead class="align-bottom">
+                                            <tr class="font-bold text-xl text-secondary-dark text-center underline">
+                                                <th class="pb-3 w-[40px]">Rank</th>
+                                                <th class="pb-3 w-[90px]">League</th>
+                                                <th class="pb-3 w-[90px]">Name</th>
+                                                <th class="pb-3 w-[90px]">Clan Role</th>
+                                                <th class="pb-3 w-[90px]">Trophies</th>
+                                                <th class="pb-3 w-[150px]">Donations</th>
+                                                <th class="pb-3 w-[150px]">Donations Received</th>
+                                            </tr>
+                                        </thead>
+                                        @for(cl of clanData.memberList; track cl.tag)
+                                        {
+                                        <tbody>
+                                            <tr class="border-b border-yellow-300 last:border-b-0">
+                                                <td class="text-center">
+                                                    {{cl.clanRank}}
+                                                </td>
+                                                <td class="flex justify-center items-center">
+                                                    <img [src]=clanData.memberList[0].league.iconUrls.tiny
+                                                        alt="clanData.memberList[0].league.name"
+                                                        [name]=clanData.memberList[0].league.name
+                                                        class="w-[50px] h-[50px] flex justify-center items-center shrink-0 rounded-2xl"
+                                                        height=[350px] width=[350px] />
+                                                </td>
+                                                <td class="text-center">
+                                                    <button (click)="getPlayerDetails(cl.tag)"
+                                                        class="mb-1 font-semibold cursor-pointer transition-colors duration-200 ease-in-out text-lg/normal text-secondary-inverse hover:text-primary">
+                                                        {{cl.name}} </button>
+                                                </td>
+                                                <td class="text-center">
+                                                    {{cl.role.toUpperCase()}}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{cl.trophies}}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{cl.donations}}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{cl.donationsReceived}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+
+        @if(isWarStatsOpen)
+        {
+        <div>
+            <h1 class="text-center font-bold text-xl">War stats here</h1>
+
+        </div>
+
+        }
+
+    </div>
+    }
+    @else {
+    <div class="flex justify-center items-center py-5">
+        <h1 class="text-2xl font-bold text-red-500"> Search clans by criteria or by tag !!!!!</h1>
+        <hr />
+        <a routerLink="/clashOfClans/search-clan" class="mt-10 text-xl font-bold text-yellow-500">Search Clan</a>
+    </div>
+    }
+</div>

@@ -105,7 +105,6 @@ export class AuthenticationService {
 
   public saveToken(userId: string) {
     // get the user user email or something and set to cookie for ui interaction according to it
-    console.log("first", userId)
     this.cookie.set("curr-app-user", userId, 1, "/", "localhost", true, "None");
   }
 

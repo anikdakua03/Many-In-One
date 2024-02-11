@@ -3,11 +3,17 @@
     <h1 class="text-center text-yellow-400 font-bold text-2xl">Clashing Informations </h1>
 
     <button
-        class="text-white bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         (click)="fetchAllLocations()">Get All Locations</button>
+    <button
+        class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        (click)="fetchAllClanLabels()">Get All Clan Labels</button>
+    <button
+        class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        (click)="fetchAllPlayerLabels()">Get All Player Lables</button>
 
             <div class="col-6 shadow-md sm:rounded-lg ml-4 mr-4 rounded-lg border-spacing-1">
-                <div class="text-2xl font-bold bg-orange-300 text-center">Payment Details</div>
+                <div class="text-2xl font-bold bg-orange-300 text-center">All locations list</div>
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -25,7 +31,7 @@
                         <tr
                             class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {{loc.name}}
+                                {{loc.name === "" ? "UNNAMED" : loc.name}}
                             </th>
                             <td class="px-6 py-4">
                                 {{ loc.isCountry}}
@@ -42,4 +48,18 @@
                     }
                 </table>
             </div>
+</div>
+<div class="justify-center items-center text-xl font-bold ml-36 py-3">
+    <h1 class="text-amber-600 text-2xl font-extrabold pt-16 py-2"> These are the thigs we can now get : <br />
+    </h1>
+    <h4 class="text-green-600 text-xl font-semibold underline-offset-4 py-4"> All options you have currently :
+        <hr />
+    </h4>
+
+    <li class="text-blue-600 font-bold hover:underline"><a routerLink="/clashOfClans/search-player"
+            class="py-4">Search player </a><br />
+    </li>
+    <li class="text-blue-600 font-bold hover:underline"><a routerLink="/clashOfClans/search-clan">Search
+            clans</a><br />
+    </li>
 </div>

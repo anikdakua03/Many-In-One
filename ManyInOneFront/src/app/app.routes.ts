@@ -14,6 +14,9 @@ import { Enable2FAComponent } from './components/auth/2FA/enable2-fa/enable2-fa.
 import { Disable2FAComponent } from './components/auth/2FA/disable2-fa/disable2-fa.component';
 import { TwoFALoginComponent } from './components/auth/two-falogin/two-falogin.component';
 import { ClashingComponent } from './components/clashing/clashing.component';
+import { SearchPlayerComponent } from './components/clashing/search-player/search-player.component';
+import { SearchClanComponent } from './components/clashing/search-clan/search-clan.component';
+import { ClanDetailsComponent } from './components/clashing/search-clan/clan-details/clan-details.component';
 
 export const routes: Routes = [
     {
@@ -50,7 +53,16 @@ export const routes: Routes = [
         'path': 'genAI/textandimageonly', 'title': 'Image & Text Only Input', component: TextAndImageOnlyComponent,  canActivate : [authGuard]
     },
     {
-        'path': 'clashOfClans', 'title': 'Clashing', component: ClashingComponent,  //canActivate : [authGuard]
+        'path': 'clashOfClans', 'title': 'Clashing', component: ClashingComponent,  canActivate : [authGuard]
+    },
+    {
+        'path': 'clashOfClans/search-player', 'title': 'Clash Player', component: SearchPlayerComponent,  canActivate : [authGuard]
+    },
+    {
+        'path': 'clashOfClans/search-clan', 'title': 'Clans', component: SearchClanComponent,  canActivate : [authGuard]
+    },
+    {
+        'path': 'clashOfClans/search-clan/clan-details', 'title': 'Clan Details', component: ClanDetailsComponent,  canActivate : [authGuard]
     },
     {
         'path': '**', 'title': 'Page Not Found', component: PageNotFoundComponent

@@ -3,10 +3,8 @@ using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
 using ManyInOneAPI.Models.Auth;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
@@ -684,7 +682,7 @@ namespace ManyInOneAPI.Services.Auth
                 ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1)
             };
 
-            var res =  _dbContext.RefreshTokens.Update(newRefreshToken);
+            var res =  await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
             await _dbContext.SaveChangesAsync();
 
             return true;

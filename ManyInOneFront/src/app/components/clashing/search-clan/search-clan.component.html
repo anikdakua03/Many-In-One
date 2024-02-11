@@ -1,0 +1,216 @@
+<div class="pt-12 px-4">
+    <h1 class="text-center font-bold text-2xl">Search clans</h1>
+    <hr />
+    <div class="grid grid-rows-2 grid-flow-row mt-8 gap-x-4 gap-y-5">
+
+        <div class="flext justify-between w-auto h-40 py-3 px-6 bg-gray-50 border-b">
+            <div>
+                <div class="flex justify-center items-center w-full min-w-[200px] h-4 mt-10 space-x-5">
+                    <form [formGroup]="clanByTagForm" (submit)="onSearchClanByTag()" autocomplete="off">
+                        <input formControlName="clanTag"
+                            class="px-3 py-2 dont-bold w-full placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Type Clan Tag" />
+
+                        <button
+                            class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 mt-5 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-1 dark:focus:ring-blue-800">Search
+                            by
+                            Clan Tag</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Divider  Do not touch-->
+        <div class="inline-flex items-center justify-center w-full h-12 mt-1">
+            <hr class="w-12 h-px my-2 mx-2 bg-gray-200 border-0 dark:bg-gray-700">
+            <span
+                class="absolute px-3 font-bold text-xl text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">OR</span>
+        </div>
+
+        <div class="h-11 py-3 px-1 mt-2 bg-gray-50 border-b">
+            <h1 class="text-center font-bold text-yellow-700 text-2xl underline px-2 py-2"> Search by filters </h1>
+            <!-- <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"> -->
+            <div class="gap-6 mb-6 md:grid-cols-2">
+                <div class="justify-center items-center w-full min-w-[200px] h-4 mt-2 space-x-8 space-y-4">
+                    <form [formGroup]="clanSearchForm" (submit)="onSearchByFilter()" autocomplete="off">
+
+                        <input formControlName="clanNamePhrase"
+                            class="px-3 py-2 ml-4 mr-4 font-bold w-auto placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Search by Name" />
+                        @if(clanSearchForm.controls['clanNamePhrase'].errors &&
+                        clanSearchForm.controls['clanNamePhrase'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500">*Clan search name phrase minimium of
+                            length 3 required.
+                        </p>
+                        }
+
+                        <!-- <h3 class="mb-5 text-lg font-medium text-gray-900">Choose War frequency</h3> -->
+                        <input formControlName="warFrequency"
+                            class="w-auto px-3 ml-4 mr-4  py-2 font-bold placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Type war frequecy" />
+                        <!-- @if(clanSearchForm.controls['warFrequency'].errors && clanSearchForm.controls['warFrequency'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500">*Clan search name phrase minimium of length 3 required.
+                        </p>
+                        } -->
+                        <!-- If it is required to pass -->
+
+                        <input formControlName="minMembers" type="number"
+                            class="w-auto px-3 py-2 ml-4 mr-4  font-bold placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Minimum members" />
+
+                        <input formControlName="maxMembers" type="number"
+                            class="w-auto px-3 py-2 ml-4 mr-4 font-bold placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Max members less than or equal 50" />
+                        @if(clanSearchForm.controls['maxMembers'].errors &&
+                        clanSearchForm.controls['maxMembers'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500">*Members cannot exceed 50.
+                        </p>
+                        }
+
+                        <input formControlName="minClanPoints" type="number"
+                            class="w-auto px-3 py-2 ml-4 mr-4  font-bold placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Min clan Points" />
+
+                        <input formControlName="minClanLevel" type="number"
+                            class="w-auto px-3 py-2 ml-4 mr-4 font-bold placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Minimum clan level" />
+
+                        <input formControlName="searchLimit" type="number"
+                            class="w-auto px-3 py-2 mt-4 ml-4 mr-4 font-bold placeholder-slate-500 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                            placeholder="Search limit <= 50" />
+                        @if(clanSearchForm.controls['searchLimit'].errors &&
+                        clanSearchForm.controls['searchLimit'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500">*Search limit not allowed.
+                        </p>
+                        }
+
+                        <ng-select [items]="allLocs" bindLabel="name" bindValue="id" formControlName="clanLocation"
+                            placeholder="Choose location.."
+                            class="w-auto px-3 py-2 mt-4 ml-4 mr-4 font-bold placeholder-slate-500 text-black rounded-lg text-xl border-none">
+                        </ng-select>
+
+                        <!-- Multiple labels selection -->
+                        <!-- <h3 class="mb-5 text-lg font-medium text-gray-900">Choose clan labels</h3>
+                        <ng-select [items]="allClanLabels" bindLabel="name" bindValue="id" [multiple]="true"
+                            [closeOnSelect]="false" formControlName="clanLabels"
+                            class="text-red-400 text-xl rounded-sm">
+                        </ng-select> -->
+
+                        <!-- With icons -->
+                        <ng-select [items]="allClanLabels" bindLabel="name" bindValue="id" [multiple]="true"
+                            [closeOnSelect]="false" [clearOnBackspace]="true" formControlName="clanLabels"
+                            placeholder="Choose clan lables.."
+                            class="w-auto px-3 py-2 mt-4 ml-4 mr-4 font-bold text-xl placeholder-slate-500 text-black rounded-lg border-none">
+                            <ng-template ng-label-tmp let-item="item">
+                                <img height="25" width="25" [src]="item.iconUrls.small" />
+                                <span class="text-center text-xl font-bold text-green-500">{{
+                                    item.name
+                                    }}</span>
+                            </ng-template>
+
+                            <ng-template ng-optgroup-tmp let-item="item" let-index="index">
+                                <img height="25" width="25" [src]="item.iconUrls.small" />
+                            </ng-template>
+                            <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm"
+                                [ngOptionHighlight]="search">
+                                <img height="25" width="25" [src]="item.iconUrls.small" />
+                                <span class="text-center text-xl font-bold text-green-500">{{ item.name }}</span>
+                            </ng-template>
+                        </ng-select>
+
+                        <button
+                            class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-1 dark:focus:ring-blue-800">Search
+                            clans</button>
+                        <button
+                            class="text-white bg-red-700 mt-2 flex justify-center items-center hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                            (click)="onClear()">Reset</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- show clans list -->
+    <div class="mt-[360px]">
+        @if(searchedClans.length > 0)
+        {
+        <h2 class="text-center text-2xl font-bold text-amber-500 underline">All Related Clans</h2>
+        <div class="flex-auto block py-8 pt-6 px-9">
+            <div class="overflow-x-auto">
+                <table class="w-full my-0 align-middle text-dark border-neutral-200 overflow-hidden">
+                    <thead class="align-bottom bg-gray-300 border-b-2 border-yellow-700">
+                        <tr class="font-bold text-xl text-secondary-dark text-center underline">
+                            <th class="pb-3 w-4">Sl. NO.</th>
+                            <th class="pb-3 w-4">League</th>
+                            <th class="pb-3 w-8">Name</th>
+                            <th class="pb-3 w-12">Clan Level</th>
+                            <th class="pb-3 w-6">Clan Trophies</th>
+                            <th class="pb-3 w-6">Required Trophies</th>
+                            <th class="pb-3 w-8">Members</th>
+                            <th class="pb-3 w-8">Clan Points</th>
+                            <th class="pb-3 w-10">War League</th>
+                            <th class="pb-3 w-6">Clan Type</th>
+                            <th class="pb-3 w-6"></th>
+                        </tr>
+                    </thead>
+                    @for(cl of searchedClans; track cl.tag;)
+                    {
+                    <tbody class="divide-y divide-red-400">
+                        <tr
+                            class="border-b border-yellow-300 last:border-b-amber-200 bg-cyan-300 hover:bg-cyan-200 hover:scale-105">
+
+                            <!-- for normal ordering page -->
+                            <td>1 + 1</td>
+
+                            <td class="flex justify-center items-center whitespace-nowrap">
+                                <img [src]=cl.badgeUrls.medium alt="cl.name" [title]="cl.name"
+                                    class="w-[50px] h-[50px] flex justify-center items-center shrink-0 rounded-2xl"
+                                    height=[350px] width=[350px] />
+                            </td>
+                            <td class="text-center whitespace-nowrap cursor-pointer" (click)="getClanDetails(cl.tag)">
+                                <a
+                                    class="mb-1 font-semibold transition-colors duration-200 ease-in-out text-lg/normal text-secondary-inverse hover:underline hover:text-primary">
+                                    {{cl.name}} </a>
+                                <dl class="font-normal">
+                                    <dd>{{cl.tag}}</dd>
+                                </dl>
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.clanLevel}}
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.clanPoints}}
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.requiredTrophies}}
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.members}}
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.clanPoints}}
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.warLeague.name}}
+                            </td>
+                            <td class="text-center whitespace-nowrap">
+                                {{cl.type.toLocaleUpperCase()}}
+                            </td>
+                            <td><button (click)="getClanDetails(cl.tag)"
+                                    class="mb-1 font-semibold cursor-pointer transition-colors bg-emerald-500 duration-200 ease-in-out text-lg/normal text-secondary-inverse hover:text-primary">
+                                    View Clan </button></td>
+                        </tr>
+                    </tbody>
+                    }
+                </table>
+            </div>
+        </div>
+        }
+    </div>
+</div>

@@ -1,4 +1,6 @@
-﻿using ManyInOneAPI.Services.Clasher;
+﻿using ManyInOneAPI.Models.Clasher;
+using ManyInOneAPI.Services.Clasher;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -6,6 +8,7 @@ namespace ManyInOneAPI.Controllers.Clasher
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ClashController : ControllerBase
     {
         private readonly IClashingHttpClient _clashingHttpClient;
@@ -19,20 +22,20 @@ namespace ManyInOneAPI.Controllers.Clasher
 
         [HttpPost]
         [Route("GetPlayerInfo")]
-        public async Task<IActionResult> GetPlayer( string playerTag)
+        public async Task<IActionResult> GetPlayer([FromBody]string playerTag)
         {
             try
             {
                 if (!playerTag.IsNullOrEmpty())
                 {
-                var res = await _clashingHttpClient.GetPlayerById(playerTag);
+                    var res = await _clashingHttpClient.GetPlayerById(playerTag);
 
-                    if (res.Succeed)
-                    {
-                        return Ok(res);
-                    }
+                    //if (res.Succeed)
+                    //{
+                    //    return Ok(res);
+                    //}
 
-                    return NotFound(res.Errors);
+                    return Ok(res);
                 }
                 return BadRequest("Invalid request !! ");
             }
@@ -178,7 +181,7 @@ namespace ManyInOneAPI.Controllers.Clasher
 
         [HttpPost]
         [Route("GetClanInfoById")]
-        public async Task<IActionResult> GetClan([FromQuery]string clanTag)
+        public async Task<IActionResult> GetClan([FromBody]string clanTag)
         {
             try
             {
@@ -186,12 +189,12 @@ namespace ManyInOneAPI.Controllers.Clasher
                 {
                     var res = await _clashingHttpClient.GetClanById(clanTag);
 
-                    if (res.Succeed)
-                    {
-                        return Ok(res);
-                    }
+                    //if (res.Succeed)
+                    //{
+                    //    return Ok(res);
+                    //}
 
-                    return NotFound(res.Errors);
+                    return Ok(res);
                 }
                 return BadRequest("Invalid request !! ");
             }
@@ -253,22 +256,22 @@ namespace ManyInOneAPI.Controllers.Clasher
 
         [HttpPost]
         [Route("SearchClans")]
-        public async Task<IActionResult> GetClans(string name, string warFrequency, int locationId, int minMembers, int maxMembers, int minClanPoints, int minClanLevel, int limit)
+        public async Task<IActionResult> GetClans([FromBody]SearchClansRequest searchClansRequest)
         {
             try
             {
-                if (true) // need to validate parameters
+                if (ModelState.IsValid) 
                 {
-                    var res = await _clashingHttpClient.SearchClans(name, warFrequency, locationId, minMembers, maxMembers, minClanPoints, minClanLevel, limit);
+                    var res = await _clashingHttpClient.SearchClans(searchClansRequest);
 
-                    if (res.Succeed)
-                    {
-                        return Ok(res);
-                    }
+                    //if (res.Succeed)
+                    //{
+                    //    return Ok(res);
+                    //}
 
-                    return NotFound(res.Errors);
+                    return Ok(res);
                 }
-                //return BadRequest("Invalid request !! ");
+                return BadRequest($"Invalid parameter with --> {ModelState.ErrorCount} error count !!");
             }
             catch (Exception ex)
             {
@@ -400,6 +403,51 @@ namespace ManyInOneAPI.Controllers.Clasher
             try
             {
                 var res = await _clashingHttpClient.GetAllCapitaLeagues();
+
+                if (res.Succeed)
+                {
+                    return Ok(res);
+                }
+
+                return NotFound(res.Errors);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        #region Labels Related
+
+        [HttpGet]
+        [Route("GetAllClanLabels")]
+        public async Task<IActionResult> AllClanLabels()
+        {
+            try
+            {
+                var res = await _clashingHttpClient.GetAllClanLabels();
+
+                if (res.Succeed)
+                {
+                    return Ok(res);
+                }
+
+                return NotFound(res.Errors);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllPlayerLabels")]
+        public async Task<IActionResult> AllPlayerLabels()
+        {
+            try
+            {
+                var res = await _clashingHttpClient.GetAllPlayerLabels();
 
                 if (res.Succeed)
                 {

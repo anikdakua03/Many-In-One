@@ -5,12 +5,12 @@ import { routes } from './app.routes';
 import { provideToastr } from 'ngx-toastr';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideMarkdown } from 'ngx-markdown';
-import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
+// import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
 
   providers: [
-    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
+    provideHttpClient(withFetch(), ), //withInterceptors([AuthInterceptor])
     provideRouter(routes), 
     provideAnimations(), // required animations providers
     provideToastr({

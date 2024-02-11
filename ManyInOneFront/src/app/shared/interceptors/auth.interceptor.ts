@@ -14,8 +14,8 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     const toaster = inject(ToastrService);
 
     return next(req).pipe(
-
         catchError((err: HttpErrorResponse) => {
+            debugger
             if (err && err.status === 401 && counter !== 1) {
                 counter++; // Increment counter only if attempting refresh
 
@@ -45,4 +45,6 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
             }
         })
     );
+
+
 };

@@ -2,10 +2,10 @@
 {
     public class SearchClans
     {
-        public List<Info>? items { get; set; }
+        public List<SearchClanInfo>? items { get; set; }
         public Paging? paging { get; set; }
     }
-    public class Info
+    public class SearchClanInfo
     {
         public string? tag { get; set; }
         public string? name { get; set; }

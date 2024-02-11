@@ -1,6 +1,7 @@
 ﻿using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Models.Clasher;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Web;
@@ -41,7 +42,7 @@ namespace ManyInOneAPI.Services.Clasher
 
                     var playerInfo = JsonSerializer.Deserialize<Player>(responseString)!;
 
-                    return new ClashResponse<Player>() { Result = playerInfo, Succeed = true };
+                    return new ClashResponse<Player>() { Result = playerInfo, Succeed = true, Message = playerInfo is not null ? "Player found" : "No player found !!" };
                 }
                 else
                 {
@@ -286,7 +287,7 @@ namespace ManyInOneAPI.Services.Clasher
                     var responseString = await response.Content.ReadAsStringAsync();
 
                     var clanInfo = JsonSerializer.Deserialize<ClanInfo>(responseString)!;
-                    return new ClashResponse<ClanInfo> { Result = clanInfo, Succeed = true };
+                    return new ClashResponse<ClanInfo> { Result = clanInfo, Succeed = true, Message = clanInfo is not null ? "Clan found with given tag found" : "No clan found !!" };
                 }
                 else
                 {
@@ -367,7 +368,7 @@ namespace ManyInOneAPI.Services.Clasher
             }
         }
 
-        public async Task<ClashResponse<List<Info>>> SearchClans(string name, string warFrequency, int locationId, int minMembers, int maxMembers, int minClanPoints, int minClanLevel, int limit = 10)
+        public async Task<ClashResponse<List<SearchClanInfo>>> SearchClans(SearchClansRequest searchClansRequest)
         {
             try
             {
@@ -378,7 +379,7 @@ namespace ManyInOneAPI.Services.Clasher
                 // OR
                 //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var address = $"clans?name={name}&warFrequency={warFrequency}&locationId={locationId}&minMembers={minMembers}&maxMembers={maxMembers}&minClanPoints={minClanPoints}&minClanLevel={minClanLevel}&limit={limit}"; // by default taking limit as 100
+                var address = SearchClansAddressMaker(searchClansRequest);
 
                 var response = await _httpClient.GetAsync(address);
 
@@ -387,16 +388,16 @@ namespace ManyInOneAPI.Services.Clasher
                     var responseString = await response.Content.ReadAsStringAsync();
 
                     var clansRes = JsonSerializer.Deserialize<SearchClans>(responseString)!;
-                    return new ClashResponse<List<Info>> { Result = clansRes.items, Succeed = true };
+                    return new ClashResponse<List<SearchClanInfo>> { Result = clansRes.items, Succeed = true, Message = clansRes.items!.Count() > 0 ? "Clans found with given criteria" : "No clan found with given filters !!" };
                 }
                 else
                 {
-                    return new ClashResponse<List<Info>> { Result = null, Succeed = false };
+                    return new ClashResponse<List<SearchClanInfo>> { Result = null, Succeed = false };
                 }
             }
             catch (Exception)
             {
-                return new ClashResponse<List<Info>> { Succeed = false };
+                return new ClashResponse<List<SearchClanInfo>> { Succeed = false };
             }
         }
 
@@ -442,6 +443,56 @@ namespace ManyInOneAPI.Services.Clasher
             return null!;
         }
 
+        private string SearchClansAddressMaker(SearchClansRequest searchClansRequest)
+        {
+            string allLabels = "";
+            for (int i = 0; i < searchClansRequest.Labels!.Count(); i++)
+            {
+                // if we are getting int from client , can convert it here also
+                allLabels +=  searchClansRequest.Labels![i].ToString() + ",";
+            }
+
+            // Uri address making according to params , only name is required , others are optional
+            var address = "clans?name=" + searchClansRequest.Name;
+            if (!searchClansRequest.WarFrequency.IsNullOrEmpty())
+            {
+                address += "&warFrequency=" + searchClansRequest.WarFrequency;
+            }
+            if (searchClansRequest.LocationId > 0)
+            {
+                address += "&locationId=" + searchClansRequest.LocationId;
+            }
+            if (searchClansRequest.MinMembers > 0)
+            {
+                address += "&minMembers=" + searchClansRequest.MinMembers;
+            }
+
+            if (searchClansRequest.MaxMembers > 0)
+            {
+                address += "&maxMembers=" + searchClansRequest.MaxMembers;
+            }
+
+            if (searchClansRequest.MinClanPoints > 0)
+            {
+                address += "&minClanPoints=" + searchClansRequest.MinClanPoints;
+            }
+
+            if (searchClansRequest.MinClanLevel > 0)
+            {
+                address += "&minClanLevel=" + searchClansRequest.MinClanLevel;
+            }
+
+            address += "&limit=" + (searchClansRequest.Limit > 100 ? 50 : searchClansRequest.Limit); // manual limitting 
+
+            if (searchClansRequest.Labels!.Count() > 0 && !searchClansRequest.Labels.IsNullOrEmpty())
+            {
+                // for removing extra ,
+                string labelIds = allLabels.Remove(allLabels.Length - 1, 1);
+                address += "&labelIds=" + HttpUtility.UrlEncode(labelIds);
+            }
+
+            return address;
+        }
         #endregion
 
         #region Leagues Related
@@ -578,6 +629,75 @@ namespace ManyInOneAPI.Services.Clasher
             }
         }
 
+        #endregion
+
+        #region Labels Related
+        public async Task<ClashResponse<List<Label>>> GetAllClanLabels()
+        {
+            try
+            {
+                // Set request headers
+                _httpClient.DefaultRequestHeaders.Accept.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+                // OR
+                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var address = "labels/clans";
+
+                var response = await _httpClient.GetAsync(address);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    var jsonData = JsonSerializer.Deserialize<ClanLabel>(responseString)!;
+
+                    return new ClashResponse<List<Label>>() { Result = jsonData.items, Succeed = true };
+                }
+                else
+                {
+                    return new ClashResponse<List<Label>>() { Succeed = false };
+                }
+            }
+            catch (Exception)
+            {
+                return new ClashResponse<List<Label>>() { Succeed = false };
+            }
+        }
+        public async Task<ClashResponse<List<Label>>> GetAllPlayerLabels()
+        {
+            try
+            {
+                // Set request headers
+                _httpClient.DefaultRequestHeaders.Accept.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+                // OR
+                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var address = "labels/players";
+
+                var response = await _httpClient.GetAsync(address);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    var jsonData = JsonSerializer.Deserialize<PlayerLabel>(responseString)!;
+
+                    return new ClashResponse<List<Label>>() { Result = jsonData.items, Succeed = true };
+                }
+                else
+                {
+                    return new ClashResponse<List<Label>>() { Succeed = false };
+                }
+            }
+            catch (Exception)
+            {
+                return new ClashResponse<List<Label>>() { Succeed = false };
+            }
+        }
         #endregion
     }
 }

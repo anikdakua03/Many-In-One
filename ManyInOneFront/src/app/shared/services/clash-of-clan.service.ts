@@ -1,8 +1,12 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { IClanInfoResponse } from '../interfaces/clan-info';
+import { ISearchClanResponse } from '../interfaces/search-clan-response';
+import { IPlayerResponse } from '../interfaces/player';
+import { SearchClansRequest } from '../models/Clasher/search-clans-request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +28,18 @@ export class ClashOfClanService {
   // GET
   //   / clans / { clanTag }
   // Get clan information
+  public getClanByTag(clanTag: string): Observable<IClanInfoResponse> {
+    const header = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<IClanInfoResponse>(`${this.baseURL}Clash/GetClanInfoById`, JSON.stringify(clanTag), { headers: header, withCredentials: true });
+  }
+  
+  // GET
+  // Search clans by name and warfrequency or location, minimummembers , max members, min clan points, min clan level
+  public searchClan(searchClansRq: SearchClansRequest): Observable<ISearchClanResponse> {
+    const header = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<ISearchClanResponse>(`${this.baseURL}Clash/SearchClans`, searchClansRq, { headers: header, withCredentials: true });
+  }
+
 
   // GET
   //   / clans / { clanTag } / members
@@ -37,11 +53,16 @@ export class ClashOfClanService {
 
   //#endregion
 
-  //#region Clans Specific Players specific
+  //#region Specific Players specific
 
   //   GET
   //   / players / { playerTag }
   // Get player information
+  public getPlayer(playerTag : string): Observable<IPlayerResponse> {
+    const header = new HttpHeaders({ 'Content-Type': 'application/json' });
+    console.log("Value ---> ", playerTag);
+    return this.http.post<IPlayerResponse>(`${this.baseURL}Clash/GetPlayerInfo`, JSON.stringify(playerTag), { headers : header, withCredentials: true });
+  }
 
   //#endregion
 
@@ -79,5 +100,16 @@ export class ClashOfClanService {
   //     / locations / { locationId }
   // Get location information
 
+  //#endregion
+
+  //#region Labels related
+  // Get all player labels
+  public getPlayerLabels(): Observable<any> {
+    return this.http.get(`${this.baseURL}Clash/GetAllPlayerLabels`, { withCredentials: true });
+  }
+  // Get all clan labels
+  public getClanLabels(): Observable<any> {
+    return this.http.get(`${this.baseURL}Clash/GetAllClanLabels`, { withCredentials: true });
+  }
   //#endregion
 }
