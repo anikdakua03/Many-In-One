@@ -9,8 +9,11 @@
                     <a routerLink="genAI/textonly" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Text Only</a>
                     <a routerLink="genAI/textandimageonly" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Text
                         and Image</a>
+                    <a routerLink="clashOfClans" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Clash of
+                        Clans</a>
                     <!-- @if(authService.currUserSignal !== null && authService.currUserSignal !== undefined) -->
-                    @if(authService.isAuthenticated)
+                    <!-- authService.isAuthenticated -->
+                    @if(false)
                     {
                         <a routerLink="manage" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Manage</a>
                     }

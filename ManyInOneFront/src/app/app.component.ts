@@ -4,15 +4,14 @@ import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import { HeaderComponent } from './components/home/header/header.component';
 import { RouterOutlet } from '@angular/router';
-import { Enable2FAComponent } from "./components/auth/2FA/enable2-fa/enable2-fa.component";
 import { AuthenticationService } from './shared/services/authentication.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  templateUrl: './app.component.html',
-  styles: [],
-  imports: [CommonModule, RouterOutlet, HttpClientModule, HeaderComponent, ToastrModule, Enable2FAComponent]
+    selector: 'app-root',
+    standalone: true,
+    templateUrl: './app.component.html',
+    styles: [],
+    imports: [CommonModule, RouterOutlet, HttpClientModule, HeaderComponent, ToastrModule]
 })
 export class AppComponent implements OnInit {
   title = 'Many In One';
