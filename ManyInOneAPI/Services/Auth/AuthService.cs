@@ -3,10 +3,8 @@ using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
 using ManyInOneAPI.Models.Auth;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
@@ -225,7 +223,7 @@ namespace ManyInOneAPI.Services.Auth
             var isPersistent = true;
             _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
 
-            var result = await _signInManager.PasswordSignInAsync(userRequestDTO.Email, userRequestDTO.Password, isPersistent, lockoutOnFailure: true);
+            var result = await _signInManager.PasswordSignInAsync(userRequestDTO.Email, userRequestDTO.Password, isPersistent, lockoutOnFailure: true); // this things need to check , why it is failing
 
             var jwttoken = GenerateJwtToken(existingUser);
 
@@ -611,7 +609,7 @@ namespace ManyInOneAPI.Services.Auth
                 }),
                 Issuer = _authConfig.Issuer,
                 Audience = _authConfig.Audience,
-                Expires = DateTime.Now.ToLocalTime().AddMinutes(30), // need to be as geenral short like in min ,
+                Expires = DateTime.Now.ToLocalTime().AddHours(1), // need to be as geenral short like in min ,
                 //when implement refresh token , change here
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
             };
@@ -640,7 +638,7 @@ namespace ManyInOneAPI.Services.Auth
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 AddedDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1)
+                ExpiryDate = DateTime.Now.ToLocalTime().AddDays(5)
             };
 
             return refreshToken;
@@ -652,7 +650,7 @@ namespace ManyInOneAPI.Services.Auth
             _httpContextAccessor.HttpContext!.Response.Cookies.Append("x-access-token", encryptedToken,
              new CookieOptions
              {
-                 Expires = DateTime.Now.ToLocalTime().AddMinutes(30),
+                 Expires = DateTime.Now.ToLocalTime().AddHours(1),
                  Secure = true,
                  HttpOnly = true,
                  IsEssential = true,
@@ -681,10 +679,10 @@ namespace ManyInOneAPI.Services.Auth
                 IsUsed = true,
                 IsRevoked = false,
                 AddedDate = DateTime.Now.ToLocalTime(),
-                ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1)
+                ExpiryDate = DateTime.Now.ToLocalTime().AddDays(5)
             };
 
-            var res =  _dbContext.RefreshTokens.Update(newRefreshToken);
+            var res =  await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
             await _dbContext.SaveChangesAsync();
 
             return true;

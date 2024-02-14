@@ -23,8 +23,8 @@ namespace ManyInOneAPI.Services.Clasher
         public Task<ClashResponse<ClanInfo>> GetClanById(string clanTag);
         public Task<ClashResponse<CurrentClanWarLeagueGroup>> GetClansCurrentClanWarLeagueGroup(string clanTag);
         public Task<ClashResponse<WarLog>> GetClansWarLog(string clanTag);
-        public Task<ClashResponse<List<Info>>> SearchClans(string name, string warFrequency, int locationId, int minMembers, int maxMembers, int minClanPoints, int minClanLevel, int limit = 10);
-        public Task<ClashResponse<CapitalRaidSeason>> GetClansCapitalRaidSeasons(string clanTag, int limit = 10);
+        public Task<ClashResponse<List<SearchClanInfo>>> SearchClans(SearchClansRequest searchClansRequest);
+        public Task<ClashResponse<CapitalRaidSeason>> GetClansCapitalRaidSeasons(string clanTag, int limit = 100);
         public Task<ClashResponse<CurrentWar>> GetClansCurrentWar(string clanTag);
 
         #endregion
@@ -35,6 +35,11 @@ namespace ManyInOneAPI.Services.Clasher
         public Task<ClashResponse<List<Other>>> GetAllBuilderBaseLeagues();
         public Task<ClashResponse<List<Other>>> GetAllCapitaLeagues();
 
+        #endregion
+
+        #region Labels Related
+        public Task<ClashResponse<List<Label>>> GetAllClanLabels();
+        public Task<ClashResponse<List<Label>>> GetAllPlayerLabels();
         #endregion
     }
 }

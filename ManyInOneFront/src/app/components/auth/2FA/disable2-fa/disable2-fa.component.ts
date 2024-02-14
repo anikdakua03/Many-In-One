@@ -12,6 +12,8 @@ import { AuthenticationService } from '../../../../shared/services/authenticatio
 })
 export class Disable2FAComponent {
 
+    isLoading : boolean = false;
+
   constructor(private authService: AuthenticationService, private toaster: ToastrService) {
 
   }
@@ -20,9 +22,11 @@ export class Disable2FAComponent {
   {
     this.authService.disableAuthenticator().subscribe({
       next: res => {
+        this.isLoading = false;
         this.toaster.success("Disabled successfully !!", "2 FA code disable");
       },
       error: err => {
+      this.isLoading = false;
         this.toaster.error("Unable to disable 2FA !!", "2 FA code disable");
       }
     });

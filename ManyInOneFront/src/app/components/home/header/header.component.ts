@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 
@@ -10,23 +10,30 @@ import { AuthenticationService } from '../../../shared/services/authentication.s
   templateUrl: './header.component.html',
   styles: ``
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
 
+  checkCurrUser: boolean = false;
 
   constructor(protected authService: AuthenticationService, private router: Router) {
   }
 
+  ngOnInit(): void {
+    this.authService.isAuthenticatedd.subscribe((data) => {
+      this.checkCurrUser = data;
+    }
+    );
+  }
+
   // logout
   onLogout() {
-  
+    debugger
     this.authService.signOut().subscribe({
       next: res => {
-        console.log(res);
-        this.authService.currUserSignal.set(null);
         if (res.result) {
+          this.authService.isAuthenticatedd.next(false); // set false
           this.authService.removeToken();
-          this.router.navigateByUrl('/'); // go to home
           window.location.reload();
+          this.router.navigateByUrl('/'); // go to home
         }
       },
       error: err => {

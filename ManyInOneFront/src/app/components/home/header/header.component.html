@@ -13,7 +13,7 @@
                         Clans</a>
                     <!-- @if(authService.currUserSignal !== null && authService.currUserSignal !== undefined) -->
                     <!-- authService.isAuthenticated -->
-                    @if(false)
+                    @if(checkCurrUser)
                     {
                         <a routerLink="manage" class="hover:text-indigo-600 cursor-pointer text-gray-700 font-bold">Manage</a>
                     }
@@ -22,7 +22,7 @@
             <div class="flex space-x-4 items-center">
 
                 <!-- @if(authService.currUserSignal !== null && authService.currUserSignal !== undefined) -->
-                @if(authService.isAuthenticated)
+                @if(checkCurrUser)
                 {
                 <button type="submit" (click)="onLogout()"
                     class="bg-red-400 px-4 py-2 rounded text-white cursor-pointer font-bold hover:bg-indigo-500 text-sm">Log

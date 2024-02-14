@@ -8,11 +8,12 @@ import { Router, RouterLink } from '@angular/router';
 import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
 import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { environment } from '../../../../environments/environment';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NgxLoadingModule],
   templateUrl: './register.component.html',
   styles: ``
 })
@@ -23,6 +24,7 @@ export class RegisterComponent {
   // registerDto: Register = new Register();
   authResponseDto: AuthResponse = new AuthResponse();
   registerForm!: FormGroup;
+  isLoading: boolean = false;
 
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) {
     
@@ -77,18 +79,20 @@ export class RegisterComponent {
   // registerDto : Register
   onRegister() {
     if (this.registerForm.valid) {
+      this.isLoading = true;
       // console.log("Register form ---> ", this.registerForm.value);
       this.authService.register(this.registerForm.value).subscribe({
         next:
-          res => {
-            console.log(res);
-            // get the user user email or something and set to cookie for ui interaction according to it
-            // this.authService.saveToken(this.registerForm.value.email);
-            this.toaster.success(res.message, "User registered");
-          },
+        res => {
+          // roue to login
+          this.isLoading = false;
+          this.router.navigateByUrl('/login');
+          this.toaster.success(res.message, "User registered");
+        },
         error:
-          err => {
-            console.log(err);
+        err => {
+          console.log(err);
+          this.isLoading = false;
             this.toaster.error(err.message, "User registration failed !!");
           }
       });

@@ -1,5 +1,7 @@
+using HealthChecks.UI.Client;
 using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
+using ManyInOneAPI.Health;
 using ManyInOneAPI.Repositories.Payment;
 using ManyInOneAPI.Services.Auth;
 using ManyInOneAPI.Services.Clasher;
@@ -7,6 +9,7 @@ using ManyInOneAPI.Services.GenAI;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +19,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// adding healthcheck
+builder.Services.AddHealthChecks()
+    //.AddCheck<DatabaseHealthCheck>("DatabasehealthCheck") // for custom check
+    .AddSqlServer(connectionString!);
 // Add services to the container.
 builder.Services.AddControllers();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // adding configurations
 builder.Services.Configure<AuthConfig>(builder.Configuration.GetSection("Auth"));
@@ -170,6 +177,12 @@ app.UseStaticFiles();
 
 app.UseCors("Frontend");
 
+// adding healthchecks , ordering matters
+app.MapHealthChecks("/_health", new HealthCheckOptions
+{
+    // decorating health check responses
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

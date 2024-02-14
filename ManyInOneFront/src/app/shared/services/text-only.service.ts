@@ -21,6 +21,6 @@ export class TextOnlyService {
   askQuestion(askQuery: object): Observable<any> {
     this.formSubmitted = true;
 
-    return this.http.post<any>(this.url, askQuery);
+    return this.http.post<any>(this.url, askQuery, { withCredentials: true });
   }
 }

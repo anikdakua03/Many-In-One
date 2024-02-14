@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthResponse } from '../models/auth-response.model';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -10,8 +10,10 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class AuthenticationService {
 
-  // check user is logged in or not
-  // isAuthenticated : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  // check user is logged in or not , this will availble to whole application 
+  // if user reloads then it will be set to inital , as here false 
+  // so that time we will fill it from localstorage based on that user id
+  isAuthenticatedd: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   currUserSignal = signal<AuthResponse | null | undefined>(undefined);// when not null or not logged in in -> undefined , when not authenticated -> null , when authenticated -> got response , where ther will be user id
   isAuthenticated: boolean = false;
 
@@ -96,17 +98,33 @@ export class AuthenticationService {
 
   // ================================================Token related =====================================
   // this can be sfifted to another service
-  public updateToken(status: boolean) {
-    this.isAuthenticated = status;
-    let ch = this.isAuthenticated;
-    console.log("from  user status", ch)
-  }
+  // public updateToken(status: boolean) {
+  //   this.isAuthenticated = status;
+  //   let ch = this.isAuthenticated;
+  //   console.log("from  user status", ch)
+  // }
 
 
   public saveToken(userId: string) {
+    //set that is authenticated behavior 
+    this.isAuthenticatedd.next(true);
+    // and set the user to localstorage
+    localStorage.setItem("curr-app-user", userId);
     // get the user user email or something and set to cookie for ui interaction according to it
-    console.log("first", userId)
-    this.cookie.set("curr-app-user", userId, 1, "/", "localhost", true, "None");
+    // this.cookie.set("curr-app-user", userId, 1, "/", "localhost", true, "None");
+  }
+
+  // when reload happens but already alogged in , that time behavioursubjoct resets , so that time can get 
+  // the user from localstorage
+  public getUserFromLocal() {
+    if (this.isAuthenticatedd.value === false) {
+      let fromLocal = localStorage.getItem("curr-app-user");
+      if (fromLocal !== null || fromLocal === '') {
+        // exists then set again 
+        this.isAuthenticatedd.next(true);
+      }
+    }
+    return this.isAuthenticatedd.value;
   }
 
 
@@ -115,45 +133,44 @@ export class AuthenticationService {
     return this.http.get(`${this.baseUrl}Auth/GetCurrentUser`, { withCredentials: true });
   }
 
-  public isLoggegIn(): boolean
-  {
-    this.getCurrentUser().subscribe({
-      next: res => {
-        // console.log("After checking froms erver also --> ", res);
-        this.saveToken(res.userId);
-        // this.isAuthenticated = check == null || undefined ? false : true;
-        // console.log("autheee -->", this.isAuthenticated);
-      },
-      error: err => {
-        console.log("Invaliddd -->", err);
-      }
-    });
+  // public isLoggegIn(): boolean
+  // {
+  //   this.getCurrentUser().subscribe({
+  //     next: res => {
+  //       // console.log("After checking froms erver also --> ", res);
+  //       this.saveToken(res.userId);
+  //       // this.isAuthenticated = check == null || undefined ? false : true;
+  //       // console.log("autheee -->", this.isAuthenticated);
+  //     },
+  //     error: err => {
+  //       console.log("Invaliddd -->", err);
+  //     }
+  //   });
 
-    // after matchis from server also
-    const user = this.getToken();
-    if(user !== null)
-    {
-      this.isAuthenticated = true;
-      return true;
-    }
-    else
-    {
-      this.isAuthenticated = false;
-      return false;
-    }
-  }
+  //   // after matchis from server also
+  //   const user = this.getToken();
+  //   if(user !== null)
+  //   {
+  //     this.isAuthenticated = true;
+  //     return true;
+  //   }
+  //   else
+  //   {
+  //     this.isAuthenticated = false;
+  //     return false;
+  //   }
+  // }
 
   public removeToken() {
-    // deleteing only the access token bcs it is loggin out manually
-    // so next time user log s in , it only need s to get access token
+    localStorage.removeItem("curr-app-user");
     this.cookie.deleteAll();
     // window.location.reload();
   }
 
-  public getToken(): string | null {
-    // will get current token , else return null
-    return this.cookie.get("curr-app-user") || null;
-  }
+  // public getToken(): string | null {
+  //   // will get current token , else return null
+  //   return this.cookie.get("curr-app-user") || null;
+  // }
 }
 
 // ================================================ Token related Ends=====================================
