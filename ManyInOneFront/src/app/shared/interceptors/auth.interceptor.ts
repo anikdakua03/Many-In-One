@@ -5,7 +5,6 @@ import { catchError, tap, throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { AuthenticationService } from '../services/authentication.service';
 
-let counter: number = 0;
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -13,11 +12,13 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     const router = inject(Router);
     const toaster = inject(ToastrService);
 
+    let refresh : boolean = false;
+
     return next(req).pipe(
         catchError((err: HttpErrorResponse) => {
             debugger
-            if (err && err.status === 401 && counter !== 1) {
-                counter++; // Increment counter only if attempting refresh
+            if (err && err.status === 401 && !refresh) {
+                refresh = true; // will refresh , so set to true
 
                 return authService.refreshToken().pipe(
                     tap(x => {
@@ -25,10 +26,12 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                     }), // Emit message without affecting flow
 
                     catchError(() => {
-                        // Refresh failed, revoke token
+                        // Refresh failed, some error occurred while refreshing, so revoke all token
+                        authService.removeToken();
+                        toaster.show("Please login again to continue !!!");
                         return authService.revokeToken().pipe(
                             tap(x => {
-                                router.navigateByUrl('/home');
+                                router.navigateByUrl('/login');
                                 toaster.show("Please login again to continue !!!");
                             }),
                             catchError(() => {
@@ -40,7 +43,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                 );
             }
             else {
-                counter = 0; // Reset counter for other errors
+                refresh = false; // Reset counter for other errors
                 return throwError(() => new Error(err.message)); // Rethrow original error
             }
         })

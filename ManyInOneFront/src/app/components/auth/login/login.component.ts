@@ -8,11 +8,12 @@ import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router, RouterLink } from '@angular/router';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NgxLoadingModule],
   templateUrl: './login.component.html',
   styles: ``
 })
@@ -23,6 +24,7 @@ export class LoginComponent {
 
   authResponseDto: AuthResponse = new AuthResponse();
   loginForm!: FormGroup;
+  isLoading: boolean = false;
 
 
   constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) 
@@ -85,13 +87,13 @@ export class LoginComponent {
   // loginDto : Login
   onLogin() {
     if (this.loginForm.valid) {
-      // console.log("login --> ", this.loginForm.value);
-
+      this.isLoading = true;
       this.authService.login(this.loginForm.value).subscribe({
         next:
           res => {
             console.log(res.userId);
             if (!res.twoFAEnabled) {
+              this.isLoading = false;
               // get the user user email or something and set to cookie for ui interaction according to it
               this.authService.saveToken(res.userId);
               // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
@@ -99,12 +101,13 @@ export class LoginComponent {
               this.router.navigateByUrl("/home");
             }
             else {
+              this.isLoading = false;
               this.router.navigateByUrl("/login/2FA");
             }
           },
         error:
           err => {
-            // console.log(err);
+            this.isLoading = false;
             this.toaster.error("Login failed !!", "User Logged in failed !!");
           }
       });
@@ -113,5 +116,4 @@ export class LoginComponent {
       this.loginForm.markAllAsTouched(); // will show all the errors
     }
   }
-
 }

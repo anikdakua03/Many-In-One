@@ -1,3 +1,4 @@
+<ngx-loading [show]="isLoading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
 <div class="pt-12 px-4">
     <h1 class="text-center font-bold text-2xl">Search clans</h1>
     <hr />
@@ -159,14 +160,14 @@
                             <th class="pb-3 w-6"></th>
                         </tr>
                     </thead>
-                    @for(cl of searchedClans; track cl.tag;)
+                    @for(cl of searchedClans; track cl.tag; let idx = $index)
                     {
                     <tbody class="divide-y divide-red-400">
                         <tr
                             class="border-b border-yellow-300 last:border-b-amber-200 bg-cyan-300 hover:bg-cyan-200 hover:scale-105">
 
                             <!-- for normal ordering page -->
-                            <td>1 + 1</td>
+                            <td>{{idx + 1}}</td>
 
                             <td class="flex justify-center items-center whitespace-nowrap">
                                 <img [src]=cl.badgeUrls.medium alt="cl.name" [title]="cl.name"

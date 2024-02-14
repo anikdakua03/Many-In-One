@@ -3,11 +3,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ToastrService } from 'ngx-toastr';
 import { ClashOfClanService } from '../../../shared/services/clash-of-clan.service';
 import { IPlayer } from '../../../shared/interfaces/player';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @Component({
   selector: 'app-search-player',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgxLoadingModule],
   templateUrl: './search-player.component.html',
   styles: ``
 })
@@ -22,6 +23,7 @@ export class SearchPlayerComponent {
   isTroopsOpen: boolean = false;
   isAchievementOpen: boolean = false;
   isBuilderBaseOpen: boolean = false;
+  isLoading : boolean = false;
 
   // allSuperTroops: [] = [];
 
@@ -146,8 +148,12 @@ export class SearchPlayerComponent {
   constructor(private clashingService: ClashOfClanService, private toaster: ToastrService) {
     // for dev purpose
     const data = localStorage.getItem("player");
+    if( JSON.parse(data!).legendStatistics === null)
+    {
+      JSON.parse(data!).legendStatistics = {};
+    }
     this.playerData = JSON.parse(data!);
-    // console.log("plyerrrr", this.playerData);
+    console.log("plyerrrr", this.playerData);
 
   }
 
@@ -155,15 +161,17 @@ export class SearchPlayerComponent {
   onSearchPlayer() {
     if (this.playerForm.valid) {
       debugger
+      this.isLoading = true;
       // check localstorage player tag if there
       const data = localStorage.getItem("player");
       console.log("plyerrrr", this.playerData);
-
+      
       if (data === null || data === undefined || JSON.parse(data!).tag !== this.playerForm.value.playerTag) {
-
+        
         this.clashingService.getPlayer(this.playerForm.value.playerTag).subscribe({
           next: res => {
             if (res.result !== null) {
+              this.isLoading = false;
               // console.log("Player response", res);
               this.playerData = res.result;
               // storing in local storage for dev purpose to restrict api call
@@ -171,16 +179,19 @@ export class SearchPlayerComponent {
               this.toaster.success("Player found", "Player  found!!");
             }
             else {
+              this.isLoading = false;
               this.toaster.error(res.message, "No player  found!!");
             }
           },
           error: err => {
+            this.isLoading = false;
             console.log(err)
           }
         });
       }
       else {
         // get from localstorage
+        this.isLoading = false;
         this.playerData = JSON.parse(data!);
         this.toaster.success("Player found", "Player  found!!");
       }

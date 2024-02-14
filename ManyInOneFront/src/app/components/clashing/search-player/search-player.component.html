@@ -1,3 +1,4 @@
+<ngx-loading [show]="isLoading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
 <div class="pt-12 px-4">
     <div>
         <h1 class="text-center font-bold text-2xl">Search clash Player</h1>
@@ -118,7 +119,7 @@
                 <div class="text-center text-lg font-bold align-baseline">
                     <label class="text-2xl font-bold text-blue-700 bg-amber-400 shadow-md">Heros</label>
                     <div class="grid grid-cols-3 justify-center ">
-                        @for(tr of playerData.heroes; track tr.village == "home")
+                        @for(tr of playerData.heroes; track $index)
                         {
                         <div class="bg-teal-400 p-1 w-[350px] m-1 relative rounded-md">
                             <label class="mr-12">{{tr.name}}</label>
@@ -137,7 +138,7 @@
                 <div class="text-center text-lg font-bold align-baseline">
                     <label class="text-2xl font-bold text-blue-700 bg-amber-400 shadow-md">Troops</label>
                     <div class="grid lg:grid-cols-4 sm:grid-cols-2 auto-rows-max">
-                        @for(tr of playerData.troops; track tr.village == "home")
+                        @for(tr of playerData.troops; track $index)
                         {
                         <div class="bg-teal-400 p-1 m-1 flex justify-center items-center relative">
                             <label class="mr-12">{{tr.name}}</label>

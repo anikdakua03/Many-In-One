@@ -5,11 +5,12 @@ import { AuthenticationService } from '../../../shared/services/authentication.s
 import { ToastrService } from 'ngx-toastr';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @Component({
   selector: 'app-two-falogin',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgxLoadingModule],
   templateUrl: './two-falogin.component.html',
   styles: ``
 })
@@ -17,6 +18,7 @@ export class TwoFALoginComponent {
 
   authResponseDto: AuthResponse = new AuthResponse();
   twoFALoginForm!: FormGroup;
+  isLoading: boolean = false;
 
 
   constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router) {
@@ -27,9 +29,11 @@ export class TwoFALoginComponent {
   }
 
   on2FALogin() {
+    this.isLoading = true;
     this.authService.verifyAndLogin(this.twoFALoginForm.value).subscribe({
       next:
-        res => {
+      res => {
+          this.isLoading = false;
           console.log(res);
           // get the user user email or something and set to cookie for ui interaction according to it
           this.authService.saveToken(res.userId);

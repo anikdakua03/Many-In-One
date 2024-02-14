@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
@@ -15,26 +15,45 @@ import { AuthenticationService } from './shared/services/authentication.service'
 })
 export class AppComponent implements OnInit {
   title = 'Many In One';
-  constructor(private authService: AuthenticationService) {
+  constructor() {
 
+  }
+
+  isMenuScrolled: boolean = false;
+
+  @HostListener('window:scroll', ['$event'])
+  scrollCheck() {
+    if (window.scrollY > 100) {
+      this.isMenuScrolled = true;
+    }
+    else {
+      this.isMenuScrolled = false;
+    }
+    // console.log("Scrolled or not", this.isMenuScrolled);
   }
 
   // any time user reloads the page will get the user based on token from server
   ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe({
-      next: res => {
-        // and set the curruserSignal and will be avalibale for whole application
-        // console.log(res);
-        this.authService.currUserSignal.set(res);
-      },
-      error: err => {
-        this.authService.currUserSignal.set(null);
-      }
-    });
+    // this.authService.getCurrentUser().subscribe({
+    //   next: res => {
+    //     // and set the curruserSignal and will be avalibale for whole application
+    //     // console.log(res);
+    //     this.authService.currUserSignal.set(res);
+    //   },
+    //   error: err => {
+    //     this.authService.currUserSignal.set(null);
+    //   }
+    // });
 
-    if(this.authService.isLoggegIn())
-    {
+    // if(this.authService.isLoggegIn())
+    // {
       
-    }
+    // }
+  }
+
+  scrollToTop() {
+    document.body.scrollIntoView({
+      behavior : 'smooth'
+    });
   }
 }

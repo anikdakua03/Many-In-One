@@ -1,3 +1,4 @@
+<ngx-loading [show]="isLoading"  [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
 <div class="ml-6 justify-center items-center">
     <div class="pt-16">
         <a class="text-blue-600 font-bold pt-16" routerLink="/home">Home</a><br />
@@ -22,7 +23,9 @@
     </div>
 </div>
 
-<div class="mb-3 ml-5 mr-6">
-    <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer :--> </label>
-    <p markdown [data]="response" [disableSanitizer]="true"></p>
+<div class="container mb-3 ml-5 mr-6">
+
+    <!-- <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer : </label> -->
+    <markdown [data]="response" lineNumbers lineHighlight clipboard katex [katexOptions]="options"></markdown>
+    <!-- <markdown [data]="mathEq" lineNumbers lineHighlight clipboard katex></markdown> -->
 </div>

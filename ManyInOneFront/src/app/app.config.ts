@@ -4,13 +4,13 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { provideToastr } from 'ngx-toastr';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { provideMarkdown } from 'ngx-markdown';
-// import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
+import { CLIPBOARD_OPTIONS, ClipboardButtonComponent, MARKED_OPTIONS, MarkedRenderer, provideMarkdown } from 'ngx-markdown';
+import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
 
   providers: [
-    provideHttpClient(withFetch(), ), //withInterceptors([AuthInterceptor])
+    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
     provideRouter(routes), 
     provideAnimations(), // required animations providers
     provideToastr({
@@ -18,5 +18,36 @@ export const appConfig: ApplicationConfig = {
       positionClass: 'toast-top-center',
       preventDuplicates: true,
     }),
-    provideMarkdown(),] //for markdown configuration need to add here] // Toastr providers]
+    provideMarkdown({
+      clipboardOptions: {
+        provide: CLIPBOARD_OPTIONS,
+        useValue: {
+          buttonComponent: ClipboardButtonComponent,
+        },
+      },
+      markedOptions: {
+        provide: MARKED_OPTIONS,
+        useValue: {
+          renderer: new MarkedRenderer(),
+          gfm: true,
+          breaks: false,
+          pedantic: false,
+          smartLists: true,
+          lineNumber: true,
+          langPrefix: 'language-',
+          // highlight : function(code, lang)
+          // {
+          //   if(Prism.language[lang])
+          //   {
+          //     return Prism.highlight(code, Prism.language[lang], lang);
+          //   }
+          //   else
+          //   {
+          //     return code;
+          //   }
+          // }
+        },
+      }
+    }),
+  ] //for markdown configuration need to add here] // Toastr providers]
 };

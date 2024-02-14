@@ -53,10 +53,10 @@ export const routes: Routes = [
         'path': 'genAI/textandimageonly', 'title': 'Image & Text Only Input', component: TextAndImageOnlyComponent,  canActivate : [authGuard]
     },
     {
-        'path': 'clashOfClans', 'title': 'Clashing', component: ClashingComponent,  canActivate : [authGuard]
+        'path': 'clashOfClans', 'title': 'Clashing', component: ClashingComponent, canActivate : [authGuard]
     },
     {
-        'path': 'clashOfClans/search-player', 'title': 'Clash Player', component: SearchPlayerComponent,  canActivate : [authGuard]
+        'path': 'clashOfClans/search-player', 'title': 'Clash Player', component: SearchPlayerComponent,   canActivate : [authGuard]
     },
     {
         'path': 'clashOfClans/search-clan', 'title': 'Clans', component: SearchClanComponent,  canActivate : [authGuard]
