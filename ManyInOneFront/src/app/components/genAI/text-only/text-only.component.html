@@ -25,7 +25,8 @@
 
 <div class="container mb-3 ml-5 mr-6">
 
-    <!-- <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer : </label> -->
+    <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Query : {{inputForm.value.inputText}}</label>
+    <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Answer : </label>
     <markdown [data]="response" lineNumbers lineHighlight clipboard katex [katexOptions]="options"></markdown>
     <!-- <markdown [data]="mathEq" lineNumbers lineHighlight clipboard katex></markdown> -->
 </div>

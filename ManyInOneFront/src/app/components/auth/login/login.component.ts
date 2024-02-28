@@ -1,6 +1,6 @@
 declare var google: any;
 
-import { Component, NgZone } from '@angular/core';
+import { Component, Inject, NgZone, PLATFORM_ID} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
 import { environment } from '../../../../environments/environment';
@@ -9,69 +9,65 @@ import { AuthenticationService } from '../../../shared/services/authentication.s
 import { ToastrService } from 'ngx-toastr';
 import { Router, RouterLink } from '@angular/router';
 import { NgxLoadingModule } from 'ngx-loading';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, NgxLoadingModule],
   templateUrl: './login.component.html',
-  styles: ``
+  styles: ``,
 })
 export class LoginComponent {
 
   clientId: string = environment.clientId;
-
 
   authResponseDto: AuthResponse = new AuthResponse();
   loginForm!: FormGroup;
   isLoading: boolean = false;
 
 
-  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone) 
+  constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object) 
   {
-    // debugger
-    // if (authService.currUserSignal !== null && authService.currUserSignal !== undefined) {
-    //   router.navigateByUrl('/home'); // if user already logged in , why they should go to login page
-    // }
     this.loginForm = this.fb.group({
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
     });
   }
-
-
+  
   ngOnInit(): void {
-    (window as any).onGoogleLibraryLoad = () => {
-
-      // setting up th eclients id 
-      // we could set up here , to our api url to hit and get some response or can also create callback to do some 
-      // buit we can't have both 
-      google.accounts.id.initialize({
-        client_id: this.clientId,
-        callback: this.handleCredentialResponse.bind(this),
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
-
-      // setting up th egoogle log in pop up
-      google.accounts.id.renderButton(
-        document.getElementById("onGoogleLogin")!,
-        { theme: "outline", size: "large", width: 100 }
-      );
-
-      // will send to google with all above info 
-      // google will give some info and token
-      google.accounts.id.prompt((notification: PromptMomentNotification) => (""));
+    // console.log("platform id for login -->", this.platformId);
+    if (isPlatformBrowser(this.platformId)) {
+      // we do not need this on google library load , it is causing not rendering button properly
+      // (window as any).onGoogleLibraryLoad = async () => {
+        // setting up the clients id 
+        // we could set up here , to our api url to hit and get some response or can also create callback to do some 
+        // but we can't have both 
+        google.accounts.id.initialize({
+          client_id: this.clientId,
+          callback: this.handleCredentialResponse.bind(this),
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+  
+        // setting up the google log in pop up
+        google.accounts.id.renderButton(
+          document.getElementById("onGoogleLogin")!,
+          { theme: "outline", size: "large", width: 100, shape : "rectangle" }
+        );
+  
+        // will send to google with all above info 
+        // google will give some info and token
+        google.accounts.id.prompt((notification: PromptMomentNotification) => (""));
+      // }
     }
   }
 
   handleCredentialResponse(response: CredentialResponse) {
-    // then will send it to our api to confirm and cehck
+  // then will send it to our api to confirm and check
     this.authService.logInWithGoogle(response.credential).subscribe(res => {
-      // localStorage.setItem("x-access-token", res.token);
       this._ngZone.run(() => {
-        // set the user signal for whole application
-        this.authService.currUserSignal.set(res);
+        this.authService.isAuthenticated$.next(true);
         this.authService.saveToken(res.userId);
         this.router.navigate(['/home']);
         window.location.reload();

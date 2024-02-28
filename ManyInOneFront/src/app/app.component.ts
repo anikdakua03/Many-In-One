@@ -4,7 +4,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import { HeaderComponent } from './components/home/header/header.component';
 import { RouterOutlet } from '@angular/router';
-import { AuthenticationService } from './shared/services/authentication.service';
 
 @Component({
     selector: 'app-root',
@@ -36,7 +35,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     // this.authService.getCurrentUser().subscribe({
     //   next: res => {
-    //     // and set the curruserSignal and will be avalibale for whole application
+    //     // and set the curr userSignal and will be avalibale for whole application
     //     // console.log(res);
     //     this.authService.currUserSignal.set(res);
     //   },

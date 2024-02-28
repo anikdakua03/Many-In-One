@@ -3,7 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthResponse } from '../models/auth-response.model';
-import { CookieService } from 'ngx-cookie-service';
+import { SsrCookieService } from 'ngx-cookie-service-ssr';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +13,9 @@ export class AuthenticationService {
   // check user is logged in or not , this will availble to whole application 
   // if user reloads then it will be set to inital , as here false 
   // so that time we will fill it from localstorage based on that user id
-  isAuthenticatedd: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  currUserSignal = signal<AuthResponse | null | undefined>(undefined);// when not null or not logged in in -> undefined , when not authenticated -> null , when authenticated -> got response , where ther will be user id
-  isAuthenticated: boolean = false;
+  isAuthenticated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(this.getUserFromLocal());
+  currUserSignal = signal<AuthResponse | null | undefined>(undefined);// when not null or not logged in in -> undefined , when not authenticated -> null , when authenticated -> got response , where there will be user id
+  // isAuthenticatedd: boolean = false;
 
   baseUrl: string = environment.apiBaseUrl;
 
@@ -23,7 +23,7 @@ export class AuthenticationService {
   loginUrl: string = "auth/Login";
 
 
-  constructor(private http: HttpClient, private cookie: CookieService) {
+  constructor(private http: HttpClient, private cookie: SsrCookieService) {
   }
 
   // registration
@@ -74,7 +74,7 @@ export class AuthenticationService {
   // load and share qr and shared key
   public loadAndShareQR(userId: string): Observable<any> {
     const header = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.http.post(`${this.baseUrl}Auth/Get2FAQRCodeeeeeee`, JSON.stringify(userId), { headers: header, withCredentials: true });
+    return this.http.post(`${this.baseUrl}Auth/Get2FAQRCode`, JSON.stringify(userId), { headers: header, withCredentials: true });
   }
 
   // verify 2 FA code
@@ -107,27 +107,26 @@ export class AuthenticationService {
 
   public saveToken(userId: string) {
     //set that is authenticated behavior 
-    this.isAuthenticatedd.next(true);
+    this.isAuthenticated$.next(true);
+    // not using localstorage because converted this to SSR so uisng ssr cookie
     // and set the user to localstorage
-    localStorage.setItem("curr-app-user", userId);
+    // localStorage.setItem("curr-app-user", userId);
+    this.cookie.set("curr-app-user", userId);
     // get the user user email or something and set to cookie for ui interaction according to it
     // this.cookie.set("curr-app-user", userId, 1, "/", "localhost", true, "None");
   }
 
   // when reload happens but already alogged in , that time behavioursubjoct resets , so that time can get 
   // the user from localstorage
-  public getUserFromLocal() {
-    if (this.isAuthenticatedd.value === false) {
-      let fromLocal = localStorage.getItem("curr-app-user");
-      if (fromLocal !== null || fromLocal === '') {
-        // exists then set again 
-        this.isAuthenticatedd.next(true);
+  public getUserFromLocal(): any {
+    let fromCookie = this.cookie.get("curr-app-user");
+    if (fromCookie !== null || fromCookie !== '') {
+        return fromCookie;
       }
-    }
-    return this.isAuthenticatedd.value;
+    return false;
   }
 
-
+  // not needed
   public getCurrentUser() : Observable<any>
   {
     return this.http.get(`${this.baseUrl}Auth/GetCurrentUser`, { withCredentials: true });

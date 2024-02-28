@@ -75,7 +75,7 @@ namespace ManyInOneAPI.Services.Auth
 
                 return new RegistrationResponse()
                 {
-                    Message = $" Registration successful , confirm your mail , just send to t you {emailSend.Message} !!",
+                    Message = $" Registration successful , confirm your mail , just send to you {emailSend.Message} !!",
                     Result = true
                 };
             }
@@ -535,7 +535,7 @@ namespace ManyInOneAPI.Services.Auth
             var currToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
             var currUser = new IdentityUser();
             // but if there is no access token
-            // then need to get first the refresh token and then genrate set new token and refresh token also
+            // then need to get first the refresh token and then generate set new token and refresh token also
             if (currToken.IsNullOrEmpty())
             {
                 var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
@@ -556,7 +556,7 @@ namespace ManyInOneAPI.Services.Auth
                 // other wise give the user email
                 var user = await GetUserFromJWT(currToken!);
 
-                // after that also verifies from user maanger
+                // after that also verifies from user manager
                 var isvalidUser = await _userManager.FindByEmailAsync(user.Email!);
 
                 if (isvalidUser is null)
@@ -654,7 +654,7 @@ namespace ManyInOneAPI.Services.Auth
                  Secure = true,
                  HttpOnly = true,
                  IsEssential = true,
-                 SameSite = SameSiteMode.None // chamged to none , to check if it is working?!
+                 SameSite = SameSiteMode.None // changed to none , to check if it is working?!
              });
         }
 
@@ -667,7 +667,7 @@ namespace ManyInOneAPI.Services.Auth
                 Secure = true,
                 HttpOnly = true,
                 IsEssential = true,
-                SameSite = SameSiteMode.None // chamged to none , to check if it is working?!
+                SameSite = SameSiteMode.None // changed to none , to check if it is working?!
             });
 
             // also add to the database in the refresh token table
@@ -682,7 +682,7 @@ namespace ManyInOneAPI.Services.Auth
                 ExpiryDate = DateTime.Now.ToLocalTime().AddDays(5)
             };
 
-            var res =  await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
+            await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
             await _dbContext.SaveChangesAsync();
 
             return true;
@@ -692,7 +692,7 @@ namespace ManyInOneAPI.Services.Auth
         {
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(credential);
 
-            // after that also verifies from user maanger
+            // after that also verifies from user manager
             var isvalidUser = await _userManager.FindByEmailAsync(jwt.Subject);
 
             return isvalidUser!;

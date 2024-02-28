@@ -73,7 +73,6 @@ export class SearchClanComponent implements OnInit {
 
 
   onSearchClanByTag() {
-    debugger
     if (this.clanByTagForm.valid) {
       // check localstorage player tag if there
       this.isLoading = true;

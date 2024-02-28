@@ -160,7 +160,6 @@ export class SearchPlayerComponent {
 
   onSearchPlayer() {
     if (this.playerForm.valid) {
-      debugger
       this.isLoading = true;
       // check localstorage player tag if there
       const data = localStorage.getItem("player");

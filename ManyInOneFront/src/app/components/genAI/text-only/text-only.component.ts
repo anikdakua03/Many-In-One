@@ -57,7 +57,6 @@ export class TextOnlyComponent {
   getAnswer() {
     const obj = this.inputForm.value;
     console.log(" Your query is componeent --> " + this.inputForm.value.inputText);
-    debugger
     if (this.inputForm.valid) {
       this.service.formSubmitted = true; // making flag true
       this.isLoading = true;

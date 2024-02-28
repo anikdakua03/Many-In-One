@@ -44,7 +44,8 @@
     <div class="mb-3 ml-5 mr-5 mt-4">
         <p>
             
-            <!-- <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer : </label> -->
+                <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Query : {{myForm.value.inputText}}</label>
+                <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Answer : </label>
             <markdown [data]="response" lineNumbers lineHighlight clipboard katex [katexOptions]="options"></markdown>
             <!-- <markdown [data]="mathEq" lineNumbers lineHighlight clipboard katex></markdown> -->
         </p>

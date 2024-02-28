@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 
@@ -14,23 +14,23 @@ export class HeaderComponent implements OnInit {
 
   checkCurrUser: boolean = false;
 
-  constructor(protected authService: AuthenticationService, private router: Router) {
+  constructor(protected authService: AuthenticationService, private router: Router, @Inject(PLATFORM_ID) private platformId: object) {
   }
 
   ngOnInit(): void {
-    this.authService.isAuthenticatedd.subscribe((data) => {
+    // if (isPlatformBrowser(this.platformId)) {
+      this.authService.isAuthenticated$.subscribe((data) => {
       this.checkCurrUser = data;
-    }
-    );
+    });
+    // }
   }
 
   // logout
   onLogout() {
-    debugger
     this.authService.signOut().subscribe({
       next: res => {
         if (res.result) {
-          this.authService.isAuthenticatedd.next(false); // set false
+          this.authService.isAuthenticated$.next(false); // set false
           this.authService.removeToken();
           window.location.reload();
           this.router.navigateByUrl('/'); // go to home

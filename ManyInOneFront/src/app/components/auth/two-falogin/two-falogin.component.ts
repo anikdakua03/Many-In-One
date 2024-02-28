@@ -3,7 +3,6 @@ import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
-import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import { NgxLoadingModule } from 'ngx-loading';
 

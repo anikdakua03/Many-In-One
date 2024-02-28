@@ -37,7 +37,15 @@ builder.Services.Configure<ClasherConfig>(builder.Configuration.GetSection("Clas
 
 builder.Services.AddDbContext<ManyInOneDbContext>(options =>
 {
-    options.UseSqlServer(connectionString);
+    options.UseSqlServer(connectionString, 
+        // for connection failure check if any
+    sqlServerOptionsAction: sqlOptions => 
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount : 5,
+            maxRetryDelay : TimeSpan.FromSeconds(30),
+            errorNumbersToAdd : null);
+    });
 });
 
 builder.Services.AddTransient<IEmailService, EmailService>();
@@ -119,7 +127,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Frontend", policyBuilder =>
     {
         policyBuilder
-            .WithOrigins("http://localhost:4200") // Allow requests from only this origin
+            .WithOrigins("http://localhost:4200", "https://localhost:8081") // Allow requests from only this origin
             .AllowAnyMethod() 
             .AllowCredentials()
             .AllowAnyHeader(); 
