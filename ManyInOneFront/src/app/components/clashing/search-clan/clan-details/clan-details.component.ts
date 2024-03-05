@@ -10,13 +10,13 @@ import { NgxLoadingModule } from 'ngx-loading';
 @Component({
   selector: 'app-clan-details',
   standalone: true,
-  imports: [RouterLink, NgxLoadingModule],
   templateUrl: './clan-details.component.html',
-  styles: ``
+  styles: ``,
+  imports: [RouterLink, NgxLoadingModule]
 })
 export class ClanDetailsComponent {
 
-  clanData: IClanInfo;
+  clanData?: IClanInfo;
   staticImgs: any = Images;
   memberData?: IPlayer;
   isLoading : boolean = false;
@@ -28,31 +28,30 @@ export class ClanDetailsComponent {
     // already set from when called this so can get that from local storage
     const data = localStorage.getItem("clan");
     this.clanData = JSON.parse(data!);
-
   }
 
 
   getPlayerDetails(playerTag: string) {
     // get player tag and get that player and show all details
-    console.log("After clicking", playerTag);
+    // console.log("After clicking", playerTag);
     // check localstorage player tag if there
     const data = localStorage.getItem("player");
-    console.log("member from local", this.memberData);
-
+    // // console.log("member from local", data);
     if (data === null || data === undefined || JSON.parse(data!).tag !== playerTag) {
       this.isLoading = true;
       this.clashingService.getPlayer(playerTag).subscribe({
         next: res => {
           this.isLoading = false;
           this.memberData = res.result as IPlayer;
-          // storing in local storage for dev purpose to restrict api call
+          // storing in local storage for avoid same req calling server
           localStorage.setItem("player", JSON.stringify(res.result));
-          // this.router.navigateByUrl('/clashOfClans/search-player');
-          window.location.reload();
+          this.router.navigateByUrl('/clashOfClans/search-player');
+          this.toaster.success("Player details found !", "Player Details")
         },
         error: err => {
           this.isLoading = false;
-          console.log(err)
+          this.toaster.error("Player details not found !", "Player Details")
+          // console.log(err);
         }
       });
     }
@@ -60,12 +59,12 @@ export class ClanDetailsComponent {
       // get from localstorage
       this.isLoading = false;
       this.memberData = JSON.parse(data!);
-      // this.router.navigateByUrl('/clashOfClans/search-player');
+      this.router.navigateByUrl('/clashOfClans/search-player');
+      this.toaster.success("Player details found !", "Player Details")
     }
-  this.router.navigateByUrl('/clashOfClans/search-player');
   }
 
-  onClickMemeberList() {
+  onClickMemberList() {
     this.isMembersListOpen = true;
     this.isWarStatsOpen = false;
   }

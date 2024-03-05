@@ -22,32 +22,17 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:scroll', ['$event'])
   scrollCheck() {
-    if (window.scrollY > 100) {
+    if (window.scrollY > 50) {
       this.isMenuScrolled = true;
     }
     else {
       this.isMenuScrolled = false;
     }
-    // console.log("Scrolled or not", this.isMenuScrolled);
   }
 
   // any time user reloads the page will get the user based on token from server
   ngOnInit(): void {
-    // this.authService.getCurrentUser().subscribe({
-    //   next: res => {
-    //     // and set the curr userSignal and will be avalibale for whole application
-    //     // console.log(res);
-    //     this.authService.currUserSignal.set(res);
-    //   },
-    //   error: err => {
-    //     this.authService.currUserSignal.set(null);
-    //   }
-    // });
 
-    // if(this.authService.isLoggegIn())
-    // {
-      
-    // }
   }
 
   scrollToTop() {

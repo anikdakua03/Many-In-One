@@ -13,16 +13,26 @@ import { AuthenticationService } from '../../../shared/services/authentication.s
 export class HeaderComponent implements OnInit {
 
   checkCurrUser: boolean = false;
+  currUserName: string = "";
+  isSidebarShowing: boolean = false;
 
-  constructor(protected authService: AuthenticationService, private router: Router, @Inject(PLATFORM_ID) private platformId: object) {
+  constructor(protected authService: AuthenticationService, private router: Router) {
   }
 
   ngOnInit(): void {
-    // if (isPlatformBrowser(this.platformId)) {
       this.authService.isAuthenticated$.subscribe((data) => {
       this.checkCurrUser = data;
     });
-    // }
+    const data = this.authService.getCurrentUserName();
+    this.currUserName = data === "" ? "User" : data.replaceAll('"', '');
+  }
+
+  openSidebar() {
+    this.isSidebarShowing = true;
+  }
+    
+    closeSidebar() {
+      this.isSidebarShowing = false;
   }
 
   // logout

@@ -26,6 +26,11 @@ export class RegisterComponent {
   authResponseDto: AuthResponse = new AuthResponse();
   registerForm!: FormGroup;
   isLoading: boolean = false;
+  localUser: any = {
+    userId: "",
+    userName: "",
+    is2FaEnabled: false
+  };
 
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object) {
     
@@ -72,14 +77,16 @@ export class RegisterComponent {
       this._ngZone.run(() => {
         // set the user signal for whole application
         this.authService.isAuthenticated$.next(true);
-        this.authService.saveToken(res.userId);
+        this.authService.saveToken("x-app-user", res.userId);
+        this.authService.saveToken("x-user-name", res.userName);
+        this.authService.saveToken("twofa-enable", res.twoFAEnabled);
         this.router.navigateByUrl('/home');
         this.toaster.success("Registered with google Successful !!", "User Registered successfully !!");
       });
     },
       (err: any) => {
         console.log(err);
-        this.toaster.error(err, "User registeration failed !!");
+        this.toaster.error(err, "User registration failed !!");
       });
   }
 

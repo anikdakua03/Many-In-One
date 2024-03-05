@@ -34,7 +34,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                                 toaster.show("Please login again to continue !!!");
                             }),
                             catchError(() => {
-                                console.log("Other error occured --> ", err.message);
+                                console.log("Other error occurred --> ", err.message);
                                 return throwError(() => new Error("Token revoked")); // Final error handling
                             })
                         );

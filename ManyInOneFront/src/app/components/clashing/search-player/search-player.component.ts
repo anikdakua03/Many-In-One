@@ -4,21 +4,21 @@ import { ToastrService } from 'ngx-toastr';
 import { ClashOfClanService } from '../../../shared/services/clash-of-clan.service';
 import { IPlayer } from '../../../shared/interfaces/player';
 import { NgxLoadingModule } from 'ngx-loading';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-search-player',
   standalone: true,
-  imports: [ReactiveFormsModule, NgxLoadingModule],
+  imports: [ReactiveFormsModule, NgxLoadingModule, RouterLink],
   templateUrl: './search-player.component.html',
   styles: ``
 })
 export class SearchPlayerComponent {
-
   playerForm: FormGroup = new FormGroup({
-    playerTag: new FormControl("", [Validators.required]),
+    playerTag: new FormControl("", [Validators.required, Validators.minLength(10), Validators.maxLength(11)]),
   });
 
-  playerData: IPlayer;
+  playerData?: IPlayer;
 
   isTroopsOpen: boolean = false;
   isAchievementOpen: boolean = false;
@@ -86,6 +86,7 @@ export class SearchPlayerComponent {
     "Drop Ship": "assets/Clasher/Drop_Ship_info.webp",
     // "Baby Dragon": "assets/Clasher/PEKKA1", // used as same
     "Night Witch": "assets/Clasher/Night_Witch_info.webp",
+    "Electrofire Wizard": "assets/Clasher/Electrofire_Wizard_info.webp",
     // Machines
     "Wall Wrecker": "assets/Clasher/Avatar_Wall_Wrecker.webp",
     "Battle Blimp": "assets/Clasher/Avatar_Battle_Blimp.webp",
@@ -128,6 +129,8 @@ export class SearchPlayerComponent {
     "Giant Arrow": "assets/Clasher/Giant_Arrow.webp",
     "Healing Tome": "assets/Clasher/Healing_Tome.webp",
     "Frozen Arrow": "assets/Clasher/Frozen_Arrow.webp",
+    "Hog Rider Puppet": "assets/Clasher/Hog_Rider_Puppet.webp",
+    "Haste Vial": "assets/Clasher/Haste_Vial.webp",
     // Spells
     "Lightning Spell": "assets/Clasher/Lightning_Spell_info.jpg",
     "Healing Spell": "assets/Clasher/Healing_Spell_info.webp",
@@ -142,28 +145,21 @@ export class SearchPlayerComponent {
     "Haste Spell": "assets/Clasher/Haste_Spell_info.webp",
     "Skeleton Spell": "assets/Clasher/Skeleton_Spell_info.webp",
     "Bat Spell": "assets/Clasher/Bat_Spell_info.webp",
+    "Overgrowth Spell": "assets/Clasher/Overgrowth_Spell_info.webp",
   };
 
-
   constructor(private clashingService: ClashOfClanService, private toaster: ToastrService) {
-    // for dev purpose
     const data = localStorage.getItem("player");
-    if( JSON.parse(data!).legendStatistics === null)
-    {
-      JSON.parse(data!).legendStatistics = {};
-    }
     this.playerData = JSON.parse(data!);
-    console.log("plyerrrr", this.playerData);
-
   }
 
 
   onSearchPlayer() {
     if (this.playerForm.valid) {
       this.isLoading = true;
-      // check localstorage player tag if there
+      // check local storage player tag if there
       const data = localStorage.getItem("player");
-      console.log("plyerrrr", this.playerData);
+      // console.log("plyerrrr", this.playerData);
       
       if (data === null || data === undefined || JSON.parse(data!).tag !== this.playerForm.value.playerTag) {
         
@@ -184,9 +180,10 @@ export class SearchPlayerComponent {
           },
           error: err => {
             this.isLoading = false;
-            console.log(err)
+            // console.log(err)
           }
         });
+        // window.location.reload();
       }
       else {
         // get from localstorage

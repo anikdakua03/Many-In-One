@@ -20,6 +20,8 @@
                         </div>
                     </div>
 
+                    @if(showTwoFA === false)
+                    {
                     <div class="mx-auto max-w-xs mt-4">
                         <form [formGroup]="loginForm" (click)="onLogin()" novalidate autocomplete="off">
                             <div class="bg-white px-5 py-8 rounded-xl w-screen shadow-xl max-w-sm">
@@ -40,8 +42,8 @@
                                                 required</span>
                                         </p>
                                         }
-                                        </div>
-                                        <div class="flex items-center border-2 py-2 px-3 rounded-md">
+                                    </div>
+                                    <div class="flex items-center border-2 py-2 px-3 rounded-md">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd"
                                                 d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
@@ -54,33 +56,66 @@
                                         {
                                         <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> - Password
                                                 required </span> of minimum 6 length.
-                                                </p>
-                                                }
-                                                </div>
-                                                </div>
-                                                <button type="submit"
-                                                    class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000">Login</button>
-                                                <hr>
+                                        </p>
+                                        }
+                                        </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000">Login</button>
+                                        <hr>
                             </div>
-                            </form>
-                            
-                            <div class="flex justify-center items-center mt-4">
-                                <p class="inline-flex items-center text-gray-700 font-medium text-lg text-center">
+                        </form>
+                        
+                        <div class="flex justify-center items-center mt-4">
+                            <p class="inline-flex items-center text-gray-700 font-medium text-lg text-center">
                                 <span class="ml-2">Don't have an account?<a routerLink="/register"
                                         class="text-md ml-2 text-blue-500 font-semibold">Register now &rarr;</a>
                                 </span>
-                                </p>
+                            </p>
+                            </div>
+                            </div>
+                    }
+                    @else {
+                    <div class="mx-auto max-w-xs mt-10">
+                        <div
+                            class="relative grid mx-4 mb-4 -mt-6 overflow-hidden text-white shadow-lg h-12 place-items-center rounded-xl bg-gradient-to-tr from-blue-500 to-blue-800 bg-clip-border shadow-gray-900/20">
+                            <h3 class="block font-sans text-center text-xl antialiased font-semibold leading-snug tracking-normal text-white">
+                                Two Factor Code Verification
+                            </h3>
+                        </div>
+                        <div class="flex flex-col justify-center items-center gap-4 p-6">
+                            <form [formGroup]="twoFALoginForm" (click)="on2FALogin()" novalidate autocomplete="off">
+                                <div class="bg-[#f4f5f7] px-5 py-8 rounded-xl justify-center w-screen shadow-xl max-w-sm">
+                                    <!-- <div class="space-y-4"> -->
+                                    <div class="flex items-center py-2 px-3 rounded-md mb-4">
+                                        <input class="pl-2 bg-inherit text-xl w-auto" type="text" name="twoFACode" value=""
+                                            placeholder="Two factor Code Here" formControlName="twoFACode" />
+                                        @if(twoFALoginForm.controls['twoFACode'].errors &&
+                                        twoFALoginForm.controls['twoFACode'].touched)
+                                        {
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> Two Factor code is
+                                                required of minimum 6 digits!!</span>
+                                        </p>
+                                        }
+                                    </div>
+                        
+                                    <button type="submit"
+                                        class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000">Verify
+                                        and Login</button>
+                                    <hr>
                                 </div>
-                                </div>
+                            </form>
+                        </div>
+                        </div>
+                        
+                        }
+                        </div>
+                        </div>
+                        </div>
+                        <div class="flex-1 bg-indigo-100 text-center hidden lg:flex">
+                <div class="m-12 xl:m-16 w-full min-h-screen bg-contain bg-center bg-no-repeat"
+                    style="background-image: url('https://cdn.pixabay.com/photo/2015/01/08/18/25/desk-593327_1280.jpg');">
                 </div>
-                <!-- <div class="col-span-6 bg-transparent" >
-                                                                                        </div> -->
-                </div>
-                </div>
-                <div class="flex-1 bg-indigo-100 text-center hidden lg:flex">
-                    <div class="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-                        style="background-image: url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg');">
-                    </div>
                 </div>
                 </div>
 </div>

@@ -20,11 +20,14 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//var pgConnectionString = builder.Configuration.GetConnectionString("PgConnection");
 
 // adding healthcheck
 builder.Services.AddHealthChecks()
     //.AddCheck<DatabaseHealthCheck>("DatabasehealthCheck") // for custom check
-    .AddSqlServer(connectionString!);
+    .AddSqlServer(connectionString!)
+     //.AddNpgSql(pgConnectionString!)
+    ;
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -37,16 +40,29 @@ builder.Services.Configure<ClasherConfig>(builder.Configuration.GetSection("Clas
 
 builder.Services.AddDbContext<ManyInOneDbContext>(options =>
 {
-    options.UseSqlServer(connectionString, 
-        // for connection failure check if any
-    sqlServerOptionsAction: sqlOptions => 
+    options.UseSqlServer(connectionString,
+    // for connection failure check if any
+    sqlServerOptionsAction: sqlOptions =>
     {
         sqlOptions.EnableRetryOnFailure(
-            maxRetryCount : 5,
-            maxRetryDelay : TimeSpan.FromSeconds(30),
-            errorNumbersToAdd : null);
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
     });
 });
+
+// builder.Services.AddDbContext<ManyInOnePgDbContext>(options =>
+// {
+//     options.UseNpgsql(pgConnectionString,
+//     // for connection failure check if any
+//     pgSqlOptions =>
+//     {
+//         pgSqlOptions.EnableRetryOnFailure(
+//             maxRetryCount: 5,
+//             maxRetryDelay: TimeSpan.FromSeconds(30),
+//             errorCodesToAdd : null);
+//     });
+// });
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
@@ -67,7 +83,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.SignIn.RequireConfirmedPhoneNumber = false;
     options.SignIn.RequireConfirmedEmail = true;
 
-}).AddEntityFrameworkStores<ManyInOneDbContext>();
+}).AddEntityFrameworkStores<ManyInOneDbContext>(); //.AddEntityFrameworkStores<ManyInOnePgDbContext>(); //.
 
 
 // google authentication and jwt added together
@@ -118,7 +134,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.ClientId = builder.Configuration.GetSection("Auth:GoogleClientId").Value!;
         options.ClientSecret = builder.Configuration.GetSection("Auth:GoogleClientSecret").Value!;
-        options.ClaimActions.MapJsonKey("urn:google:picture", "pictuer", "url");
+        options.ClaimActions.MapJsonKey("urn:google:picture", "picturer", "url");
     })
     ;
 
@@ -127,7 +143,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Frontend", policyBuilder =>
     {
         policyBuilder
-            .WithOrigins("http://localhost:4200", "https://localhost:8081") // Allow requests from only this origin
+            .WithOrigins("http://localhost:4200","https://localhost:7150", "https://localhost:8081") // Allow requests from only this origin
             .AllowAnyMethod() 
             .AllowCredentials()
             .AllowAnyHeader(); 
@@ -137,7 +153,7 @@ builder.Services.AddCors(options =>
 // for handling multipart body length
 builder.Services.Configure<FormOptions>(options =>
 {
-    // accepting all maxsize
+    // accepting all max size
     options.ValueLengthLimit = int.MaxValue;
     options.MultipartBodyLengthLimit = int.MaxValue;
     options.MemoryBufferThreshold = int.MaxValue;
@@ -152,7 +168,7 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
         Name = "Authorization",
-        Description = "Bearer authuentication with JWT token",
+        Description = "Bearer authentication with JWT token",
         Type = SecuritySchemeType.Http
     });
     options.AddSecurityRequirement(new OpenApiSecurityRequirement

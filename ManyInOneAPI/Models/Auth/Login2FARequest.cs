@@ -2,6 +2,7 @@
 {
     public class Login2FARequest
     {
-        public string? TwoFACode { get; set; }
+        public required string? CurrUserId { get; set; }
+        public required string? TwoFACode { get; set; }
     }
 }

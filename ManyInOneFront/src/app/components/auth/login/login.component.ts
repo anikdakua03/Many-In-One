@@ -24,7 +24,15 @@ export class LoginComponent {
 
   authResponseDto: AuthResponse = new AuthResponse();
   loginForm!: FormGroup;
+  twoFALoginForm!: FormGroup;
   isLoading: boolean = false;
+  showTwoFA: boolean = false;
+  userIdWith2FA: string = ""; // when have 2fa login enabled then it will set and will be passed for 2fa code verification
+  localUser : any = {
+    userId: "",
+    userName : "",
+    is2FaEnabled : false
+  };
 
 
   constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object) 
@@ -32,6 +40,10 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       email: new FormControl("", [Validators.required, Validators.email]),
       password: new FormControl("", [Validators.required, Validators.minLength(6)])
+    });
+    this.twoFALoginForm = this.fb.group({
+      twoFACode: new FormControl("", [Validators.required, Validators.minLength(6), Validators.pattern("[0-9]*")]),
+      currUserId: new FormControl(""),
     });
   }
   
@@ -68,7 +80,9 @@ export class LoginComponent {
     this.authService.logInWithGoogle(response.credential).subscribe(res => {
       this._ngZone.run(() => {
         this.authService.isAuthenticated$.next(true);
-        this.authService.saveToken(res.userId);
+        this.authService.saveToken("x-app-user",res.userId);
+        this.authService.saveToken("x-user-name",res.userName);
+        this.authService.saveToken("twofa-enable",res.twoFAEnabled);
         this.router.navigate(['/home']);
         window.location.reload();
         this.toaster.success("Login Successful !!", "User Logged in");
@@ -91,14 +105,19 @@ export class LoginComponent {
             if (!res.twoFAEnabled) {
               this.isLoading = false;
               // get the user user email or something and set to cookie for ui interaction according to it
-              this.authService.saveToken(res.userId);
+              this.authService.saveToken("x-app-user", res.userId);
+              this.authService.saveToken("x-user-name", res.userName);
+              this.authService.saveToken("twofa-enable", res.twoFAEnabled);
               // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
               this.toaster.success("Login Successful !!", "User Logged in");
               this.router.navigateByUrl("/home");
             }
             else {
               this.isLoading = false;
-              this.router.navigateByUrl("/login/2FA");
+              // this.router.navigateByUrl("/login/2FA");
+              this.toaster.info("Enter two FA code from authenticator !!", "Two Factor Verification !!");
+              this.showTwoFA = true;
+              this.userIdWith2FA = res.userId;
             }
           },
         error:
@@ -110,6 +129,36 @@ export class LoginComponent {
     }
     else {
       this.loginForm.markAllAsTouched(); // will show all the errors
+    }
+  }
+
+  on2FALogin() {
+    // console.log(this.twoFALoginForm.value);
+    if (this.twoFALoginForm.valid) {
+      this.isLoading = true;
+      // let code = this.twoFALoginForm.get('twoFACode')?.value;
+      this.twoFALoginForm.value.currUserId = this.userIdWith2FA;
+      this.twoFALoginForm.value.currUserId = this.userIdWith2FA;
+      this.authService.verifyAndLogin(this.twoFALoginForm.value).subscribe({
+        next:
+          res => {
+            this.isLoading = false;
+            // get the user user email or something and set to cookie for ui interaction according to it
+            this.authService.saveToken("x-app-user", res.userId);
+            this.authService.saveToken("x-user-name", res.userName);
+            this.authService.saveToken("twofa-enable", res.twoFAEnabled);
+            // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+            this.toaster.success("Login Successful !!", "User Logged in");
+            this.router.navigateByUrl("/home");
+          },
+        error: err => {
+          this.isLoading = false;
+          this.toaster.error("Invalid code !!", "User Log in Failed");
+        }
+      });
+    }
+    else {
+      this.twoFALoginForm.markAllAsTouched();
     }
   }
 }

@@ -24,9 +24,7 @@ namespace ManyInOneAPI.Services.Auth
             var subject = "Test mail from my one of the project ";
             var emailBody = GetHtmlBody();
 
-            var callbackURL = string.Format((_configuration.GetSection("AppSettings:APIURL").Value
-                                    + _configuration.GetSection("AppSettings:ConfirmEmail").Value),
-                                    userId, confirmationCode);
+            var callbackURL = $"{_emailSettings.APIURL}auth/ConfirmEmail?userID={userId}&code={confirmationCode}";
 
             // now encoding the email body bcs in code , there may be # ^ escape char , which may affect the url
             var replacedBody = emailBody.Replace("#URL#", callbackURL);
