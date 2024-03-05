@@ -7,6 +7,7 @@ namespace ManyInOneAPI.Repositories.Payment
     public class PaymentDetailRepository : IPaymentDetailRepository
     {
         private readonly ManyInOneDbContext _dbContext;
+        // private readonly ManyInOnePgDbContext _dbContext;
         public PaymentDetailRepository(ManyInOneDbContext dbContext)
         {
             _dbContext = dbContext;

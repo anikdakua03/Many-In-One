@@ -1,12 +1,12 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IClanInfoResponse } from '../interfaces/clan-info';
 import { ISearchClanResponse } from '../interfaces/search-clan-response';
-import { IPlayerResponse } from '../interfaces/player';
+import { IPlayer, IPlayerResponse } from '../interfaces/player';
 import { SearchClansRequest } from '../models/Clasher/search-clans-request.model';
+import { SsrCookieService } from 'ngx-cookie-service-ssr';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class ClashOfClanService {
   baseURL: string = environment.apiBaseUrl;
 
 
-  constructor(private http: HttpClient, private cookie: CookieService) { }
+  constructor(private http: HttpClient, private cookie: SsrCookieService) { }
 
   //#region  Clans Specific
   //   
@@ -60,7 +60,6 @@ export class ClashOfClanService {
   // Get player information
   public getPlayer(playerTag : string): Observable<IPlayerResponse> {
     const header = new HttpHeaders({ 'Content-Type': 'application/json' });
-    console.log("Value ---> ", playerTag);
     return this.http.post<IPlayerResponse>(`${this.baseURL}Clash/GetPlayerInfo`, JSON.stringify(playerTag), { headers : header, withCredentials: true });
   }
 

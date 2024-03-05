@@ -7,5 +7,8 @@
         public string? Host { get; set; }
         public string? DisplayName { get; set; }
         public int Port { get; set; }
+
+        // this is for setting up confirm email link
+        public string? APIURL { get; set; } //": "https://localhost:8081/api/",
     }
 }

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { QRCodeModule } from 'angularx-qrcode';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CookieService } from 'ngx-cookie-service';
+import { SsrCookieService } from 'ngx-cookie-service-ssr';
 import { AuthenticationService } from '../../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -21,22 +21,14 @@ export class Enable2FAComponent {
   isLoading: boolean = false;
 
   twoFAForm!: FormGroup;
-  constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService, private cookie : CookieService)
+  constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService, private cookie : SsrCookieService, private router : Router)
   {
-    // if two factor is not enabled , then will show and load qr and then cod eto verufy
-    // const userId  = sessionStorage.getItem("curr-app-user");
-    console.log("ghifdhgifudhg",this.authService.currUserSignal()?.userId) ;
-    // if(authService.currUserSignal() !== undefined || authService.currUserSignal() !== null)
-    // {
-    //   this.is2FAEnabled = authService.currUserSignal()?.twoFAEnabled ?? false;
-    // }
-
-    // if (this.authService.currUserSignal)
-    if (this.authService.isAuthenticatedd)
+    // if two factor is not enabled , then will show and load qr and then cod eto verify
+    this.is2FAEnabled = authService.CheckUser2FA();
+    if (!this.is2FAEnabled)
     {
-      // call the load and share qr 
-      // const userid = this.authService.currUserSignal || "";
-      const userid = localStorage.getItem("curr-app-user") || "";
+      // call the load and share qr ;
+      const userid = cookie.get("curr-app-user") || "";
       this.authService.loadAndShareQR(userid).subscribe({
         next : res => {
           this.sharedKey = res.sharedKey;
@@ -60,11 +52,14 @@ export class Enable2FAComponent {
         next : res => {
           this.isLoading = false;
           console.log("code verification", res);
-          this.toaster.success("Code verifed successfully !!", "2 FA code verification");
+          this.cookie.set("2fa", "true");
+          this.toaster.success("Code verified successfully !!", "2 FA code verification");
+          this.router.navigateByUrl("/manage");
         },
         error : err => {
           this.isLoading = false;
-          this.toaster.error("Invalid code, try again ", " Two Factor code verifiaction");
+          this.cookie.set("2fa", "true");
+          this.toaster.error("Invalid code, try again ", " Two Factor code verification");
         }
       });
     }

@@ -6,12 +6,15 @@ import { provideToastr } from 'ngx-toastr';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { CLIPBOARD_OPTIONS, ClipboardButtonComponent, MARKED_OPTIONS, MarkedRenderer, provideMarkdown } from 'ngx-markdown';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
+import { provideClientHydration, withHttpTransferCacheOptions } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
 
   providers: [
-    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
     provideRouter(routes), 
+    // HttpClient cached outgoing network requests when running on the server.This information is serialized and transferred to the browser as part of the initial HTML sent from the server.In the browser, HttpClient checks whether it has data in the cache and if so, reuses it instead of making a new HTTP request during initial application rendering.HttpClient stops using the cache once an application becomes stable while running in a browser.
+    provideClientHydration(withHttpTransferCacheOptions({includePostRequests : true})),
+    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
     provideAnimations(), // required animations providers
     provideToastr({
       timeOut: 10000,
@@ -49,5 +52,5 @@ export const appConfig: ApplicationConfig = {
         },
       }
     }),
-  ] //for markdown configuration need to add here] // Toastr providers]
+  ]
 };

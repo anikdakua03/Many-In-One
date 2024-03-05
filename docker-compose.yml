@@ -1,0 +1,65 @@
+version: '3.6'
+
+name: manyinoneapp
+
+networks:
+  dev:
+    driver : bridge
+
+services:
+  manyinonedb : 
+    container_name: manyinone-db-container
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment : 
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YOUR_DB_PASSWORD
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    restart: always
+    volumes:
+      - app_data:/var/lib/mssql/data
+    networks : 
+      - dev
+
+  manyinoneapi:
+    container_name: manyinone-api-container
+    image: ${DOCKER_REGISTRY-}manyinoneapi
+    build:
+      context: .
+      dockerfile: ManyInOneAPI/Dockerfile
+
+    depends_on : 
+      - manyinonedb
+    ports:
+      - "5000:5000"
+      - "7150:7150"
+      # Set environment variables for connection strings etc.
+    environment : 
+      ASPNETCORE_URLS : "https://+.;http://+:"
+      ASPNETCORE_HTTPS_PORT : "7150"
+      ASPNETCORE_ENVIRONMENT : "Development"
+      CONNECTION_STRING: "server=SERVER_NAME;database=DB_NAME;user=sa;password=YOUR_DB_PASSWORD;Trusted_Connection=true; MultipleActiveResultSets=true; Integrated Security=true; TrustServerCertificate=true;"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+    networks :
+      - dev
+
+  # manyinonefront : 
+  #   container_name: manyinonefront-container
+  #   build:
+  #     context: .
+  #     dockerfile: ManyInOneFront/Dockerfile
+  #   depends_on :
+  #     - manyinoneapi
+  #   ports:
+  #     - 80:80
+  #   expose:
+  #     - 80
+  #   networks:
+  #     - dev
+
+volumes:
+  app_data:

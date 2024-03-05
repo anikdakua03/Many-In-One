@@ -51,7 +51,6 @@ export class PaymentDetailsComponent implements OnInit {
 
   // pop up testing
   openPop(oldDetails: any) {
-    debugger
     this.isOpen = true;
     this.populateForm(oldDetails);
   }

@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { RouterLink } from '@angular/router';
 import { KatexOptions, MarkdownModule } from 'ngx-markdown';
 import { NgxLoadingModule } from 'ngx-loading';
+import { CopyToClipboardComponent } from '../../copy-to-clipboard/copy-to-clipboard.component';
 
 @Component({
   selector: 'app-text-and-image-only',
@@ -26,7 +27,7 @@ export class TextAndImageOnlyComponent {
   
   
   isLoading : boolean = false;
-
+  readonly clipBoardButton = CopyToClipboardComponent;
   myForm: FormGroup;
 
   constructor(public service: TextAndImageOnlyService, private toaster: ToastrService) {
@@ -74,7 +75,7 @@ export class TextAndImageOnlyComponent {
           next: res => {
             this.response = res.responseMessage;
             this.isLoading = false;
-            this.toaster.error("Got response", "Success");
+            this.toaster.success("Got response", "Success");
           },
           error: err => {
             console.log("This is error --> ", err.error);

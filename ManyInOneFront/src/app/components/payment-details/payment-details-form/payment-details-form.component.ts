@@ -57,7 +57,6 @@ export class PaymentDetailsFormComponent {
     const obj = this.paymentForm.value;
     delete this.paymentForm.value.paymentDetailId; // Remove the property
     console.log(obj);
-    debugger
     this.service.addPaymentDetails(obj)
       .subscribe(
         {

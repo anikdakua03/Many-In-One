@@ -9,7 +9,7 @@ export const authGuard = () => {
     // if(authService.currUserSignal !== null && authService.currUserSignal !== undefined)
 
     // get the user if there 
-    let user = authService.getUserFromLocal();
+    let user = authService.isAuthenticated$.value;
     if (user) // true
     {
         return true;
@@ -19,16 +19,7 @@ export const authGuard = () => {
         route.navigateByUrl('/login');
         return false;
     }
-    
-    // if(authService.isLoggegIn())
-    // {
-    //     return true;
-    // }
-    // else
-    // {
-    //     route.navigateByUrl('/login');
-    //     return false;
-    // }
+
 }
 
 /** Login guard  is to protect already logged in user going to login page again */
@@ -38,21 +29,14 @@ export const loggedInUserGuard = () => {
     const route = inject(Router);
 
     // get the user if there 
-    let user = authService.getUserFromLocal();
-    if (user) // if true then why to login page....??? so flase
+    let user = authService.isAuthenticated$.value;
+    if (user) // if true then why to login page....??? so false
     {
+        route.navigateByUrl('/home');
         return false;
     }
     else
     {
         return true;
     }
-
-    // if (authService.isLoggegIn()) {
-    //     route.navigateByUrl('/home');
-    //     return false;
-    // }
-    // else {
-    //     return true;
-    // }
 }

@@ -19,6 +19,9 @@ export class ClashingComponent {
   allClanLabels: [{}] = [{}];
 
   constructor(private router: Router, private clashingService: ClashOfClanService) {
+    this.fetchAllLocations();
+    this.fetchAllClanLabels();
+    this.fetchAllPlayerLabels();
   }
 
   fetchAllLocations()

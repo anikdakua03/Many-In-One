@@ -1,5 +1,4 @@
 ﻿using ManyInOneAPI.Models.Auth;
-using Microsoft.AspNetCore.Identity;
 
 namespace ManyInOneAPI.Services.Auth
 {
@@ -10,7 +9,7 @@ namespace ManyInOneAPI.Services.Auth
         public Task<AuthResult> ConfirmUserEmail(string userId, string code);
         public Task<AuthResult> Login(UserLoginRequestDTO userRequestDTO);
         public Task<AuthResult> LoginWithGoogle(string credentials);
-        public Task<AuthResult> VerifyAndLoginWith2FA(string credentials);
+        public Task<AuthResult> VerifyAndLoginWith2FA(Login2FARequest login2FARequest);
         public Task<AuthResult> Verify2FA(string credentials);
         public Task<AuthResult> Disable2FA();
         public Task<TwoFAResponse> LoadSharedKeyAndQrCodeUriAsync(string userId);

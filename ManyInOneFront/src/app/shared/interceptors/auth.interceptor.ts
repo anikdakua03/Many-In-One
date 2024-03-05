@@ -16,7 +16,6 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(req).pipe(
         catchError((err: HttpErrorResponse) => {
-            debugger
             if (err && err.status === 401 && !refresh) {
                 refresh = true; // will refresh , so set to true
 
@@ -35,7 +34,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                                 toaster.show("Please login again to continue !!!");
                             }),
                             catchError(() => {
-                                console.log("Other error occured --> ", err.message);
+                                console.log("Other error occurred --> ", err.message);
                                 return throwError(() => new Error("Token revoked")); // Final error handling
                             })
                         );

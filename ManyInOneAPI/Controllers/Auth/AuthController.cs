@@ -161,13 +161,13 @@ namespace ManyInOneAPI.Controllers.Auth
 
         [HttpPost]
         [Route("VerifyAndLoginWith2FA")]
-        public async Task<IActionResult> LoginWith2FA([FromBody] string code)
+        public async Task<IActionResult> LoginWith2FA([FromBody] Login2FARequest login2FARequest)
         {
             try
             {
-                if (!code.IsNullOrEmpty())
+                if (ModelState.IsValid)
                 {
-                    var res = await _authService.VerifyAndLoginWith2FA(code);
+                    var res = await _authService.VerifyAndLoginWith2FA(login2FARequest);
 
                     if (res.Result)
                     {
@@ -283,12 +283,12 @@ namespace ManyInOneAPI.Controllers.Auth
             { 
                 var res = await _authService.GetRefreshToken();
 
-                if (res.Errors is null)
+                if (res.Result == true)
                 {
                     return Ok(res);
                 }
 
-                return Unauthorized(res.Errors);
+                return BadRequest(res.Errors);
             }
             catch (Exception ex)
             {

@@ -61,7 +61,7 @@ namespace ManyInOneAPI.Services.GenAI
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
-
+                    
                     var responseText = ExtractTextFromStringResponse(responseString);
 
                     return new GenAIResponse() { ResponseMessage = responseText, Succeed = true };

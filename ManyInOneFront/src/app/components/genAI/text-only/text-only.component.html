@@ -1,11 +1,12 @@
-<ngx-loading [show]="isLoading"  [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+<ngx-loading [show]="isLoading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
 <div class="ml-6 justify-center items-center">
     <div class="pt-16">
         <a class="text-blue-600 font-bold pt-16" routerLink="/home">Home</a><br />
         <form [formGroup]="inputForm" (submit)="getAnswer()" [class.submitted]="service.formSubmitted" novalidate
             autocomplete="off">
             <div class="mt-4">
-                <label for="first_name" class="block mb-2 text-lg font-medium text-gray-900">Type your query here..</label>
+                <label for="first_name" class="block mb-2 text-lg font-medium text-gray-100">Type your query
+                    here..</label>
                 <input type="text" formControlName="inputText"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Ask your query.." required>
@@ -13,19 +14,52 @@
             <div class="d-grid">
                 <!-- [disabled]="!paymentForm.valid" -->
                 <button type="submit"
-                    class="text-white mt-4 bg-blue-700 hover:bg-yellow-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ask</button>
+                    class="text-white mt-4 bg-green-700 w-52 hover:bg-yellow-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ask</button>
             </div>
         </form>
-        <div class="justify-between">
+        <div class="justify-between w-52">
             <button type="button" (click)="clearAll()"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Clear all</button>
+                class="text-white bg-red-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Clear
+                all</button>
         </div>
     </div>
 </div>
 
+@if(response !== null && response !== "")
+{
 <div class="container mb-3 ml-5 mr-6">
-
-    <!-- <label class="mt-1 md-1 text-bg-dark text-xl font-bold">Your answer : </label> -->
-    <markdown [data]="response" lineNumbers lineHighlight clipboard katex [katexOptions]="options"></markdown>
-    <!-- <markdown [data]="mathEq" lineNumbers lineHighlight clipboard katex></markdown> -->
+    <div class="flex flex-col h-full overflow-x-auto mb-4">
+        <div class="flex flex-col h-full">
+            <div class="grid grid-cols-12 gap-y-2">
+                <div class="col-start-1 col-end-8 p-3 rounded-lg">
+                    <div class="flex flex-row items-center">
+                        <div
+                            class="flex items-center justify-center text-yellow-300 font-bold h-14 w-14 rounded-full bg-orange-800 flex-shrink-0">
+                            Query
+                        </div>
+                        <div class="relative ml-3 text-xl text-white bg-slate-800 py-2 px-4 shadow-md shadow-slate-600 rounded-xl">
+                            <div>{{inputForm.value.inputText}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-start-1 col-end-8 p-3 rounded-lg">
+                    <div class="flex flex-row items-baseline">
+                        <div
+                            class="flex items-center justify-center text-yellow-300 font-bold h-16 w-16 rounded-full bg-green-800 flex-shrink-0">
+                            Answer
+                        </div>
+                        <div
+                            class="relative ml-3 text-md text-white bg-slate-800 py-2 px-4 shadow-md shadow-slate-700 rounded-xl">
+                            <div>
+                                <markdown [data]="response" lineNumbers lineHighlight clipboard
+                                    [clipboardButtonComponent]="clipBoardButton" katex [katexOptions]="options">
+                                </markdown>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+}

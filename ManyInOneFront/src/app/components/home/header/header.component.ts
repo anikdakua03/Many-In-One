@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 
@@ -13,24 +13,34 @@ import { AuthenticationService } from '../../../shared/services/authentication.s
 export class HeaderComponent implements OnInit {
 
   checkCurrUser: boolean = false;
+  currUserName: string = "";
+  isSidebarShowing: boolean = false;
 
   constructor(protected authService: AuthenticationService, private router: Router) {
   }
 
   ngOnInit(): void {
-    this.authService.isAuthenticatedd.subscribe((data) => {
+      this.authService.isAuthenticated$.subscribe((data) => {
       this.checkCurrUser = data;
-    }
-    );
+    });
+    const data = this.authService.getCurrentUserName();
+    this.currUserName = data === "" ? "User" : data.replaceAll('"', '');
+  }
+
+  openSidebar() {
+    this.isSidebarShowing = true;
+  }
+    
+    closeSidebar() {
+      this.isSidebarShowing = false;
   }
 
   // logout
   onLogout() {
-    debugger
     this.authService.signOut().subscribe({
       next: res => {
         if (res.result) {
-          this.authService.isAuthenticatedd.next(false); // set false
+          this.authService.isAuthenticated$.next(false); // set false
           this.authService.removeToken();
           window.location.reload();
           this.router.navigateByUrl('/'); // go to home
