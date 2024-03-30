@@ -21,99 +21,68 @@ namespace ManyInOneAPI.Controllers.Payment
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDetail>>> GetPaymentDetails()
         {
-          try
-            {
-                var res = await _paymentDeatilsRepo.GetPaymentDetails();
-                if (res == null)
-                {
-                    return NotFound("There is no payment deatils yet !!");
-                }
+            var res = await _paymentDeatilsRepo.GetPaymentDetails(HttpContext.RequestAborted);
+            //if (res == null)
+            //{
+            //    return NotFound("There is no payment deatils yet !!");
+            //}
 
-                return Ok(res.ToList());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
 
         // GET : api/PaymentDeatils/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDetail>> GetPaymentDetailById(int id)
         {
-                      try
-            {
-                var res = await _paymentDeatilsRepo.GetPaymentDetailById(id);
-                if (res == null)
-                {
-                    return NotFound($"There is no payment deatils with this id {id} !!");
-                }
 
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var res = await _paymentDeatilsRepo.GetPaymentDetailById(id, HttpContext.RequestAborted);
+            //if (res == null)
+            //{
+            //    return NotFound($"There is no payment deatils with this id {id} !!");
+            //}
+
+            return Ok(res);
+
         }
 
         // POST : api/PaymentDeatils/
         [HttpPost]
-        public async Task<ActionResult<PaymentDetail>> AddPaymentDetail([FromBody]PaymentDetail paymentDetail)
+        public async Task<ActionResult<PaymentDetail>> AddPaymentDetail([FromBody] PaymentDetail paymentDetail)
         {
-                      try
-            {
-                var res = await _paymentDeatilsRepo.AddPaymentDetail(paymentDetail);
-                if (res == null)
-                {
-                    return BadRequest("Unable to add payment deatils !!");
-                }
+            var res = await _paymentDeatilsRepo.AddPaymentDetail(paymentDetail, HttpContext.RequestAborted);
+            //if (res == null)
+            //{
+            //    return BadRequest("Unable to add payment deatils !!");
+            //}
 
-                return CreatedAtAction("GetPaymentDetailById", new { id = res.PaymentDetailId }, res);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return CreatedAtAction("GetPaymentDetailById", new { id = res.Data!.PaymentDetailId }, res);
+
         }
 
         // PUT : api/PaymentDeatils/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<PaymentDetail>> UpdatePaymentDetailById(int id, PaymentDetail paymentDetail)
         {
-            try
-            {
-                if (id != paymentDetail.PaymentDetailId)
-                    return BadRequest("Payment detail Id mismatch");
 
-                var res = await _paymentDeatilsRepo.UpdatePaymentDetailById(id, paymentDetail);
+            if (id != paymentDetail.PaymentDetailId)
+                return BadRequest("Payment detail Id mismatch");
 
-                if (res == null)
-                    return NotFound($"Payment detail with Id = {id} not found");
+            var res = await _paymentDeatilsRepo.UpdatePaymentDetailById(id, paymentDetail, HttpContext.RequestAborted);
 
-                return res;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating data");
-            }
+            //if (res == null)
+            //    return NotFound($"Payment detail with Id = {id} not found");
+
+            return Ok(res);
+
         }
 
         // DELETE : api/PaymentDeatils/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeletePaymentDetailById(int id)
         {
-            try
-            {
-                var res = await _paymentDeatilsRepo.DeletePaymentDetailById(id);
+            var res = await _paymentDeatilsRepo.DeletePaymentDetailById(id, HttpContext.RequestAborted);
 
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
     }
 }

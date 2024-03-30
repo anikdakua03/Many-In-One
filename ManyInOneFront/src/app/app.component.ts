@@ -12,11 +12,8 @@ import { RouterOutlet } from '@angular/router';
     styles: [],
     imports: [CommonModule, RouterOutlet, HttpClientModule, HeaderComponent, ToastrModule]
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'Many In One';
-  constructor() {
-
-  }
 
   isMenuScrolled: boolean = false;
 
@@ -28,11 +25,6 @@ export class AppComponent implements OnInit {
     else {
       this.isMenuScrolled = false;
     }
-  }
-
-  // any time user reloads the page will get the user based on token from server
-  ngOnInit(): void {
-
   }
 
   scrollToTop() {

@@ -7,9 +7,9 @@
                 Update Payment Details
             </div>
             <div class="w-72">
-                <form [formGroup]="updateForm" (submit)="onSubmit()" [class.submitted]="service.formSubmitted" novalidate
-                    autocomplete="off">
-        
+                <form [formGroup]="updateForm" (submit)="onSubmit()" [class.submitted]="service.formSubmitted"
+                    novalidate autocomplete="off">
+
                     <input type="hidden" name="paymentDetailId" [value]="service.formData.paymentDetailId">
                     <div class="mb-3">
                         <label class=" mb-2 text-lg font-medium text-gray-100">Card Owner Name</label>
@@ -18,14 +18,15 @@
                             placeholder="Name on Card" name="cardOwnerName" required>
                         @if(updateForm.controls['cardOwnerName'].errors && updateForm.controls['cardOwnerName'].touched)
                         {
-                        <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card owner name
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card owner
+                                name
                                 is
                                 required</span> of minimum 4 length.
                         </p>
                         }
-        
+
                     </div>
-        
+
                     <div class="mb-3">
                         <label class="mb-2 text-lg font-medium text-gray-100">Card Number</label>
                         <input type="text" formControlName="cardOwnerNumber"
@@ -33,21 +34,24 @@
                             placeholder="16 digit Card Number" name="cardNumber" formControlName="cardNumber" required>
                         @if(updateForm.controls['cardNumber'].errors && updateForm.controls['cardNumber'].touched)
                         {
-                        <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card number is
+                        <p class="mt-2 text-lg text-red-600 dark:text-red-500"><span class="font-medium"> - Card number
+                                is
                                 of 16
                                 digits</span>
                             required.
                         </p>
                         }
                     </div>
-        
+
                     <div class="row">
                         <div class="mb-3 col-6">
                             <label class="block mb-2 text-lg font-medium text-gray-100">Security Code</label>
                             <input type="password" formControlName="cardOwnerName"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="CVV" type="password" name="securityCode" formControlName="securityCode" required>
-                            @if(updateForm.controls['securityCode'].errors && updateForm.controls['securityCode'].touched)
+                                placeholder="CVV" type="password" name="securityCode" formControlName="securityCode"
+                                required>
+                            @if(updateForm.controls['securityCode'].errors &&
+                            updateForm.controls['securityCode'].touched)
                             {
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500"><span class="font-medium"> - 3
                                     digits</span>
@@ -57,8 +61,8 @@
                         </div>
                         <div class="mb-3 col-6">
                             <label class="block mb-2 text-lg font-medium text-gray-100">Expiry Date</label>
-                            <input type="text" formControlName="cardOwnerName"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            <input type="text"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-[16px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="MM/YY" name="expirationDate" formControlName="expirationDate" required>
                             @if(updateForm.controls['expirationDate'].errors &&
                             updateForm.controls['expirationDate'].touched)
@@ -70,16 +74,26 @@
                             }
                         </div>
                     </div>
-        
-                    <div class="gap-12">
-                        <!-- [disabled]="!updateForm.valid" -->
-                        <button type="submit"
-                            class="text-white mr-12 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Update</button>
+
+                    <div class="flex justify-evenly items-center gap-2">
+                        <button type="submit" [disabled]="!updateForm.valid || isLoading"
+                            class="text-white h-10 mr-12 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                            @if(isLoading)
+                            {
+                            <svg xmlns="http://www.w3.org/2000/svg" height="28" width="56"
+                                class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in"
+                                viewBox="0 0 448 512">
+                                <path fill="#b9c9f8"
+                                    d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
+                            </svg>
+                            }
+                            @else { <p class="text-[16px]">Submit</p>}
+                        </button>
                         <button
-                            class="text-white bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                            class="text-white h-10 bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                             (click)="closePop()">Close</button>
                     </div>
-        
+
                 </form>
             </div>
         </div>
@@ -112,7 +126,7 @@
                     </th>
                 </tr>
             </thead>
-            @for (pd of service.list; track pd.paymentDetailId ) 
+            @for (pd of service.list; track pd.paymentDetailId )
             {
             <tbody>
                 <tr
@@ -150,7 +164,14 @@
             @empty {
             <div>
                 <h1 class="px-6 py-4 font-extrabold items-center content-center text-red-500"> No payment details added
-                    yet !!</h1>
+                    yet !! OR <div class="flex justify-center items-center bg-inherit">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="animate-bounce animate-infinite animate-ease-in h-16 w-44" viewBox="0 0 448 512">
+                            <path fill="#63E6BE"
+                                d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
+                        </svg>
+                    </div>
+                </h1>
             </div>
             }
         </table>

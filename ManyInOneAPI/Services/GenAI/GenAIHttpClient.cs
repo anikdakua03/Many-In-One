@@ -1,4 +1,6 @@
-﻿using ManyInOneAPI.Configurations;
+﻿using Azure;
+using ManyInOneAPI.Configurations;
+using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.GenAI;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
@@ -21,11 +23,9 @@ namespace ManyInOneAPI.Services.GenAI
         }
 
         //Generate text from text-only input
-        public async Task<GenAIResponse> TextOnlyInput(TextOnly inputText)
+        public async Task<Result<GenAIResponse>> TextOnlyInput(TextOnly inputText, CancellationToken cancellationToken)
         {
             // Create JSON request content
-            // while sending we can do some custimization on getting response
-            // Configuration --> https://ai.google.dev/tutorials/rest_quickstart#configuration
             var requestContent = new
             {
                 contents = new[]
@@ -50,42 +50,28 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             // Send POST request with error handling
-            try
+            var address = $"{_genAiConfig.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
+
+            var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                // need :
-                // https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=$API_KEY \
-                var address = $"{_genAiConfig.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"));
+                var responseText = ExtractTextFromStringResponse(responseString);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    
-                    var responseText = ExtractTextFromStringResponse(responseString);
-
-                    return new GenAIResponse() { ResponseMessage = responseText, Succeed = true };
-                }
-                else
-                {
-                    return new GenAIResponse() { ErrorMessage = $"Failed with status code :--> {response.StatusCode}", Succeed = false };
-                }
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = responseText, Succeed = true } );
             }
-            catch (Exception ex)
+            else
             {
-                return new GenAIResponse() { ErrorMessage = $"Failed with error message :--> {ex.Message}", Succeed = false };
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
         //Generate text from text-and-image input(multimodal)
-        public async Task<GenAIResponse> TextAndImageAsInput(IFormFile formFile, string inputText)
+        public async Task<Result<GenAIResponse>> TextAndImageAsInput(IFormFile formFile, string inputText, CancellationToken cancellationToken = default)
         {
-            // Create JSON request content
-            // while sending we can do some custimization on getting response
-            // Configuration --> https://ai.google.dev/tutorials/rest_quickstart#configuration
-
             // first convert IFileForm to memory stream then to byte array
-
             // Read image file as byte array
             using var imageStream = formFile.OpenReadStream();
             var imageBytes = new byte[imageStream.Length];
@@ -124,80 +110,192 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             // Send POST request with error handling
-            try
+            var response = await _httpClient.PostAsync(uri, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                var response = await _httpClient.PostAsync(uri, new StringContent(requestJson, Encoding.UTF8, "application/json"));
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var responseText = ExtractTextFromStringResponse(responseJson);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    var responseText = ExtractTextFromStringResponse(responseJson);
-
-                    return new GenAIResponse() { ResponseMessage = responseText, Succeed = true };
-                }
-                else
-                {
-                    return new GenAIResponse() { ErrorMessage = $"Failed with status code :--> {response.RequestMessage}", Succeed = false };
-                }
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = responseText, Succeed = true });
             }
-            catch (Exception ex)
+            else
             {
-                return new GenAIResponse() { ErrorMessage = $"Failed with error message :--> {ex.Message}", Succeed = false };
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
         //Build multi-turn conversations(chat)
+        public async Task<Result<GenAIResponse>> MultiTurnConversation(Conversation allChats, CancellationToken cancellationToken = default)
+        {
+            var requestJson = JsonSerializer.Serialize(allChats);
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var address = $"{_genAiConfig.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
+
+            var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var responseText = ExtractTextFromStringResponse(responseString);
+
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = responseText, Succeed = true });
+            }
+            else
+            {
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+        }
+
+        // Text summarization
+        public async Task<Result<GenAIResponse>> TextSummarize(TextOnly longText, CancellationToken cancellationToken = default)
+        {
+            // will allow only 500 long words text
+            var isVeryLong = CheckForVeryLongText(longText.InputText);
+
+            if(isVeryLong) 
+            {
+                return Result<GenAIResponse>.Failure(Error.Validation("Validation", "Currently more than 500 words are not allowed to summarize. "));
+            }
+
+            var requestJson = JsonSerializer.Serialize(longText.InputText);
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _genAiConfig.HF_KEY);
+
+            var response = await _httpClient.PostAsync("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var responseObj = JsonSerializer.Deserialize<Dictionary<string, string>[]>(responseString);
+
+                var text = responseObj![0]["summary_text"];
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = text, Succeed = true });
+            }
+            else
+            {
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+        }
+
+        // Text to Image generation
+        public async Task<Result<GenAIResponse>> TextToImage(TextOnly longText, CancellationToken cancellationToken = default)
+        {
+            var requestJson = JsonSerializer.Serialize(longText.InputText);
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _genAiConfig.HF_KEY);
+
+            string[] links = { "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5" };
+            Random rand = new Random();
+            // Generate a random index less than the size of the array.
+            int index = rand.Next(links.Length);
+
+            var response = await _httpClient.PostAsync(links[index], new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                //response content-type : content/jpeg
+                var responseByteArr = await response.Content.ReadAsByteArrayAsync();
+                //Convert byte arry to base64string
+                string imageBase64Data = Convert.ToBase64String(responseByteArr);
+                string imgDataURL = string.Format("data:image/jpeg;base64,{0}", imageBase64Data);
+
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = imgDataURL, Succeed = true });
+            }
+            else
+            {
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+        }
+
+        public async Task<Result<GenAIResponse>> TextToSpeech(TextOnly longText, CancellationToken cancellationToken = default)
+        {
+            var requestJson = JsonSerializer.Serialize(longText.InputText);
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _genAiConfig.HF_KEY);
+
+            string address = "https://api-inference.huggingface.co/models/facebook/mms-tts-eng";
+
+            var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                //response content-type : content/jpeg
+                var responseByteArr = await response.Content.ReadAsByteArrayAsync();
+                //Convert byte arry to base64string
+                string audioBase64Data = Convert.ToBase64String(responseByteArr);
+                string audDataURL = string.Format("data:audio/ogg;base64,{0}", audioBase64Data);
+
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = audDataURL, Succeed = true });
+            }
+            else
+            {
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+        }
 
         #region Model info and other utilities
         //Get model by model name
-        public async Task<GenAIModelInfo> GetModelByName(string modelName)
-        {
-            // Set request headers
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
+        //public async Task<GenAIModelInfo> GetModelByName(string modelName)
+        //{
+        //    // Set request headers
+        //    _httpClient.DefaultRequestHeaders.Accept.Clear();
 
-            // Send GET request with error handling
-            try
-            {
-                // need :
-                // https://generativelanguage.googleapis.com/v1/models/gemini-pro?key=$API_KEY
-                var address = $"https://generativelanguage.googleapis.com/v1/models/{modelName}?key={_genAiConfig.API_KEY})";
+        //    // Send GET request with error handling
 
-                var response = await _httpClient.GetAsync(address);
+        //        var address = $"https://generativelanguage.googleapis.com/v1/models/{modelName}?key={_genAiConfig.API_KEY})";
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var responseStringJSON = await response.Content.ReadFromJsonAsync<GenAIModelInfo>();
-                    //var responseText = ExtractTextFromStringResponse(responseString);
+        //        var response = await _httpClient.GetAsync(address);
 
-                    return new GenAIModelInfo() { };
-                }
-                else
-                {
-                    return new GenAIModelInfo() { };
-                }
-            }
-            catch (Exception)
-            {
-                return new GenAIModelInfo() { };
-            }
-        }
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            var responseString = await response.Content.ReadAsStringAsync();
+        //            var responseStringJSON = await response.Content.ReadFromJsonAsync<GenAIModelInfo>();
+        //            //var responseText = ExtractTextFromStringResponse(responseString);
+
+        //            return new GenAIModelInfo() { };
+        //        }
+        //        else
+        //        {
+        //            return new GenAIModelInfo() { };
+        //        }
+        //}
 
         //Get list of all models
-        public Task<List<GenAIModelInfo>> GetAllModels()
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<List<GenAIModelInfo>> GetAllModels()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         // extract informatiom from the response
         private string ExtractTextFromStringResponse(string responseString)
         {
-            var  jsonData = JsonSerializer.Deserialize<TextOnlyResponse>(responseString)!;
+            var jsonData = JsonSerializer.Deserialize<GeminiResponse>(responseString)!;
             //string extractedText = jsonData.candidates[0].content.parts[0].text;
 
             return jsonData!.candidates![0].content!.parts![0].text!;
         }
 
+        private bool CheckForVeryLongText(string inputText)
+        {
+            var wordCount = inputText.Split(" ").Length;
+            return wordCount > 500 ? true : false;
+        }
         #endregion
     }
 }

@@ -1,4 +1,3 @@
-<ngx-loading class="min-h-screen" [show]="isLoading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
 <div class="pt-12 px-4">
     @if(clanData !== null && clanData !== undefined)
     {
@@ -27,14 +26,14 @@
 
         <div class="w-auto py-4 mx-auto grid grid-cols-3 gap-4 divide-x-4 divide-black">
             <div class="text-center text-lg font-bold align-baseline">
-                    <div class="flex justify-center items-center"><img [src]="clanData.badgeUrls.small" alt="image" />
-                    </div>
+                <div class="flex justify-center items-center"><img [src]="clanData.badgeUrls.small" alt="image" />
+                </div>
                 <li>Clan Name : {{clanData.name}}</li>
                 <li>Clan Tag : {{clanData.tag}}</li>
                 <li>Clan Level : {{clanData.clanLevel}}</li>
-                <li> Clan type : {{clanData.type}}</li>
+                <li> Clan type : {{clanData.type.toLocaleUpperCase()}}</li>
                 <li>Description : {{clanData.description}}</li>
-                <li>Family Friendly : {{clanData.isFamilyFriendly}}</li>
+                <li>Family Friendly : {{clanData.isFamilyFriendly ? 'Yes': 'No'}} </li>
                 <li>Clan Location : {{clanData.location.name}}</li>
                 <li>Clan Points : {{clanData.clanPoints}}</li>
             </div>
@@ -51,7 +50,7 @@
                 @for(tr of clanData.labels; track tr.id)
                 {
                 <div class="bg-teal-400 p-1 w-[350px] m-1 ml-16 relative rounded-md flex justify-between items-center">
-                    <label class="mr-12 text-[brown]">{{tr.name}}</label>
+                    <label class="mr-12 p-2 text-[brown]">{{tr.name}}</label>
                     <img [src]=tr.iconUrls.small alt="tr.name"
                         style="display: flex; align-items: center; justify-content: center;" height=[350px]
                         width=[350px] />
@@ -91,11 +90,16 @@
                             </div>
                             <!-- end card header -->
                             <!-- card body  -->
+                                        <!-- Pagination -->
+                                        <app-pagination [totalItems]="clanData.memberList === null ? 0 : clanData.memberList.length"
+                                            [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" (onClick)="changePage($event)"
+                                            class="flex justify-center p-2"></app-pagination>
                             <div class="flex-auto block py-8 pt-6 px-9">
-                                <div class="overflow-x-auto">
+                                <div class="overflow-x-hidden">
                                     <table class="w-full my-0 align-middle text-dark border-neutral-200">
                                         <thead class="align-bottom">
                                             <tr class="font-bold text-xl text-[#f58787] text-secondary-dark text-center underline">
+                                                <th class="ml-2 pb-3 px-2 w-4">Sl. NO.</th>
                                                 <th class="pb-3 w-[40px]">Rank</th>
                                                 <th class="pb-3 w-[90px]">League</th>
                                                 <th class="pb-3 w-[90px]">Name</th>
@@ -105,16 +109,19 @@
                                                 <th class="pb-3 w-[150px]">Donations Received</th>
                                             </tr>
                                         </thead>
-                                        @for(cl of clanData.memberList; track $index)
+                                        @for(cl of paginatedData; track idx; let idx = $index)
                                         {
                                         <tbody class="divide-y divide-red-100">
-                                            <tr class="border-b hover:text-black text-lg border-yellow-300 last:border-b-amber-200 bg-cyan-800 hover:bg-yellow-700 hover:scale-105">
+                                            <tr
+                                                class="border-b hover:text-black text-lg border-yellow-300 last:border-b-amber-200 bg-cyan-800 hover:bg-yellow-700 hover:scale-105">
+                                                <!-- for normal ordering page -->
+                                                <td class="text-center text-xl font-semibold">{{ idx + 1 + (currentPage - 1) *
+                                                    itemsPerPage }}</td>
                                                 <td class="text-center font-bold">
                                                     {{cl.clanRank}}
                                                 </td>
                                                 <td class="flex justify-center items-center">
-                                                    <img [src]="cl.league.iconUrls.small"
-                                                        [alt]="cl.league.name"
+                                                    <img [src]="cl.league.iconUrls.small" [alt]="cl.league.name"
                                                         [name]="cl.league.name"
                                                         class="w-[50px] h-[50px] flex justify-center items-center shrink-0 rounded-2xl"
                                                         height=[350px] width=[350px] />
@@ -168,7 +175,7 @@
     </div>
     }
     @else {
-    <div class="flex justify-center items-center py-5">
+    <div class="flex justify-center items-center py-5 min-h-screen">
         <h1 class="text-2xl font-bold text-red-500"> Search clans by criteria or by tag !!!!!</h1>
         <hr />
         <a routerLink="/clashOfClans/search-clan" class="mt-10 text-xl font-bold text-yellow-500">Search Clan</a>

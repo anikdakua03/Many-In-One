@@ -21,6 +21,7 @@ export class Enable2FAComponent {
   isLoading: boolean = false;
 
   twoFAForm!: FormGroup;
+  
   constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService, private cookie : SsrCookieService, private router : Router)
   {
     // if two factor is not enabled , then will show and load qr and then cod eto verify
@@ -28,11 +29,11 @@ export class Enable2FAComponent {
     if (!this.is2FAEnabled)
     {
       // call the load and share qr ;
-      const userid = cookie.get("curr-app-user") || "";
+      const userid = JSON.parse(cookie.get("x-app-user")) || "";
       this.authService.loadAndShareQR(userid).subscribe({
         next : res => {
-          this.sharedKey = res.sharedKey;
-          this.qrURI = res.qr;
+          this.sharedKey = res.data.sharedKey;
+          this.qrURI = res.data.qr;
         }
       });
     }
@@ -50,23 +51,29 @@ export class Enable2FAComponent {
       let code = this.twoFAForm.get('faCode')?.value;
       this.authService.verifyFACode(code.toString()).subscribe({
         next : res => {
-          this.isLoading = false;
-          console.log("code verification", res);
-          this.cookie.set("2fa", "true");
-          this.toaster.success("Code verified successfully !!", "2 FA code verification");
-          this.router.navigateByUrl("/manage");
+          if(res.isSuccess)
+          {
+            this.isLoading = false;
+            this.authService.saveToken("twofa-enable", "true");
+            this.toaster.success("Code verified successfully !!", "2 FA code verification");
+            this.router.navigateByUrl("/manage");
+          }
+          else
+          {
+            this.isLoading = false;
+            this.toaster.error(res.error.description!, "2 FA code verification");
+          }
         },
         error : err => {
           this.isLoading = false;
-          this.cookie.set("2fa", "true");
-          this.toaster.error("Invalid code, try again ", " Two Factor code verification");
+          this.toaster.error("Some error occurred, please try again ", " Two Factor code verification");
         }
       });
     }
     else
     {
       this.isLoading = false;
-      this.toaster.error("Invalid code format"," Two Factor code");
+      this.twoFAForm.markAllAsTouched();
     }
   }
 }

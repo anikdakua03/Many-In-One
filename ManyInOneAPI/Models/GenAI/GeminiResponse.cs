@@ -1,10 +1,6 @@
 ﻿namespace ManyInOneAPI.Models.GenAI
 {
-    //public class Root
-    //{
-    //    public Root? root { get; set; }
-    //}
-    public class TextOnlyResponse
+    public class GeminiResponse
     {
         public List<Candidate>? candidates { get; set; }
         public PromptFeedback? promptFeedback { get; set; }
@@ -20,8 +16,8 @@
 
     public class Content
     {
-        public List<Part>? parts { get; set; }
         public string? role { get; set; }
+        public List<Part>? parts { get; set; }
     }
 
     public class Part

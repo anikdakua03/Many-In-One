@@ -1,6 +1,5 @@
-<ngx-loading [show]="isLoading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
-<div class="min-h-screen bg-gray-500 text-gray-900 flex justify-center rounded-md">
-    <div class="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+<div class="mt-[45px] min-h-screen bg-inherit text-gray-900 flex justify-center rounded-md">
+    <div class="max-w-screen-xl m-0 sm:m-10 bg-[#e9ecee] shadow sm:rounded-lg flex justify-center flex-1">
         <div class="lg:w-3/4 xl:w-6/12 p-6 sm:p-12">
             <div class="mt-6 flex flex-col items-center">
                 <h1 class="text-3xl xl:text-xl font-extrabold">
@@ -23,8 +22,8 @@
                     @if(showTwoFA === false)
                     {
                     <div class="mx-auto max-w-xs mt-4">
-                        <form [formGroup]="loginForm" (click)="onLogin()" novalidate autocomplete="off">
-                            <div class="bg-white px-5 py-8 rounded-xl w-screen shadow-xl max-w-sm">
+                        <form [formGroup]="loginForm" (submit)="onLogin()" novalidate autocomplete="off">
+                            <div class="bg-[#fdfdfd] px-5 py-8 rounded-xl w-screen shadow-xl max-w-sm">
                                 <div class="space-y-4">
                                     <h1 class="text-center text-2xl font-semibold text-gray-600">Login</h1>
                                     <hr>
@@ -58,22 +57,43 @@
                                                 required </span> of minimum 6 length.
                                         </p>
                                         }
-                                        </div>
-                                        </div>
-                                        <button type="submit"
-                                            class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000">Login</button>
-                                        <hr>
+                                    </div>
+                                    </div>
+                                    <button type="submit" [disabled]="isLoading || !loginForm.valid"
+                                    class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000">
+                                    @if(isLoading)
+                                    {
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="ml-[74px] flex items-center justify-center animate-bounce animate-infinite animate-ease-in h-10 w-44"
+                                        viewBox="0 0 448 512">
+                                        <path fill="#b9c9f8"
+                                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
+                                    </svg>
+                                    }
+                                    @else { Login }
+                                </button>
+
+                                <hr>
                             </div>
                         </form>
-                        
+
+                        <div class="flex justify-center items-center mt-4">
+                            <p class="inline-flex items-center text-gray-700 font-medium text-lg text-center">
+                                <span class="ml-2">Forgot password?<a routerLink="/account/send-email/forgot-password-mail"
+                                        class="text-md ml-2 text-[#bb4632] font-bold hover:underline">Reset Password
+                                        &rarr;</a>
+                                </span>
+                            </p>
+                        </div>
                         <div class="flex justify-center items-center mt-4">
                             <p class="inline-flex items-center text-gray-700 font-medium text-lg text-center">
                                 <span class="ml-2">Don't have an account?<a routerLink="/register"
-                                        class="text-md ml-2 text-blue-500 font-semibold">Register now &rarr;</a>
+                                        class="text-md ml-2 text-[#b12b7e] font-bold hover:underline">Register now
+                                        &rarr;</a>
                                 </span>
                             </p>
-                            </div>
-                            </div>
+                        </div>
+                        </div>
                     }
                     @else {
                     <div class="mx-auto max-w-xs mt-10">
@@ -84,12 +104,12 @@
                             </h3>
                         </div>
                         <div class="flex flex-col justify-center items-center gap-4 p-6">
-                            <form [formGroup]="twoFALoginForm" (click)="on2FALogin()" novalidate autocomplete="off">
+                            <form [formGroup]="twoFALoginForm" (submit)="on2FALogin()" novalidate autocomplete="off">
                                 <div class="bg-[#f4f5f7] px-5 py-8 rounded-xl justify-center w-screen shadow-xl max-w-sm">
                                     <!-- <div class="space-y-4"> -->
                                     <div class="flex items-center py-2 px-3 rounded-md mb-4">
-                                        <input class="pl-2 bg-inherit text-xl w-auto" type="text" name="twoFACode" value=""
-                                            placeholder="Two factor Code Here" formControlName="twoFACode" />
+                                        <input class="pl-2 bg-inherit text-xl w-auto" type="text" name="twoFACode" value="" placeholder="Two factor Code Here"
+                                            formControlName="twoFACode" />
                                         @if(twoFALoginForm.controls['twoFACode'].errors &&
                                         twoFALoginForm.controls['twoFACode'].touched)
                                         {
@@ -98,7 +118,7 @@
                                         </p>
                                         }
                                     </div>
-                        
+
                                     <button type="submit"
                                         class="mt-6 w-full shadow-xl bg-gradient-to-tr from-blue-600 to-red-400 hover:to-red-700 text-indigo-100 py-2 rounded-md text-lg tracking-wide transition duration-1000">Verify
                                         and Login</button>
@@ -106,16 +126,15 @@
                                 </div>
                             </form>
                         </div>
-                        </div>
-                        
-                        }
-                        </div>
-                        </div>
-                        </div>
-                        <div class="flex-1 bg-indigo-100 text-center hidden lg:flex">
-                <div class="m-12 xl:m-16 w-full min-h-screen bg-contain bg-center bg-no-repeat"
-                    style="background-image: url('https://cdn.pixabay.com/photo/2015/01/08/18/25/desk-593327_1280.jpg');">
-                </div>
-                </div>
-                </div>
+                    </div>
+                    }
+                    </div>
+                    </div>
+                    </div>
+        <div class="flex-1 bg-[#286ebe] rounded-ee-md text-center hidden lg:flex">
+            <div class="m-12 xl:m-16 w-full min-h-screen bg-contain bg-center rounded-md bg-no-repeat"
+                style="background-image: url('../../../../assets/General/login-bg.jpeg'); background-size: cover;">
+            </div>
+        </div>
+        </div>
 </div>

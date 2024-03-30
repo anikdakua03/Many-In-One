@@ -6,6 +6,8 @@ namespace ManyInOneAPI.Services.Auth
     {
         public Task<AuthResult> SendMailAsync(string userId, string userEmail, string confirmationCode);
 
+        public Task<AuthResult> SendPasswordResetMailAsync(string userId, string userEmail, string confirmationCode);
+
         public Task<AuthResult> SendGreetingMailAsync(string userEmail);
     }
 }

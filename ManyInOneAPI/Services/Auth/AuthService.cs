@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth;
 using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
+using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace ManyInOneAPI.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly ManyInOneDbContext _dbContext;
-        // private readonly ManyInOnePgDbContext _dbContext;
+        //  private readonly ManyInOnePgDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AuthConfig _authConfig;
@@ -39,20 +40,13 @@ namespace ManyInOneAPI.Services.Auth
             _urlEncoder = urlEncoder;
         }
 
-        public async Task<AuthResult> Register(UserRegistrationRequestDTO userRequestDTO)
+        public async Task<Result<AuthResult>> Register(UserRegistrationRequestDTO userRequestDTO)
         {
             var emailExists = await _userManager.FindByEmailAsync(userRequestDTO.Email);
+            
             if (emailExists is not null)
             {
-                return new RegistrationResponse()
-                { 
-                    Errors = new List<string>() 
-                    { 
-                        "Invalid user, email already exists !!!",
-                        "Another error"
-                    },
-                    Result = false
-                };
+                return Result<AuthResult>.Failure(Error.Conflict("Conflict", "User already exists. "));
             }
 
             // then create that user
@@ -63,30 +57,31 @@ namespace ManyInOneAPI.Services.Auth
                 EmailConfirmed = false // making it false explicitly, to make sure of
             };
             var isCreated = await _userManager.CreateAsync(newUser, userRequestDTO.Password!);
+            
             if (isCreated.Succeeded)
             {
                 // will send a verification code to that email to confirm
                 var userId = await _userManager.GetUserIdAsync(newUser);
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser); // 
-                //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser); 
 
-                var emailSend = await _emailService.SendMailAsync(newUser.Id, newUser.Email,  WebUtility.UrlEncode(code));
+                var emailSend = await _emailService.SendMailAsync(newUser.Id, newUser.Email, WebUtility.UrlEncode(code));
 
-                //var jwttoken = GenerateJwtToken(newUser);
+                if (!emailSend.Result)
+                {
+                    return Result<AuthResult>.Failure(Error.Failure("Failed to send Mail", $"Cannot send send mail to {emailSend.Message}"));
+                }
 
-                return new RegistrationResponse()
+                return Result<AuthResult>.Success(new AuthResult()
                 {
                     Message = $" Registration successful , confirm your mail , just send to you {emailSend.Message} !!",
                     Result = true
-                };
+                });
             }
 
-            return new RegistrationResponse()
-            { Errors = new List<string>() {"Error creating user !!!", isCreated!.Errors!.Select(a => a.Description)!.ToString()! },
-                    Result = false };
+            return Result<AuthResult>.Failure(Error.Validation("Error Registering User", isCreated!.Errors!.Select(a => a.Description)!.ToString()!));
         }
 
-        public async Task<AuthResult> RegisterWithGoogle(string credentials)
+        public async Task<Result<AuthResult>> RegisterWithGoogle(string credentials)
         {
             // google auth settings
             var settings = new GoogleJsonWebSignature.ValidationSettings()
@@ -99,110 +94,200 @@ namespace ManyInOneAPI.Services.Auth
 
             if (payload is null)
             {
-                return new AuthResult() { Errors = new List<string>() {"User doesn't exists !!!" } ,
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.Failure("Invalid", "Error signing in with Google. "));
             }
 
             // then get the user from payload and check in db
             var existingUser = await _userManager.FindByEmailAsync(payload.Email!);
             if (existingUser is not null)
             {
-                return new AuthResult() { Errors = new List<string>() { "User already exists, so try to log in with it!!!" } ,
-                    Result = false};
+                return Result<AuthResult>.Failure(Error.Conflict("Conflict", "User already exists, so try to log in with correct. "));
             }
 
-            // then get the user from payload create 
+            // then get the user from payload and create the user
             var newUser = new IdentityUser()
             {
+                Id = Guid.NewGuid().ToString(),
                 UserName = payload.FamilyName + payload.GivenName,
                 Email = payload.Email,
                 EmailConfirmed = true // logging in with google so
             };
 
-            // create and also add login info with provider
-            var loginInfo = new UserLoginInfo("GOOGLE", payload.Subject, "Google");
-            
-            await _userManager.AddLoginAsync(newUser, loginInfo);
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-            if (!result.Succeeded)
+            // add the user
+            var userAdded = await _userManager.CreateAsync(newUser);
+
+            if (!userAdded.Succeeded)
             {
-                return new AuthResult() { Errors = new List<string>() { "Error creating the user !!" } ,
-                    Result = false};
+                return Result<AuthResult>.Failure(Error.Validation("Failed", "Error while signing in with Google. "));
             }
 
-            // create the user
-            var res = await _userManager.CreateAsync(newUser);
+            //  also add login info with provider
+            var loginInfo = new UserLoginInfo("GOOGLE", payload.Subject, "Google");
+
+            var res = await _userManager.AddLoginAsync(newUser, loginInfo);
 
             if (!res.Succeeded)
             {
-                return new AuthResult() { Errors = new List<string>() {"Error creating the user !!"} ,
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.Validation("Failed", "Error while signing in with Google. "));
             }
+
+            // Sign in the user with this external login provider if the user already has a login.
+            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (!result.Succeeded)
+            {
+                return Result<AuthResult>.Failure(Error.Validation("Failed", "Error while signing in with Google. "));
+            }
+
             var emailSend = await _emailService.SendGreetingMailAsync(newUser.Email);
             // other wise generate token for the user and allow to log in
             var jwttoken = GenerateJwtToken(newUser);
-
-            return new RegistrationResponse()
+                
+            return Result<AuthResult>.Success(new AuthResult()
             {
                 Message = "Registration with google log in successful and shipped also!! ",
                 Result = true,
-                UserId = existingUser!.Id,
-                UserName = existingUser!.UserName
-            };
+                UserId = newUser!.Id,
+                UserName = newUser!.UserName
+            });
         }
 
-        public async Task<AuthResult> ConfirmUserEmail(string userId, string code)
+        public async Task<Result<AuthResult>> ConfirmUserEmail(ConfirmEmail confirmEmail)
         {
-            // Do something if token is expired, else continue with confirmation
-            var user = await _userManager.FindByIdAsync(userId);
+            // first check the user
+            var user = await _userManager.FindByIdAsync(confirmEmail.UserId);
             if (user is null)
             {
-                return new AuthResult()
-                {
-                    Result = false,
-                    Errors = new List<string>()
-                    {
-                        "Invalid email parameters !!"
-                    }
-                };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
+            }
+            // if already confirmed email
+            if (user.EmailConfirmed)
+            {
+                return Result<AuthResult>.Failure(Error.Conflict("Conflict", "User email confirmed already , please log in to continue !!"));
             }
 
             // verify from user manager
-            var res = await _userManager.ConfirmEmailAsync(user, code);
+            var res = await _userManager.ConfirmEmailAsync(user, confirmEmail.ConfirmationCode);
 
-            if(!res.Succeeded)
+            if (!res.Succeeded)
             {
-                return new AuthResult()
-                {
-                    Result = false,
-                    Errors = new List<string>()
-                    {
-                        "Failed to confirm mail !"
-                    }
-                };
+                return Result<AuthResult>.Failure(Error.Failure("Failed to Confirm", "Please try again confirming or resend confirmation link. "));
             }
-            return new AuthResult()
+
+            var emailSend = await _emailService.SendGreetingMailAsync(user.Email!);
+
+            return Result<AuthResult>.Success(new AuthResult()
             {
-                // here need to put some html whrer redirect link will be given
-                Result = res.Succeeded,
-                Message = $"<div style=\"text-align: center; vertical-align: middle; height: 100px;\"><h1>Your account has been confirmed!</h1><h3>Click here to login: <a href='{_authConfig.Audience}/login'>Login</a></h3></div>"
-            };
+                Result = true,
+                Message = "Your email has been verified successfully , please login now."
+            });
         }
 
-        public async Task<AuthResult> Login(UserLoginRequestDTO userRequestDTO)
+        public async Task<Result<AuthResult>> ResendConfirmationMail(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail!);
+
+            // will send a verification code to that user s email if valid user, again
+            if(user is null)
+            {
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
+            }
+
+            // if already confirmed email
+            if (user.EmailConfirmed)
+            {
+                return Result<AuthResult>.Failure(Error.Conflict("Conflict", "User email confirmed already , please log in to continue !!"));
+            }
+
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user!); 
+
+            var emailSend = await _emailService.SendMailAsync(user.Id, user.Email!, WebUtility.UrlEncode(code));
+
+            if (!emailSend.Result)
+            {
+                return Result<AuthResult>.Failure(Error.Failure("Failed to send mail", "Please try again sending link. "));
+            }
+
+            return Result<AuthResult>.Success(new AuthResult()
+            {
+                Result = true,
+                Message = $"Confirmation mail sent again to your mail , just send to you. Please check your mail. {emailSend.Message}. "
+            });
+        }
+
+        public async Task<Result<AuthResult>> ForgotPasswordMail(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail!);
+
+            // will send a verification code to that user s email if valid user, again
+            if (user is null)
+            {
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
+            }
+
+            // if user doesnt have confirmed email , cannot reset password
+            if (!user.EmailConfirmed)
+            {
+                return Result<AuthResult>.Failure(Error.Validation("Invalid", "User email not confirmed yet. "));
+            }
+
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user!);
+
+            var emailSend = await _emailService.SendPasswordResetMailAsync(user.Id, user.Email!, WebUtility.UrlEncode(code));
+
+            if (!emailSend.Result)
+            {
+                return Result<AuthResult>.Failure(Error.Failure("Failed to send mail", "Please try again sending link. "));
+            }
+
+            return Result<AuthResult>.Success(new AuthResult()
+            {
+                Result = true,
+                Message = $"Reset password mail sent to you. Please check your mail. {emailSend.Message}. "
+            });
+        }
+
+        public async Task<Result<AuthResult>> ResetPassword(ResetPasswordDTO resetPassword)
+        {
+            // first check the user
+            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            if (user is null)
+            {
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
+            }
+            // if not confirmed email
+            if (!user.EmailConfirmed)
+            {
+                return Result<AuthResult>.Failure(Error.Validation("Invalid", "User email not confirmed yet. "));
+            }
+
+            // verify from user manager
+            var res = await _userManager.ResetPasswordAsync(user, resetPassword.Code, resetPassword.NewPassword);
+
+            if (!res.Succeeded)
+            {
+                return Result<AuthResult>.Failure(Error.Failure("Failed to reset password. ", "Please try again . "));
+            }
+
+            return Result<AuthResult>.Success(new AuthResult()
+            {
+                Result = true,
+                Message = "Password has been reset successfully , please login now with new password. "
+            });
+        }
+
+        public async Task<Result<AuthResult>> Login(UserLoginRequestDTO userRequestDTO)
         {
             var existingUser = await _userManager.FindByEmailAsync(userRequestDTO.Email);
 
             if (existingUser is null)
             {
-                return new AuthResult() { Result = false, Errors = new List<string>() { "User doesn't exists !!!"} };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
             }
 
-            if(!existingUser.EmailConfirmed)
+            if (!existingUser.EmailConfirmed)
             {
-                return new AuthResult() { Errors = new List<string>() {"Email not confirmed yet!!!" },
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.Validation("Invalid", "User email not confirmed yet. "));
             }
 
 
@@ -211,15 +296,20 @@ namespace ManyInOneAPI.Services.Auth
 
             if (!passwordMatch)
             {
-                return new AuthResult() { Errors = new List<string>() {"Invalid user !!" } ,
-                    Result = false};
+                return Result<AuthResult>.Failure(Error.Validation("Invalid", "Invalid User credentials, please try again with correct ones. "));
             }
 
             if (existingUser.TwoFactorEnabled)
             {
                 // send 2 fa code to verify
-                return new AuthResult() { UserId = existingUser.Id, emailConfirmed = true, TwoFAEnabled = true, Message = "Put Two factor authentication code ..",
-                    Result = true };
+                return Result<AuthResult>.Success(new AuthResult()
+                {
+                    UserId = existingUser.Id,
+                    EmailConfirmed = existingUser.EmailConfirmed,
+                    TwoFAEnabled = existingUser.TwoFactorEnabled,
+                    Message = "Enter Two factor authentication code ..",
+                    Result = true
+                });
             }
             // sign in the user
             var useCookieScheme = true;
@@ -230,19 +320,18 @@ namespace ManyInOneAPI.Services.Auth
 
             var jwttoken = GenerateJwtToken(existingUser);
 
-            return new LoginResponse()
+            return Result<AuthResult>.Success(new AuthResult()
             {
                 Message = "Login successful and shipped also!! ",
                 Result = true,
                 UserId = existingUser.Id,
                 UserName = existingUser.UserName,
-                emailConfirmed = true,
-                TwoFAEnabled = false
-            };
+                EmailConfirmed = existingUser.EmailConfirmed,
+                TwoFAEnabled = existingUser.TwoFactorEnabled
+            });
         }
 
-
-        public async Task<AuthResult> LoginWithGoogle(string credentials)
+        public async Task<Result<AuthResult>> LoginWithGoogle(string credentials)
         {
             // google auth settings
             var settings = new GoogleJsonWebSignature.ValidationSettings()
@@ -255,8 +344,7 @@ namespace ManyInOneAPI.Services.Auth
 
             if (payload is null)
             {
-                return new AuthResult() { Errors = new List<string>() {"User doesn't exists !!!" },
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
             }
 
             // then get the user from payload and check in db
@@ -264,108 +352,106 @@ namespace ManyInOneAPI.Services.Auth
 
             if (existingUser is null)
             {
-                return new AuthResult() { Errors = new List<string>() {"Invalid user !!" },
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
             }
 
             // other wise generate token for th euser and allow to log in
             var jwttoken = GenerateJwtToken(existingUser);
 
-            return new LoginResponse()
+            return Result<AuthResult>.Success(new AuthResult()
             {
-                Message = "Login successful with google and shipped also!! ",
+                Message = "Login successful with google. ",
                 Result = true,
                 UserId = existingUser.Id,
                 UserName = existingUser.UserName,
-                emailConfirmed = true,
-                TwoFAEnabled = true,
-            };
+                EmailConfirmed = existingUser.EmailConfirmed,
+                TwoFAEnabled = existingUser.TwoFactorEnabled
+            });
         }
 
-        public async Task<AuthResult> VerifyAndLoginWith2FA(Login2FARequest login2FARequest)
+        public async Task<Result<AuthResult>> VerifyAndLoginWith2FA(Login2FARequest login2FARequest)
         {
-            // verify code
-            //var verifiedRes = await Verify2FA(credentials);
             var currUser = await _userManager.FindByIdAsync(login2FARequest.CurrUserId!);
             if (currUser is null)
             {
-                return new AuthResult()
-                {
-                    Errors = new List<string>() { "Invalid user !!" },
-                    Result = false
-                };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
             }
 
             bool validCode = await _userManager.VerifyTwoFactorTokenAsync(currUser!, _userManager.Options.Tokens.AuthenticatorTokenProvider, login2FARequest.TwoFACode!);
-            if(!validCode)
+            
+            if (!validCode)
             {
-                return new AuthResult() { Errors = new List<string>() { "Code is not valid !!, Try Aagain.." },
-                    Result = false};
+                return Result<AuthResult>.Failure(Error.Validation("Invalid Code", "Code is invalid. Try with correct code. "));
             }
 
-            // then get the user from payload and check in db
-            //var existingUser = await _userManager.FindByIdAsync(verifiedRes.UserId!);
-
-            //if (currUser is null)
-            //{
-            //    return new AuthResult() { Errors = new List<string>() { "Invalid user !!" } ,
-            //        Result = false};
-            //}
             // other wise generate token for the user and allow to log in
             var jwttoken = GenerateJwtToken(currUser);
 
-            return new LoginResponse()
+            return Result<AuthResult>.Success(new AuthResult()
             {
-                Message = "Login successful and shipped also!! ",
+                Message = "Login successful with 2 Factor verification. ",
                 Result = true,
-                UserId = login2FARequest.CurrUserId,
+                UserId = currUser.Id,
                 UserName = currUser.UserName,
-                TwoFAEnabled = true,
-                emailConfirmed = true
-            };
+                EmailConfirmed = currUser.EmailConfirmed,
+                TwoFAEnabled = currUser.TwoFactorEnabled
+            });
         }
 
-
-        public async Task<AuthResult> Verify2FA(string credentials)
+        public async Task<Result<AuthResult>> Verify2FA(string credentials)
         {
             var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
 
             if (token.IsNullOrEmpty())
             {
-                return new AuthResult() { Errors = new List<string>() { "All tokens expired, login afgain to continue !!" },
-                    Result = false };
+                // then get try refreshing tokens if there refresh token exists
+                var refToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
+                if (refToken.IsNullOrEmpty())
+                {
+                    return Result<AuthResult>.Failure(Error.Failure("Failed", "Login expired ,, Please log in again to continue .... "));
+                }
+                // other wise generate new token
+                await GetRefreshToken();
+                // try again 
+                return Result<AuthResult>.Failure(Error.Failure("Failed", "Please try again. "));
             }
             // get user 
             var currUser = await GetUserFromJWT(token!);
 
             // Strip spaces and hyphens
-            var verificationCode = credentials;//.Replace(" ", string.Empty).Replace("-", string.Empty);
+            var verificationCode = credentials;
 
             var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(currUser, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
 
             if (!is2faTokenValid)
             {
-                return new AuthResult() { Errors = new List<string>() { "Verification code is invalid." },
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.Validation("Invalid", "Invalid verification code. "));
             }
 
             await _userManager.SetTwoFactorEnabledAsync(currUser, true);
 
-            return new AuthResult() { TwoFAEnabled = true, Message = "2FA code verified", Result = true };
+            return Result<AuthResult>.Success(new AuthResult()
+            {
+                Message = "2 Factor verification successful. ",
+                Result = true,
+                UserId = currUser.Id,
+                UserName = currUser.UserName,
+                EmailConfirmed = currUser.EmailConfirmed,
+                TwoFAEnabled = currUser.TwoFactorEnabled
+            });
         }
 
-        public async Task<AuthResult> Disable2FA()
+        public async Task<Result<AuthResult>> Disable2FA()
         {
             var acToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
 
             if (acToken.IsNullOrEmpty())
             {
-                // why I am not able to get ref token from req
+                // then get try refreshing tokens if there refresh token exists
                 var refToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
-                if(refToken.IsNullOrEmpty())
+                if (refToken.IsNullOrEmpty())
                 {
-                    return new AuthResult() { Errors = new List<string>() { "Login expired ,, Please log in again to continue ..." },
-                        Result = false };
+                    return Result<AuthResult>.Failure(Error.Failure("Failed", "Login expired ,, Please log in again to continue .... "));
                 }
                 // other wise generate new token
                 await GetRefreshToken();
@@ -373,50 +459,43 @@ namespace ManyInOneAPI.Services.Auth
                 await Disable2FA();
             }
 
-            // get the jwt token id linked with this refresh token
-            // var userId = await _dbContext.RefreshTokens.Where(a => a.Token == refreshToken).Select(b => b.UserId).FirstOrDefaultAsync();
-
-            // get from database from refresh token table
-            // var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == userId);
+            // get the user from jwt token
             var user = await GetUserFromJWT(acToken!);
-
 
             if (user == null)
             {
-                return new AuthResult()
-                {
-                    Errors = new List<string>() { "Unable to get user !"},
-                    Result = false
-                };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
+            }
+            // if already disabled
+            if (!user.TwoFactorEnabled)
+            {
+                return Result<AuthResult>.Failure(Error.Conflict("Conflict", "Invalid, Two factor not enabled yet . "));
             }
 
             var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
 
             if (!disable2faResult.Succeeded)
             {
-                return new AuthResult() { Errors = new List<string>() { "Unexpected error occurred disabling 2FA." },
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.Failure("Failed", "Unexpected error occurred disabling 2FA. "));
             }
 
-            return new AuthResult()
+            return Result<AuthResult>.Success(new AuthResult()
             {
-                Message = "2fa has been disabled. You can enable again 2fa when you setup an authenticator app",
-                TwoFAEnabled = false,
-                    Result = true
-            };
-            
+                Message = "Two factor has been disabled. You can enable again when you setup an authenticator app. ",
+                Result = true,
+                UserId = user.Id,
+                UserName = user.UserName,
+                EmailConfirmed = user.EmailConfirmed,
+                TwoFAEnabled = user.TwoFactorEnabled
+            });
         }
 
-        public async Task<TwoFAResponse> LoadSharedKeyAndQrCodeUriAsync(string userId)
+        public async Task<Result<TwoFAResponse>> LoadSharedKeyAndQrCodeUriAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new TwoFAResponse()
-                {
-                    Result = false,
-                    Message = "Invalid user !!"
-                }; ;
+                return Result<TwoFAResponse>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
             }
             // Load the authenticator key & QR code URI to display on the form
             var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
@@ -431,54 +510,62 @@ namespace ManyInOneAPI.Services.Auth
             var email = await _userManager.GetEmailAsync(user);
             var AuthenticatorUri = GenerateQrCodeUri(email!, unformattedKey!);
 
-            return new TwoFAResponse()
+            return Result<TwoFAResponse>.Success(new TwoFAResponse()
             {
                 QR = AuthenticatorUri,
                 SharedKey = SharedKey,
                 Result = true,
                 Message = "Verify now the code from authenticator app !!"
-            };
+            });
         }
 
-        public async Task<AuthResult> SignOutUser()
+        public async Task<Result<AuthResult>> SignOutUser()
         {
             await _signInManager.SignOutAsync();
 
             await RevokeToken();
 
-            return new AuthResult() { Result = true, Message = " Sign out successfully !!" };
+            return Result<AuthResult>.Success(new AuthResult()
+            {
+                Message = "Signed out successfully. ",
+                Result = true,
+            });
         }
 
-        public async Task<AuthResult> GetRefreshToken()
+        public async Task<Result<AuthResult>> GetRefreshToken()
         {
             // get prev refresh token from request cookies
             var refreshToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
-            var userId = _httpContextAccessor.HttpContext!.Request.Cookies["curr-app-user"];
-
-            if(refreshToken.IsNullOrEmpty())
+            if (refreshToken.IsNullOrEmpty())
             {
-                return new AuthResult() { Errors = new List<string>() { "Login expired ,, Please log in again to conitnue ..."} ,
-                    Result = false};
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Login expired , Please log out and then log in again to continue ... "));
             }
 
             // get the jwt token id linked with this refresh token
-            // var userId = await _dbContext.RefreshTokens.Where(a => a.Token == refreshToken).Select(b => b.UserId).FirstOrDefaultAsync();
+            var userId = await _dbContext.RefreshTokens.Where(a => a.Token == refreshToken).Select(b => b.UserId).FirstOrDefaultAsync();
 
             // get from database from refresh token table
             var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == userId);
 
-            if (user is null) //|| user.TokenExpires < DateTime.UtcNow) 
+            if (user is null)
             {
-                return new AuthResult() { Errors = new List<string>() {"User is unauthorized!!" },
-                    Result = false };
+                return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
             }
             // other wiser generate refresh token
             await GenerateJwtToken(user);
 
-            return new AuthResult() { Message = "Refresh token set into cookies successfully !! ", Result = true };
+            return Result<AuthResult>.Success(new AuthResult()
+            {
+                Message = "Token refreshed successfully. ",
+                Result = true,
+                UserId = user.Id,
+                UserName = user.UserName,
+                EmailConfirmed = user.EmailConfirmed,
+                TwoFAEnabled = user.TwoFactorEnabled
+            });
         }
 
-        public async Task<AuthResult> CheckCurrentUser()
+        public async Task<Result<AuthResult>> CheckCurrentUser()
         {
             var currUserRes = new AuthResult();
             var currToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
@@ -488,9 +575,9 @@ namespace ManyInOneAPI.Services.Auth
             if (currToken.IsNullOrEmpty())
             {
                 var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
-                if(token.IsNullOrEmpty())
+                if (token.IsNullOrEmpty())
                 {
-                    return new AuthResult() { Errors = new List<string>() {"All session , token expired, please log again to continue !!" }, Result = false };
+                    return Result<AuthResult>.Failure(Error.Failure("Failed", "All session , token expired, please log again to continue. "));
                 }
 
                 var currUserId = await _dbContext.RefreshTokens.Where(a => a.Token == token).Select(b => b.UserId).FirstOrDefaultAsync();
@@ -499,14 +586,14 @@ namespace ManyInOneAPI.Services.Auth
 
                 if (user is null)
                 {
-                    return new AuthResult() { Errors = new List<string>() { "Invalid User !!!" }, Result = false };
+                    return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
                 }
                 //  aslo set the access token
                 await GenerateJwtToken(user!);
 
                 currUserRes.UserId = currUserId!;
                 currUserRes.TwoFAEnabled = user!.TwoFactorEnabled;
-                currUserRes.emailConfirmed = user!.EmailConfirmed;
+                currUserRes.EmailConfirmed = user!.EmailConfirmed;
                 currUserRes.UserName = user!.UserName;
             }
             else
@@ -522,51 +609,58 @@ namespace ManyInOneAPI.Services.Auth
 
                 if (isvalidUser is null)
                 {
-                    return new AuthResult() { Errors = new List<string>() {"Invalid User !!!" }, Result = false };
+                    return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
                 }
 
                 currUserRes.UserId = isvalidUser!.Id!;
                 currUserRes.TwoFAEnabled = user.TwoFactorEnabled;
-                currUserRes.emailConfirmed = user!.EmailConfirmed;
+                currUserRes.EmailConfirmed = user!.EmailConfirmed;
                 currUserRes.UserName = user!.UserName;
 
             }
             currUserRes.Result = true;
-            return currUserRes;
+
+            return Result<AuthResult>.Success(currUserRes);
         }
 
-        public async Task<AuthResult> RevokeToken() 
+        public async Task<Result<AuthResult>> RevokeToken()
         {
-            // this is in scenarios when jwt token and refresh token both doesnt work
+            // this is in scenarios when jwt token and refresh token both does'nt work
             // so this will be called from frontend to remove all token for that user 
             var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
-            var userId = _httpContextAccessor.HttpContext!.Request.Cookies["curr-app-user"];
 
             if (token.IsNullOrEmpty())
             {
-                return new AuthResult() { Errors = new List<string>() {"All tokens expired, login again to continue !!" }, Result = false };
+                // delete these also
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
+
+                return Result<AuthResult>.Failure(Error.Failure("Failed", "All session , token expired, please log again to continue. "));
             }
             // get the related user id first
-                var currUsersToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(a => a.Token == token);
+            var currUsersToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(a => a.Token == token);
+            if (currUsersToken is null)
+            {
+                return Result<AuthResult>.Failure(Error.Failure("Failed", "Error occurred, login again to continue !. "));
+            }
             // get prev refresh token from request and remove all refresh token related to this user
-            // var refTokens = await _dbContext.RefreshTokens.Where(a => a.UserId == currUsersToken!.UserId).ToListAsync();
-            var refTokens = await _dbContext.RefreshTokens.Where(a => a.UserId == userId).ToListAsync();
+            var refTokens = await _dbContext.RefreshTokens.Where(a => a.UserId == currUsersToken!.UserId).ToListAsync();
 
             // set the refresh token as invalid
             _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-access-token");
             _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
-            _httpContextAccessor.HttpContext!.Response.Cookies.Delete("curr-app-user");
+            _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
+            _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
+
 
             // delete from database
             _dbContext.RefreshTokens.RemoveRange(refTokens!);
             await _dbContext.SaveChangesAsync();
 
-
-            return new AuthResult() { Message = "All refresh token revoked successfully !! ", Result = true };
+            return Result<AuthResult>.Success(new AuthResult() { Message = "All refresh token revoked successfully !! ", Result = true });
         }
 
-
-        public async Task<AuthResult> DeleteAllData()
+        public async Task<Result<AuthResult>> DeleteAllData()
         {
             var currToken = _httpContextAccessor.HttpContext!.Request.Cookies["x-access-token"];
             var currUser = new IdentityUser();
@@ -577,43 +671,62 @@ namespace ManyInOneAPI.Services.Auth
                 var token = _httpContextAccessor.HttpContext!.Request.Cookies["x-refresh-token"];
                 if (token.IsNullOrEmpty())
                 {
-                    return new AuthResult() { Errors = new List<string>() { "All session , token expired, please log again to continue !!" }, Result = false };
+                    return Result<AuthResult>.Failure(Error.Failure("Failed", "All session , token expired, please log again to continue. "));
                 }
 
                 var currUserId = await _dbContext.RefreshTokens.Where(a => a.Token == token).Select(b => b.UserId).FirstOrDefaultAsync();
 
                 currUser = await _userManager.FindByIdAsync(currUserId!);
 
+                if (currUser is null)
+                {
+                    return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
+                }
+
                 // set the refresh token as invalid
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
             }
             else
             {
                 // other wise give the user email
                 var user = await GetUserFromJWT(currToken!);
 
+                if (user is null)
+                {
+                    return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
+                }
+
                 // after that also verifies from user manager
                 var isvalidUser = await _userManager.FindByEmailAsync(user.Email!);
 
                 if (isvalidUser is null)
                 {
-                    return new AuthResult() { Errors = new List<string>() { "Invalid User !!!" }, Result = false };
+                    return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
                 }
 
                 currUser = isvalidUser;
 
                 // set the access token as invalid
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-access-token");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
             }
             // delete all things 
             var result = await _userManager.DeleteAsync(currUser!);
-            
+
             if (!result.Succeeded)
             {
-                return new AuthResult() { Errors = new List<string>() { "Unexpected error occurred deleting user." }, Result = false };
+                return Result<AuthResult>.Failure(Error.Failure("Failed", "Unexpected error occurred deleting user. Try again . "));
             }
             // get prev refresh token from request and remove all refresh token related to this user
             var refTokens = await _dbContext.RefreshTokens.Where(a => a.UserId == currUser!.Id).ToListAsync();
+            if (refTokens is null)
+            {
+                return Result<AuthResult>.Failure(Error.Validation("Invalid", "Unexpected error occurred deleting user. Try again . "));
+            }
 
             _dbContext.RefreshTokens.RemoveRange(refTokens!);
 
@@ -621,11 +734,10 @@ namespace ManyInOneAPI.Services.Auth
 
             await _signInManager.SignOutAsync();
 
-            return new AuthResult() { Message = "User deleted themselves.", Result = true };
+            return Result<AuthResult>.Success(new AuthResult() { Message = "User deleted themselves successfully !! ", Result = true });
         }
 
         #region All Utilities
-        //=============================================== Utilities =====================================================
         private async Task<string> GenerateJwtToken(IdentityUser user)
         {
             var jwtTokenhandler = new JwtSecurityTokenHandler();
@@ -645,7 +757,7 @@ namespace ManyInOneAPI.Services.Auth
                 }),
                 Issuer = _authConfig.Issuer,
                 Audience = _authConfig.Audience,
-                Expires = DateTime.Now.ToLocalTime().AddHours(1), // need to be as geenral short like in min ,
+                Expires = DateTime.Now.ToLocalTime().AddHours(1), // need to be as general short like in min ,
                 //when implement refresh token , change here
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
             };
@@ -760,7 +872,6 @@ namespace ManyInOneAPI.Services.Auth
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }
-
 
         #endregion
     }

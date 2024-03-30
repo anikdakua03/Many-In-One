@@ -8,13 +8,12 @@ import { Router, RouterLink } from '@angular/router';
 import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
 import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { environment } from '../../../../environments/environment';
-import { NgxLoadingModule } from 'ngx-loading';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgxLoadingModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styles: ``
 })
@@ -26,11 +25,6 @@ export class RegisterComponent {
   authResponseDto: AuthResponse = new AuthResponse();
   registerForm!: FormGroup;
   isLoading: boolean = false;
-  localUser: any = {
-    userId: "",
-    userName: "",
-    is2FaEnabled: false
-  };
 
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object) {
     
@@ -42,7 +36,6 @@ export class RegisterComponent {
   }
 
   ngOnInit(): void {
-    // console.log("platform id for register -->", this.platformId);
     if (isPlatformBrowser(this.platformId)) {
       // we do not need this on google library load , it is causing not rendering button properly
       // (window as any).onGoogleLibraryLoad = () => {
@@ -72,21 +65,29 @@ export class RegisterComponent {
   // google registering related
   handleCredentialResponse(response: CredentialResponse) {
     // then will send it to our api to confirm and check
+    this.isLoading = true;
     this.authService.registerWithGoogle(response.credential).subscribe(res => {
-      // localStorage.setItem("x-access-token", res.token);
-      this._ngZone.run(() => {
-        // set the user signal for whole application
-        this.authService.isAuthenticated$.next(true);
-        this.authService.saveToken("x-app-user", res.userId);
-        this.authService.saveToken("x-user-name", res.userName);
-        this.authService.saveToken("twofa-enable", res.twoFAEnabled);
-        this.router.navigateByUrl('/home');
-        this.toaster.success("Registered with google Successful !!", "User Registered successfully !!");
-      });
+      if (res.isSuccess) {
+        this._ngZone.run(() => {
+          this.isLoading = false;
+          // set the user signal for whole application
+          this.authService.isAuthenticated$.next(true);
+          this.authService.saveToken("x-app-user", res.data.userId);
+          this.authService.saveToken("x-user-name", res.data.userName);
+          this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
+          this.router.navigateByUrl('/home');
+          window.location.reload();
+          this.toaster.success("Registration with google Successful !!", "User Registered successfully !!");
+        });
+      }
+      else {
+        this.isLoading = false;
+        this.toaster.error(res.error?.description, "User Registration error!!");
+      }
     },
       (err: any) => {
-        console.log(err);
-        this.toaster.error(err, "User registration failed !!");
+        this.isLoading = false;
+        this.toaster.error("User registration unsuccessful.", "User registration failed !!");
       });
   }
 
@@ -94,20 +95,25 @@ export class RegisterComponent {
   onRegister() {
     if (this.registerForm.valid) {
       this.isLoading = true;
-      // console.log("Register form ---> ", this.registerForm.value);
       this.authService.register(this.registerForm.value).subscribe({
         next:
         res => {
-          // roue to login
-          this.isLoading = false;
-          this.router.navigateByUrl('/login');
-          this.toaster.success(res.message, "User registered");
+          if (res.isSuccess) {
+            // roue to login
+            this.isLoading = false;
+            this.router.navigateByUrl('/login');
+            this.toaster.success("Registration successful, please confirm email to continue.", "User registered");
+          }
+          else {
+            this.isLoading = false;
+            this.router.navigateByUrl('/register');
+            this.toaster.success(res.error.description, "User registered");
+          }
         },
         error:
-        err => {
-          console.log(err);
+          err => {
           this.isLoading = false;
-            this.toaster.error(err.message, "User registration failed !!");
+            this.toaster.error("Registration failed", "User registration failed !!");
           }
       });
     }

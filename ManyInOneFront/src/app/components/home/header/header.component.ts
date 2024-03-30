@@ -1,7 +1,8 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-header',
@@ -15,8 +16,10 @@ export class HeaderComponent implements OnInit {
   checkCurrUser: boolean = false;
   currUserName: string = "";
   isSidebarShowing: boolean = false;
+  isLoading : boolean = false;
 
-  constructor(protected authService: AuthenticationService, private router: Router) {
+  constructor(protected authService: AuthenticationService, private router: Router, private toaster: ToastrService) {
+
   }
 
   ngOnInit(): void {
@@ -37,17 +40,24 @@ export class HeaderComponent implements OnInit {
 
   // logout
   onLogout() {
+    this.isLoading = true;
     this.authService.signOut().subscribe({
       next: res => {
-        if (res.result) {
+        if (res.isSuccess) {
+          this.isLoading = false;
           this.authService.isAuthenticated$.next(false); // set false
           this.authService.removeToken();
           window.location.reload();
           this.router.navigateByUrl('/'); // go to home
+          this.toaster.success("Signed out successfully.", "User Sign out");
+        }
+        else {
+          this.isLoading = false;
+          this.toaster.info("Please try again..", "User Sign out");
         }
       },
       error: err => {
-        console.log(err);
+        this.isLoading = false;
       }
     })
   }

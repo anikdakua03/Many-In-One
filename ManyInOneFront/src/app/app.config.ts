@@ -37,18 +37,6 @@ export const appConfig: ApplicationConfig = {
           pedantic: false,
           smartLists: true,
           lineNumber: true,
-          langPrefix: 'language-',
-          // highlight : function(code, lang)
-          // {
-          //   if(Prism.language[lang])
-          //   {
-          //     return Prism.highlight(code, Prism.language[lang], lang);
-          //   }
-          //   else
-          //   {
-          //     return code;
-          //   }
-          // }
         },
       }
     }),

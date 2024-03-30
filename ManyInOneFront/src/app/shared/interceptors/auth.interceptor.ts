@@ -7,7 +7,7 @@ import { AuthenticationService } from '../services/authentication.service';
 
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
-
+    // <>
     const authService = inject(AuthenticationService);
     const router = inject(Router);
     const toaster = inject(ToastrService);
@@ -21,20 +21,24 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
                 return authService.refreshToken().pipe(
                     tap(x => {
-                        toaster.info("Please reload the page !!!")
+                        if (x.isSuccess) {
+                            toaster.info("Inactive for too long, Please reload the page !!!");
+                        }
+                        else {
+                            toaster.info("Login expired , Please log out and then log in again to continue ... ");
+                        }
                     }), // Emit message without affecting flow
 
                     catchError(() => {
                         // Refresh failed, some error occurred while refreshing, so revoke all token
                         authService.removeToken();
-                        toaster.show("Please login again to continue !!!");
+                        toaster.show("Please log out and then log in again to continue ... ");
                         return authService.revokeToken().pipe(
                             tap(x => {
                                 router.navigateByUrl('/login');
                                 toaster.show("Please login again to continue !!!");
                             }),
                             catchError(() => {
-                                console.log("Other error occurred --> ", err.message);
                                 return throwError(() => new Error("Token revoked")); // Final error handling
                             })
                         );

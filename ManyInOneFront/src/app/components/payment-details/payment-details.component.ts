@@ -4,33 +4,25 @@ import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PaymentDetailsFormComponent } from './payment-details-form/payment-details-form.component';
-import { PaymentDetailsUpdateFormComponent } from './payment-details-update-form/payment-details-update-form.component';
-import { TableSearchFilterPipe } from "../../shared/constants/table-search-filter.pipe";
 
 @Component({
     selector: 'app-payment-details',
     standalone: true,
     templateUrl: './payment-details.component.html',
     styles: ``,
-    imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent, PaymentDetailsUpdateFormComponent, TableSearchFilterPipe]
+  imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent]
 })
 export class PaymentDetailsComponent implements OnInit {
 
-  // filterForm: FormGroup = new FormGroup({
-  //   searchText: new FormControl<string>('')
-  // });
-  // filterFormSubsription: Subscription;
-  searchText: string = '';
-  oldForm: any = "";
-  // pop up testing
   isOpen: boolean = false;
+  isLoading : boolean = false;
 
   updateForm: FormGroup = new FormGroup({
     paymentDetailId: new FormControl(0),
     cardOwnerName: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(50)]),
     cardNumber: new FormControl("", [Validators.required, Validators.minLength(16), Validators.maxLength(16)]),
     securityCode: new FormControl("", [Validators.required, Validators.minLength(3), Validators.maxLength(3)]),
-    expirationDate: new FormControl("", [Validators.required, Validators.minLength(5), Validators.maxLength(5)])
+    expirationDate: new FormControl("", [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]) // for like MM/YY [valid month]
   });
 
   constructor(public service: PaymentService, private router: Router, private toaster: ToastrService) {
@@ -38,18 +30,15 @@ export class PaymentDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.loader?.showLoader(true);
     this.service.refreshList();
-    // this.loader?.showLoader(false);
   }
 
 
   populateForm(selectedRecord: any) {
-
     this.updateForm.patchValue(selectedRecord);
   }
 
-  // pop up testing
+
   openPop(oldDetails: any) {
     this.isOpen = true;
     this.populateForm(oldDetails);
@@ -60,33 +49,37 @@ export class PaymentDetailsComponent implements OnInit {
   }
 
   onSubmit() {
-    this.service.updatePaymentDetails(this.updateForm).subscribe({
-      next: res => {
-        this.service.refreshList();
-        this.toaster.info("Payment method updated successfully !", "Payment Detail updated");
-      },
-      error: err => {
-        console.log(err);
-      }
-    });
+    if (this.updateForm.valid) {
+      this.isLoading = true;
+      this.service.updatePaymentDetails(this.updateForm).subscribe({
+        next: res => {
+          this.service.refreshList();
+          this.isLoading = false;
+          this.toaster.info("Payment method updated successfully !", "Payment Detail updated");
+        },
+        error: err => {
+        }
+      });
+      this.updateForm.reset();
+    }
+    else {
+      this.isLoading = false;
+      this.updateForm.markAllAsTouched();
+    }
   }
 
-  onDelete(id: any) {
+  onDelete(id: number) {
     // before deleting need to confirm from user
-    if (confirm("Do you want to remove this payment detail method ??")) {
-      // console.log("For deleteing from compo --> ",id);
+    if (confirm("Do you want to remove this payment detail ??")) {
+      this.isLoading = true;
       this.service.deletePaymentDetails(id)
         .subscribe(
           {
             next: res => {
-              // alert(res);
-              // toaster success message
-              this.toaster.error("Payment method deleted successfully !", "Payment Detail Delete");
-
-              // for updating the lsit
+              this.isLoading = false;
+              this.toaster.error("Payment detail deleted successfully !", "Payment Detail Delete");
               this.service.refreshList();
             },
-            error: err => { console.log(err); }
           });
     }
   }

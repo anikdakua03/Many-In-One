@@ -1,40 +1,48 @@
-<ngx-loading [show]="isLoading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
 <div class="flex absolute justify-center items-center mt-8 px-4 min-h-screen  w-full bg-cover bg-fixed"
     style="background-image: url('../../../../assets/Clasher/coc-bg.jpg');">
-    <!-- ../../../assets/Clasher/coc-bg.jpg [NOt taking this]
-        https://developer.clashofclans.com/front-bg-small.d355db.jpg-->
-    <!--  -->
     <div class="grid grid-rows-2 grid-flow-row mt-8 gap-x-4 gap-y-5">
 
         <h1 class="text-center font-bold text-3xl text-yellow-800 underline">Search clash Player</h1>
         <div class="relative justify-center items-center w-full min-w-[200px] h-4 mt-6 ml-14">
             <form [formGroup]="playerForm" (submit)="onSearchPlayer()" autocomplete="off">
-                <input formControlName="playerTag"
-                    class="w-[70%] px-3 py-3 font-bold text-xl transition-all bg-transparent border rounded-md peer text-gray-100 outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 placeholder-shown:border placeholder-shown:border-blue-500 placeholder-shown:border-t-blue-gray-200 focus:border-2 border-t-transparent focus:border-t-transparent border-blue-gray-200 focus:border-gray-900" />
-                @if(playerForm.controls['playerTag'].errors && playerForm.controls['playerTag'].touched)
-                {
-                <p class="mt-2 text-lg text-red-600">* Proper Player tag required.
-                </p>
-                }
-                <label
-                    class="flex w-[70%] select-none pointer-events-none absolute left-0 text-lg font-bold !overflow-visible truncate peer-placeholder-shown:text-blue-600 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-lg text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:text-lg after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[4.1] text-gray-800 peer-focus:text-gray-900 before:border-blue-gray-200 peer-focus:before:!border-gray-900 after:border-blue-gray-200 peer-focus:after:!border-gray-900">Player
-                    tag
-                </label>
-
-                <button
-                    class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-4 me-2 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Search
-                    player</button>
+                <div class="relative flex w-full max-w-[24rem] p-2 gap-2">
+                    <div class="relative h-14 w-full min-w-[200px]">
+                        <input type="text" formControlName="playerTag"
+                            class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 pr-20 font-sans text-[16px] font-bold text-[white] outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                            placeholder=" " value="" />
+                        @if(playerForm.controls['playerTag'].errors && playerForm.controls['playerTag'].touched)
+                        {
+                        <p class="mt-2 text-lg text-red-600">* Proper Player tag required.
+                        </p>
+                        }
+                        <label
+                            class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none !overflow-visible truncate text-[11px] font-normal leading-tight text-gray-800 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-lg peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[12px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:!border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:!border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                            Player tag
+                        </label>
+                    </div>
+                    <div class="flex justify-center">
+                        <button type="submit" [disabled]="isLoading"
+                            class="right-1 top-1 w-[150px] select-none rounded-md bg-blue-gray-500 py-2 px-4 text-center align-middle font-sans text-[12px] font-bold bg-yellow-700 text-white shadow-md shadow-blue-gray-500/20 transition-all hover:shadow-lg  hover:shadow-blue-gray-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
+                            @if(isLoading)
+                            {
+                            <svg xmlns="http://www.w3.org/2000/svg" height="28" width="56"
+                                class="ml-[22px] flex items-center justify-center animate-bounce animate-infinite animate-ease-in"
+                                viewBox="0 0 448 512">
+                                <path fill="#b9c9f8"
+                                    d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
+                            </svg>
+                            }
+                            @else { <p class="text-[16px]">Search Player</p> }
+                        </button>
+                    </div>
+                </div>
             </form>
-            <!-- <button
-                class="text-white bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                (click)="onClear()">Clear all</button> -->
         </div>
 
         <div class="mt-[30px] bg-gradient-to-b bg-[#8a761c] rounded-md shadow-md shadow-orange-500">
             @if( playerData !== null && playerData !== undefined )
             {
             <div class="mt-4">
-                <!-- <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700"> -->
                 <h2 class="text-2xl font-bold text-center underline">Clash PLayer Details</h2>
                 <div>
                     <ul
@@ -80,14 +88,16 @@
                         <li>Donations : {{playerData.donations}}</li>
                         <li>Donations Received : {{playerData.donationsReceived}}</li>
                         <li>Best Trophies : {{playerData.bestTrophies}}</li>
-                        <li>Role : {{playerData.role}}</li>
-                        <li>War Preference : {{ playerData.warPreference}}</li>
+                        <li>Role : {{playerData.role.toLocaleUpperCase()}}</li>
+                        <li>War Preference : <span
+                                [ngClass]="playerData.warPreference === 'out' ? 'bg-red-600 text-white rounded-md p-1' : 'bg-green-600 text-black rounded-md p-1'">{{
+                                playerData.warPreference.toLocaleUpperCase()}}</span></li>
                         <li>War Stars : {{playerData.warStars}}</li>
                         @for(tr of playerData.labels; track tr.id)
                         {
                         <div
-                            class="bg-teal-400 p-1 w-[350px] m-1 ml-16 relative flex justify-center items-center rounded-md">
-                            <label class="mr-12 text-[brown]">{{tr.name}}</label>
+                            class="bg-teal-400 p-1 w-[350px] m-1 ml-16 relative flex justify-between items-center rounded-md">
+                            <label class="mr-12 p-2 text-[brown]">{{tr.name}}</label>
                             <img [src]=tr.iconUrls.small alt="tr.name"
                                 style="display: flex; align-items: center; justify-content: center;" height=[350px]
                                 width=[350px] />
@@ -99,9 +109,9 @@
                         @if(playerData.legendStatistics !== null){
                         <li>Legend Trophies : {{playerData.legendStatistics.legendTrophies === 0 ? 0 :
                             playerData.legendStatistics.legendTrophies}}</li>
-                        <li>Best season Rank :{{playerData.legendStatistics.bestSeason.rank}}</li>
-                        <li>Best season Trophies :{{playerData.legendStatistics.bestSeason.trophies}}</li>
-                        <li>Current season Trophies :{{playerData.legendStatistics.currentSeason.trophies}}</li>
+                        <li>Best season Rank :{{playerData.legendStatistics.bestSeason!.rank}}</li>
+                        <li>Best season Trophies :{{playerData.legendStatistics.bestSeason!.trophies}}</li>
+                        <li>Current season Trophies :{{playerData.legendStatistics.currentSeason!.trophies}}</li>
                         }
                         @else {
                         <li>Legend Trophies : 0</li>
@@ -123,38 +133,40 @@
                 <!-- <li>labels array</li> -->
                 @if(isTroopsOpen)
                 {
-                <div>
+                <div class="overflow-y-hidden min-h-screen">
                     <h1 class="text-center font-bold text-xl underline">All Heroes and Troops details</h1>
                     <div class="w-auto py-4 mx-auto grid grid-cols-1 gap-2 ml-4">
                         <div class="text-center text-lg font-bold align-baseline">
-                            <label class="text-2xl font-bold text-blue-700 bg-amber-400 shadow-md">Heroes</label>
+                            <label
+                                class="text-2xl font-bold text-blue-700 bg-amber-400 p-2 rounded-sm shadow-md">Heroes</label>
                             <div class="grid grid-cols-3 justify-center ">
                                 @for(tr of playerData.heroes; track $index)
                                 {
                                 <div class="bg-teal-400 p-1 w-[350px] m-1 relative rounded-md">
                                     <label class="mr-12 text-[#4e4115]">{{tr.name}}</label>
-                                    <img [src]="staticImg[tr.name]" alt="tr.name" height=[350px] width=[350px] />
+                                    <img [src]="staticImg[tr.name]" [alt]="tr.name" [title]="tr.name" height="180px"
+                                        width="180px" />
                                     <div class="absolute top-10 ml-8 mt-8 flex justify-end items-end">
                                         <span
-                                            class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-m font-bold ml-32 mt-28
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
+                                            class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-m font-bold ml-32 mt-28 text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
                                     </div>
                                 </div>
                                 }
                             </div>
                         </div>
                         <div class="text-center text-lg font-bold align-baseline">
-                            <label class="text-2xl font-bold text-blue-700 bg-amber-400 shadow-md">Troops</label>
+                            <label
+                                class="text-2xl font-bold text-blue-700 p-2 rounded-sm  bg-amber-400 shadow-md">Troops</label>
                             <div class="grid lg:grid-cols-4 sm:grid-cols-2 auto-rows-max">
                                 @for(tr of playerData.troops; track $index)
                                 {
                                 <div class="bg-teal-400 p-1 m-1 flex justify-center items-center relative">
                                     <label class="mr-12 text-[#68195d]">{{tr.name}}</label>
-                                    <img [src]="staticImg[tr.name]" alt="tr.name" height=[270px] width=[270px] />
+                                    <img [src]="staticImg[tr.name]" [alt]="tr.name" [title]="tr.name" height="170px"
+                                        width="170px" />
                                     <div class="absolute top-10 ml-16 mt-11 flex justify-end items-end">
                                         <span
-                                            class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-m font-bold
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
+                                            class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-[14px] font-bold text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
                                     </div>
                                 </div>
                                 }
@@ -162,18 +174,19 @@
                         </div>
                         <div class="w-full py-4 mx-auto grid grid-cols-2 gap-4">
                             <div class="text-center text-lg font-bold align-baseline">
-                                <label class="text-2xl font-bold text-blue-700 bg-amber-400 shadow-md">Hero
+                                <label
+                                    class="text-2xl font-bold text-blue-700 p-2 rounded-sm  bg-amber-400 shadow-md">Hero
                                     Equipments</label>
                                 <div class="grid grid-flow-row auto-rows-max">
                                     @for(tr of playerData.heroEquipment; track tr.village == "home")
                                     {
                                     <div class="bg-teal-400 p-1 m-1 flex justify-center items-center relative">
                                         <label class="mr-12 text-[#913d28]">{{tr.name}}</label>
-                                        <img [src]="staticImg[tr.name]" alt="tr.name" height="[600px]" />
+                                        <img [src]="staticImg[tr.name]" [alt]="tr.name" [title]="tr.name" height="100px"
+                                            width="110px" />
                                         <div class="absolute top-10 ml-8 mt-8 flex justify-end items-end">
                                             <span
-                                                class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-m font-bold
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
+                                                class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-[14px] font-bold text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
                                         </div>
                                     </div>
                                     }
@@ -181,19 +194,19 @@
                             </div>
                             <div class="text-center text-lg font-bold align-baseline">
                                 <div class="text-center text-lg font-bold align-baseline">
-                                    <label class="text-2xl font-bold text-blue-700 bg-amber-400 shadow-md">All
+                                    <label
+                                        class="text-2xl font-bold text-blue-700 p-2 rounded-sm bg-amber-400 shadow-md">All
                                         Spells</label>
                                     <div class="grid grid-flow-row auto-rows-max relative">
                                         @for(tr of playerData.spells; track tr.village == "home")
                                         {
                                         <div class="bg-teal-400 p-1 m-1 flex justify-center items-center relative">
                                             <label class="mr-12 text-[#19565e]">{{tr.name}} </label>
-                                            <img [src]="staticImg[tr.name]" [alt]="tr.name" height=[120px]
-                                                width=[120px] />
+                                            <img [src]="staticImg[tr.name]" [alt]="tr.name" [title]="tr.name"
+                                                height="100px" width="100px" />
                                             <div class="absolute top-10 ml-8 mt-8 flex justify-end items-end">
                                                 <span
-                                                    class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-m font-bold
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        text-yellow-800 {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-500 dark:bg-blue-900 dark:text-white' }}  rounded-full ">{{tr.level}}</span>
+                                                    class="inline-flex items-center justify-center w-4 h-4 p-4 ms-4 text-[14px] font-bold  {{ tr.level === tr.maxLevel ? 'bg-yellow-400 text-black' : 'bg-blue-900 text-white' }}  rounded-full ">{{tr.level}}</span>
                                             </div>
                                         </div>
                                         }
@@ -211,8 +224,6 @@
                     <div class="w -full py-4  grid grid-cols-1 gap-4">
                         <div class="text-left text-lg font-bold flex justify-center mx-auto">
                             <div class="grid grid-flow-row auto-rows-max">
-                                <!-- @for(tr of playerData.achievements; track tr.village == "home")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    { -->
                                 <div
                                     class="bg-teal-400 p-1 m-1 text-lg text-amber-700 justify-center items-center w-full rounded-md">
                                     <label class="underline">Builder base stats</label>
@@ -223,12 +234,14 @@
                                         <li>Builder Base Current Trophies : {{playerData.builderBaseTrophies}}</li>
                                         @if(playerData.legendStatistics !== null)
                                         {
-                                            <li>Previous season : {{playerData.legendStatistics.previousSeason.id}}</li>
-                                        <li>Previous season Rank : {{playerData.legendStatistics.previousSeason.rank}} </li>
-                                        <li>Previous season Trophies : {{playerData.legendStatistics.previousSeason.trophies}} </li>
+                                        <li>Previous season : {{playerData.legendStatistics.previousSeason!.id}}</li>
+                                        <li>Previous season Rank : {{playerData.legendStatistics.previousSeason!.rank}}
+                                        </li>
+                                        <li>Previous season Trophies :
+                                            {{playerData.legendStatistics.previousSeason!.trophies}} </li>
                                         <li>Capital Clan Contribution : {{playerData.clanCapitalContributions}}</li>
                                         <li>Current season Rank : 0 </li>
-                                        <li>Best season : {{playerData.legendStatistics.bestSeason.id}}</li>}
+                                        <li>Best season : {{playerData.legendStatistics.bestSeason!.id}}</li>}
                                         @else{
                                         <li>Previous season : 0 </li>
                                         <li>Previous season Rank : 0 </li>

@@ -1,5 +1,7 @@
 ﻿using ManyInOneAPI.Configurations;
+using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.Clasher;
+using ManyInOneAPI.Models.GenAI;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
@@ -12,7 +14,7 @@ namespace ManyInOneAPI.Services.Clasher
     {
         private readonly HttpClient _httpClient;
         private readonly ClasherConfig _clasherConfig;
-
+        private readonly string ClasherAPIURL = "https://api.clashofclans.com/v1/";
         public ClashingHttpClient(HttpClient httpClient, IOptionsMonitor<ClasherConfig> optionsMonitor)
         {
             _httpClient = httpClient;
@@ -20,424 +22,378 @@ namespace ManyInOneAPI.Services.Clasher
         }
 
         #region Player related
-        public async Task<ClashResponse<Player>> GetPlayerById(string playerTag)
+        public async Task<Result<ClashResponse<Player>>> GetPlayerById(string playerTag, CancellationToken cancellationToken)
         {
-            try
+            if (playerTag.IsNullOrEmpty())
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                // Need to encode the input string to url
-                var address = $"players/{HttpUtility.UrlEncode(playerTag)}";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var playerInfo = JsonSerializer.Deserialize<Player>(responseString)!;
-
-                    return new ClashResponse<Player>() { Result = playerInfo, Succeed = true, Message = playerInfo is not null ? "Player found" : "No player found !!" };
-                }
-                else
-                {
-                    return new ClashResponse<Player>() { Succeed = false };
-                }
+                return Result<ClashResponse<Player>>.Failure(Error.Validation("Player tag empty or invalid. ", $"Failed with status code :--> {ErrorType.Validation}"));
             }
-            catch (Exception)
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            // Need to encode the input string to url
+            var address = $"{ClasherAPIURL}players/{HttpUtility.UrlEncode(playerTag)}";
+
+            var response = await _httpClient.GetAsync(address, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                return new ClashResponse<Player>() { Succeed = false };
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var playerInfo = JsonSerializer.Deserialize<Player>(responseString)!;
+
+                return Result<ClashResponse<Player>>.Success(new ClashResponse<Player>() { Result = playerInfo, Succeed = true, Message = playerInfo is not null ? "Player found" : "No player found !!" });
+            }
+            else
+            {
+                return Result<ClashResponse<Player>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
         #endregion
 
         #region Location and ranking related
-        public async Task<ClashResponse<List<Item>>> GetAllLocations()
+        public async Task<Result<ClashResponse<List<Item>>>> GetAllLocations(CancellationToken cancellationToken)
         {
-            try
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}locations";
+
+            var response = await _httpClient.GetAsync(address, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = "locations";
+                var jsonData = JsonSerializer.Deserialize<Location>(responseString)!;
 
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<Location>(responseString)!;
-
-                    return new ClashResponse<List<Item>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Item>>() { Succeed = false };
-                }
+                return Result<ClashResponse<List<Item>>>.Success(new ClashResponse<List<Item>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Item>>() { Succeed = false };
+                return Result<ClashResponse<List<Item>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<List<ClanRanking>>> GetClanRankingsByLocation(string locationId, int limit = 10)
+        public async Task<Result<ClashResponse<List<ClanRanking>>>> GetClanRankingsByLocation(string locationId, int limit = 10)
         {
-            try
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}locations/{locationId}/rankings/clans?limit={limit}";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"locations/{locationId}/rankings/clans?limit={limit}";
+                var jsonData = JsonSerializer.Deserialize<RankedClan>(responseString)!;
 
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<RankedClan>(responseString)!;
-
-                    return new ClashResponse<List<ClanRanking>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<ClanRanking>>() { Succeed = false };
-                }
+                return Result<ClashResponse<List<ClanRanking>>>.Success(new ClashResponse<List<ClanRanking>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<ClanRanking>>() { Succeed = false };
+                return Result<ClashResponse<List<ClanRanking>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+
+        }
+
+        public async Task<Result<ClashResponse<List<PlayerRanking>>>> GetPlayerRankingsByLocation(string locationId, int limit = 10)
+        {
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}locations/{locationId}/rankings/players?limit={limit}";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var jsonData = JsonSerializer.Deserialize<RankedPlayer>(responseString)!;
+
+                return Result<ClashResponse<List<PlayerRanking>>>.Success(new ClashResponse<List<PlayerRanking>>() { Result = jsonData.items, Succeed = true });
+
+            }
+            else
+            {
+                return Result<ClashResponse<List<PlayerRanking>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+
+        }
+
+        public async Task<Result<ClashResponse<List<BuilderPlayerRanking>>>> GetPlayerBuilderBaseRankingsByLoaction(string locationId, int limit = 10)
+        {
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL} locations/{locationId}/rankings/players-builder-base?limit={limit}";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var jsonData = JsonSerializer.Deserialize<RankedBuilderBasePlayer>(responseString)!;
+
+                return Result<ClashResponse<List<BuilderPlayerRanking>>>.Success(new ClashResponse<List<BuilderPlayerRanking>>() { Result = jsonData.items, Succeed = true });
+            }
+            else
+            {
+                return Result<ClashResponse<List<BuilderPlayerRanking>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<List<PlayerRanking>>> GetPlayerRankingsByLocation(string locationId, int limit = 10)
+        public async Task<Result<ClashResponse<List<BuilderClanRanking>>>> GetClanBuilderBaseRankingsByLoaction(string locationId, int limit = 10)
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL} locations/{locationId}/rankings/clans-builder-base?limit={limit}";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"locations/{locationId}/rankings/players?limit={limit}";
+                var jsonData = JsonSerializer.Deserialize<RankedBuilderBaseClan>(responseString)!;
 
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<RankedPlayer>(responseString)!;
-
-                    return new ClashResponse<List<PlayerRanking>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<PlayerRanking>>() { Succeed = false };
-                }
+                return Result<ClashResponse<List<BuilderClanRanking>>>.Success(new ClashResponse<List<BuilderClanRanking>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<PlayerRanking>>() { Succeed = false };
+                return Result<ClashResponse<List<BuilderClanRanking>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
+
         }
 
-        public async Task<ClashResponse<List<BuilderPlayerRanking>>> GetPlayerBuilderBaseRankingsByLoaction(string locationId, int limit = 10)
+        public async Task<Result<ClashResponse<List<ClanCapitalRanking>>>> GetCapitalRankingsByLoaction(string locationId, int limit = 10)
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}locations/{locationId}/rankings/capitals?limit={limit}";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"locations/{locationId}/rankings/players-builder-base?limit={limit}";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<RankedBuilderBasePlayer>(responseString)!;
-
-                    return new ClashResponse<List<BuilderPlayerRanking>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<BuilderPlayerRanking>>() { Succeed = false };
-                }
+                var jsonData = JsonSerializer.Deserialize<RankedClanCapital>(responseString)!;
+                return Result<ClashResponse<List<ClanCapitalRanking>>>.Success(new ClashResponse<List<ClanCapitalRanking>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<BuilderPlayerRanking>>() { Succeed = false };
+                return Result<ClashResponse<List<ClanCapitalRanking>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
-        }
 
-        public async Task<ClashResponse<List<BuilderClanRanking>>> GetClanBuilderBaseRankingsByLoaction(string locationId, int limit = 10)
-        {
-            try
-            {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var address = $"locations/{locationId}/rankings/clans-builder-base?limit={limit}";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<RankedBuilderBaseClan>(responseString)!;
-
-                    return new ClashResponse<List<BuilderClanRanking>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<BuilderClanRanking>>() { Succeed = false };
-                }
-            }
-            catch (Exception)
-            {
-                return new ClashResponse<List<BuilderClanRanking>>() { Succeed = false };
-            }
-        }
-
-        public async Task<ClashResponse<List<ClanCapitalRanking>>> GetCapitalRankingsByLoaction(string locationId, int limit = 10)
-        {
-            try
-            {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var address = $"locations/{locationId}/rankings/capitals?limit={limit}";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<RankedClanCapital>(responseString)!;
-
-                    return new ClashResponse<List<ClanCapitalRanking>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<ClanCapitalRanking>>() { Succeed = false };
-                }
-            }
-            catch (Exception)
-            {
-                return new ClashResponse<List<ClanCapitalRanking>>() { Succeed = false };
-            }
         }
 
         #endregion
 
         #region Clans related
 
-        public async Task<ClashResponse<ClanInfo>> GetClanById(string clanTag)
+        public async Task<Result<ClashResponse<ClanInfo>>> GetClanById(string clanTag, CancellationToken cancellationToken)
         {
-            try
+            if (clanTag.IsNullOrEmpty())
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                // Need to encode the input string to url
-                var address = $"clans/{HttpUtility.UrlEncode(clanTag)}";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var clanInfo = JsonSerializer.Deserialize<ClanInfo>(responseString)!;
-                    return new ClashResponse<ClanInfo> { Result = clanInfo, Succeed = true, Message = clanInfo is not null ? "Clan found with given tag found" : "No clan found !!" };
-                }
-                else
-                {
-                    return new ClashResponse<ClanInfo> { Result = null, Succeed = false };
-                }
+                return Result<ClashResponse<ClanInfo>>.Failure(Error.Validation("Clan tag empty or invalid. ", $"Failed with status code :--> {ErrorType.Validation}"));
             }
-            catch (Exception)
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            // Need to encode the input string to url
+            var address = $"{ClasherAPIURL}clans/{HttpUtility.UrlEncode(clanTag)}";
+
+            var response = await _httpClient.GetAsync(address, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                return new ClashResponse<ClanInfo> { Result = null, Succeed = false };
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var clanInfo = JsonSerializer.Deserialize<ClanInfo>(responseString)!;
+
+                return Result<ClashResponse<ClanInfo>>.Success(new ClashResponse<ClanInfo> { Result = clanInfo, Succeed = true, Message = clanInfo is not null ? "Clan found with given tag found" : "No clan found !!" });
+            }
+            else
+            {
+                return Result<ClashResponse<ClanInfo>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<CurrentClanWarLeagueGroup>> GetClansCurrentClanWarLeagueGroup(string clanTag)
+        public async Task<Result<ClashResponse<CurrentClanWarLeagueGroup>>> GetClansCurrentClanWarLeagueGroup(string clanTag)
         {
-            try
+            if (clanTag.IsNullOrEmpty())
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                // Need to encode the input string to url
-                var address = $"clans/{HttpUtility.UrlEncode(clanTag)}/currentwar/leaguegroup";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var clanWarRes = JsonSerializer.Deserialize<CurrentClanWarLeagueGroup>(responseString)!;
-                    return new ClashResponse<CurrentClanWarLeagueGroup> { Result = clanWarRes, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<CurrentClanWarLeagueGroup> { Result = null, Succeed = false };
-                }
+                return Result<ClashResponse<CurrentClanWarLeagueGroup>>.Failure(Error.Validation("Clan tag empty or invalid. ", $"Failed with status code :--> {ErrorType.Validation}"));
             }
-            catch (Exception)
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            // Need to encode the input string to url
+            var address = $"{ClasherAPIURL}clans/{HttpUtility.UrlEncode(clanTag)}/currentwar/leaguegroup";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                return new ClashResponse<CurrentClanWarLeagueGroup> { Result = null, Succeed = false };
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var clanWarRes = JsonSerializer.Deserialize<CurrentClanWarLeagueGroup>(responseString)!;
+
+
+                return Result<ClashResponse<CurrentClanWarLeagueGroup>>.Success(new ClashResponse<CurrentClanWarLeagueGroup> { Result = clanWarRes, Succeed = true });
+            }
+            else
+            {
+                return Result<ClashResponse<CurrentClanWarLeagueGroup>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+
+        }
+
+        public async Task<Result<ClashResponse<WarLog>>> GetClansWarLog(string clanTag)
+        {
+            if (clanTag.IsNullOrEmpty())
+            {
+                return Result<ClashResponse<WarLog>>.Failure(Error.Validation("Clan tag empty or invalid. ", $"Failed with status code :--> {ErrorType.Validation}"));
+            }
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            // Need to encode the input string to url
+            var address = $"{ClasherAPIURL}clans/{HttpUtility.UrlEncode(clanTag)}/warlog?limit=100"; // by default taking limit as 100
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var clanWarRes = JsonSerializer.Deserialize<WarLog>(responseString)!;
+
+                return Result<ClashResponse<WarLog>>.Success(new ClashResponse<WarLog> { Result = clanWarRes, Succeed = true });
+            }
+            else
+            {
+                return Result<ClashResponse<WarLog>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<WarLog>> GetClansWarLog(string clanTag)
+        public async Task<Result<ClashResponse<List<SearchClanInfo>>>> SearchClans(SearchClansRequest searchClansRequest, CancellationToken cancellationToken)
         {
-            try
+            if (searchClansRequest.Name.IsNullOrEmpty())
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                // Need to encode the input string to url
-                var address = $"clans/{HttpUtility.UrlEncode(clanTag)}/warlog?limit=100"; // by default taking limit as 100
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var clanWarRes = JsonSerializer.Deserialize<WarLog>(responseString)!;
-                    return new ClashResponse<WarLog> { Result = clanWarRes, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<WarLog> { Result = null, Succeed = false };
-                }
+                return Result<ClashResponse<List<SearchClanInfo>>>.Failure(Error.Validation("Search Clan name is empty or invalid. ", $"Failed with status code :--> {ErrorType.Validation}"));
             }
-            catch (Exception )
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = SearchClansAddressMaker(searchClansRequest);
+
+            var response = await _httpClient.GetAsync(address, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                return new ClashResponse<WarLog> { Succeed = false };
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var clansRes = JsonSerializer.Deserialize<SearchClans>(responseString)!;
+
+                return Result<ClashResponse<List<SearchClanInfo>>>.Success(new ClashResponse<List<SearchClanInfo>> { Result = clansRes.items, Succeed = true, Message = clansRes.items!.Count() > 0 ? "Clans found with given criteria" : "No clan found with given filters !!" });
+            }
+            else
+            {
+                return Result<ClashResponse<List<SearchClanInfo>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<List<SearchClanInfo>>> SearchClans(SearchClansRequest searchClansRequest)
+        public async Task<Result<ClashResponse<CapitalRaidSeason>>> GetClansCapitalRaidSeasons(string clanTag, int limit = 10)
         {
-            try
+            if (clanTag.IsNullOrEmpty())
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var address = SearchClansAddressMaker(searchClansRequest);
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var clansRes = JsonSerializer.Deserialize<SearchClans>(responseString)!;
-                    return new ClashResponse<List<SearchClanInfo>> { Result = clansRes.items, Succeed = true, Message = clansRes.items!.Count() > 0 ? "Clans found with given criteria" : "No clan found with given filters !!" };
-                }
-                else
-                {
-                    return new ClashResponse<List<SearchClanInfo>> { Result = null, Succeed = false };
-                }
+                return Result<ClashResponse<CapitalRaidSeason>>.Failure(Error.Validation("Clan tag empty or invalid. ", $"Failed with status code :--> {ErrorType.Validation}"));
             }
-            catch (Exception)
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            // Need to encode the input string to url
+            var address = $"{ClasherAPIURL}clans/{clanTag}?limit=10"; // by default taking limit as 100
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                return new ClashResponse<List<SearchClanInfo>> { Succeed = false };
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var clanWarRes = JsonSerializer.Deserialize<CapitalRaidSeason>(responseString)!;
+
+
+                return Result<ClashResponse<CapitalRaidSeason>>.Success(new ClashResponse<CapitalRaidSeason> { Result = clanWarRes, Succeed = true });
             }
-        }
-
-        public async Task<ClashResponse<CapitalRaidSeason>> GetClansCapitalRaidSeasons(string clanTag, int limit = 10)
-        {
-            try
+            else
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                // Need to encode the input string to url
-                var address = $"clans/{clanTag}?limit=10"; // by default taking limit as 100
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var clanWarRes = JsonSerializer.Deserialize<CapitalRaidSeason>(responseString)!;
-                    return new ClashResponse<CapitalRaidSeason> { Result = clanWarRes, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<CapitalRaidSeason> { Result = null, Succeed = false };
-                }
-            }
-            catch (Exception)
-            {
-                return new ClashResponse<CapitalRaidSeason> { Succeed = false };
+                return Result<ClashResponse<CapitalRaidSeason>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
         // pending 
         // v1/clans/{tag}/currentwar
-        public Task<ClashResponse<CurrentWar>> GetClansCurrentWar(string clanTag)
+        public Task<Result<ClashResponse<CurrentWar>>> GetClansCurrentWar(string clanTag)
         {
             // TODO : To be implemented after getting the proper response model
             return null!;
@@ -449,11 +405,11 @@ namespace ManyInOneAPI.Services.Clasher
             for (int i = 0; i < searchClansRequest.Labels!.Count(); i++)
             {
                 // if we are getting int from client , can convert it here also
-                allLabels +=  searchClansRequest.Labels![i].ToString() + ",";
+                allLabels += searchClansRequest.Labels![i].ToString() + ",";
             }
 
             // Uri address making according to params , only name is required , others are optional
-            var address = "clans?name=" + searchClansRequest.Name;
+            var address = $"{ClasherAPIURL}clans?name=" + searchClansRequest.Name;
             if (!searchClansRequest.WarFrequency.IsNullOrEmpty())
             {
                 address += "&warFrequency=" + searchClansRequest.WarFrequency;
@@ -497,205 +453,163 @@ namespace ManyInOneAPI.Services.Clasher
 
         #region Leagues Related
 
-        public async Task<ClashResponse<List<Normal>>> GetAllLeagues()
+        public async Task<Result<ClashResponse<List<Normal>>>> GetAllLeagues()
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}leagues";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"{_clasherConfig.ClasherAPIURL}leagues";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<NormalLeague>(responseString)!;
-                    return new ClashResponse<List<Normal>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Normal>>() { Succeed = false };
-                }
+                var jsonData = JsonSerializer.Deserialize<NormalLeague>(responseString)!;
+                return Result<ClashResponse<List<Normal>>>.Success(new ClashResponse<List<Normal>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Normal>>() { Succeed = false };
+                return Result<ClashResponse<List<Normal>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<List<Other>>> GetAllWarLeagues()
+        public async Task<Result<ClashResponse<List<Other>>>> GetAllWarLeagues()
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}warleagues";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"{_clasherConfig.ClasherAPIURL}warleagues";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<OtherLeague>(responseString)!;
-                    return new ClashResponse<List<Other>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Other>>() { Succeed = false };
-                }
+                var jsonData = JsonSerializer.Deserialize<OtherLeague>(responseString)!;
+                return Result<ClashResponse<List<Other>>>.Success(new ClashResponse<List<Other>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Other>>() { Succeed = false };
+                return Result<ClashResponse<List<Other>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<List<Other>>> GetAllBuilderBaseLeagues()
+        public async Task<Result<ClashResponse<List<Other>>>> GetAllBuilderBaseLeagues()
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}builderbaseleagues";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"{_clasherConfig.ClasherAPIURL}builderbaseleagues";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<OtherLeague>(responseString)!;
-                    return new ClashResponse<List<Other>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Other>>() { Succeed = false };
-                }
+                var jsonData = JsonSerializer.Deserialize<OtherLeague>(responseString)!;
+                return Result<ClashResponse<List<Other>>>.Success(new ClashResponse<List<Other>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Other>>() { Succeed = false };
+                return Result<ClashResponse<List<Other>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
-        public async Task<ClashResponse<List<Other>>> GetAllCapitaLeagues()
+        public async Task<Result<ClashResponse<List<Other>>>> GetAllCapitaLeagues()
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}capitalleagues";
+
+            var response = await _httpClient.GetAsync(address);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = $"{_clasherConfig.ClasherAPIURL}capitalleagues";
-
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<OtherLeague>(responseString)!;
-                    return new ClashResponse<List<Other>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Other>>() { Succeed = false };
-                }
+                var jsonData = JsonSerializer.Deserialize<OtherLeague>(responseString)!;
+                return Result<ClashResponse<List<Other>>>.Success(new ClashResponse<List<Other>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Other>>() { Succeed = false };
+                return Result<ClashResponse<List<Other>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
 
         #endregion
 
         #region Labels Related
-        public async Task<ClashResponse<List<Label>>> GetAllClanLabels()
+        public async Task<Result<ClashResponse<List<Label>>>> GetAllClanLabels(CancellationToken cancellationToken)
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}labels/clans";
+
+            var response = await _httpClient.GetAsync(address, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = "labels/clans";
+                var jsonData = JsonSerializer.Deserialize<ClanLabel>(responseString)!;
 
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<ClanLabel>(responseString)!;
-
-                    return new ClashResponse<List<Label>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Label>>() { Succeed = false };
-                }
+                return Result<ClashResponse<List<Label>>>.Success(new ClashResponse<List<Label>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Label>>() { Succeed = false };
+                return Result<ClashResponse<List<Label>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
-        public async Task<ClashResponse<List<Label>>> GetAllPlayerLabels()
+        public async Task<Result<ClashResponse<List<Label>>>> GetAllPlayerLabels(CancellationToken cancellationToken)
         {
-            try
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
+            // OR
+            //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var address = $"{ClasherAPIURL}labels/players";
+
+            var response = await _httpClient.GetAsync(address, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Set request headers
-                _httpClient.DefaultRequestHeaders.Accept.Clear();
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{_clasherConfig.API_TOKEN}");
-                // OR
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                var address = "labels/players";
+                var jsonData = JsonSerializer.Deserialize<PlayerLabel>(responseString)!;
 
-                var response = await _httpClient.GetAsync(address);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-
-                    var jsonData = JsonSerializer.Deserialize<PlayerLabel>(responseString)!;
-
-                    return new ClashResponse<List<Label>>() { Result = jsonData.items, Succeed = true };
-                }
-                else
-                {
-                    return new ClashResponse<List<Label>>() { Succeed = false };
-                }
+                return Result<ClashResponse<List<Label>>>.Success(new ClashResponse<List<Label>>() { Result = jsonData.items, Succeed = true });
             }
-            catch (Exception)
+            else
             {
-                return new ClashResponse<List<Label>>() { Succeed = false };
+                return Result<ClashResponse<List<Label>>>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
             }
         }
         #endregion

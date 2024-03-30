@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AuthResponse } from '../models/auth-response.model';
+import { AuthResponse, IConfirmEmail, IResetPassword } from '../models/auth-response.model';
 import { SsrCookieService } from 'ngx-cookie-service-ssr';
+import { ApiResponse } from '../interfaces/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -25,30 +26,50 @@ export class AuthenticationService {
   }
 
   // registration
-  public register(user: any): Observable<AuthResponse> {
-    return this.http.post<any>(`${this.baseUrl}${this.registerUrl}`, user, { withCredentials: true });
+  public register(user: any): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}${this.registerUrl}`, user, { withCredentials: true });
+  }
+
+  // confirm email
+  public confirmEmail(confirmEmailBody: IConfirmEmail): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/ConfirmEmail`, confirmEmailBody, { withCredentials: true });
+  }
+
+  // resend confirmation mail
+  public resendConfirmationMail(userId: string): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/ResendConfirmationEmail/${userId}`, {}, { withCredentials: true });
+  }
+
+  // forgot password mail
+  public forgotPasswordMail(userMail: string): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/ForgotPasswordEmail/${userMail}`, {}, { withCredentials: true });
+  }
+
+  // reset password 
+  public resetPassword(resetPasswordBody: IResetPassword): Observable<ApiResponse<AuthResponse>> {
+    return this.http.put<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/ResetPassword`, resetPasswordBody, { withCredentials: true });
   }
 
   // login
-  public login(user: any): Observable<AuthResponse> {
-    return this.http.post<any>(`${this.baseUrl}${this.loginUrl}`, user, { withCredentials: true });//
+  public login(user: any): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}${this.loginUrl}`, user, { withCredentials: true });
   }
 
   // register with google . will give our api credential 
-  public registerWithGoogle(credentials: string): Observable<AuthResponse> {
+  public registerWithGoogle(credentials: string): Observable<ApiResponse<AuthResponse>> {
     const header = new HttpHeaders().set('Content-Type', 'application/json'); // I guess , , don't need this ,
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/RegisterWithGoogleLogIn`, JSON.stringify(credentials), { headers: header, withCredentials: true });
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/RegisterWithGoogleLogIn`, JSON.stringify(credentials), { headers: header, withCredentials: true });
   }
   // log in with google
-  public logInWithGoogle(credentials: string): Observable<AuthResponse> {
+  public logInWithGoogle(credentials: string): Observable<ApiResponse<AuthResponse>> {
     const header = new HttpHeaders().set('Content-Type', 'application/json'); // I guess , , don't need this ,
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/LogInWithGoogle`, JSON.stringify(credentials), { headers: header, withCredentials: true });
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/LogInWithGoogle`, JSON.stringify(credentials), { headers: header, withCredentials: true });
   }
 
   // signout
-  public signOut() : Observable<AuthResponse>
+  public signOut() : Observable<ApiResponse<AuthResponse>>
   {
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/SignOut`, { withCredentials: true });
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/SignOut`, {}, { withCredentials: true });
   }
 
   public refreshToken(): Observable<any> {
@@ -59,69 +80,54 @@ export class AuthenticationService {
   // this is for when user authentication fails 2 consecutive times
   // 1st time access token expired but 2nd time some how refresh token validity expired
   // sp clearing all cookies and need to log in again
-  public revokeToken(): Observable<AuthResponse> {
-    const header = new HttpHeaders();
-    return this.http.delete<AuthResponse>(`${this.baseUrl}Auth/RevokeToken`, {headers : header, withCredentials : true});
+  public revokeToken(): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/RevokeToken`, {}, { withCredentials: true });
   }
 
   // verify and login with 2fa
-  public verifyAndLogin(twoFALogin: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/VerifyAndLoginWith2FA`, twoFALogin, { withCredentials: true });
+  public verifyAndLogin(twoFALogin: any): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/VerifyAndLoginWith2FA`, twoFALogin, { withCredentials: true });
   }
 
   // load and share qr and shared key
-  public loadAndShareQR(userId: string): Observable<any> {
+  public loadAndShareQR(userId: string): Observable<ApiResponse<any>> {
     const header = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.http.post<any>(`${this.baseUrl}Auth/Get2FAQRCode`, JSON.stringify(userId), { headers: header, withCredentials: true });
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}Auth/Get2FAQRCode`, JSON.stringify(userId), { headers: header, withCredentials: true });
   }
 
   // verify 2 FA code
-  public verifyFACode(code: string): Observable<AuthResponse> {
+  public verifyFACode(code: string): Observable<ApiResponse<AuthResponse>> {
     const header = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/Verify2FA`, JSON.stringify(code), { headers: header, withCredentials: true });
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/Verify2FA`, JSON.stringify(code), { headers: header, withCredentials: true });
   }
 
   // disabling authenticator
-  public disableAuthenticator(): Observable<AuthResponse> {
-    // const header = new HttpHeaders().set('Content-Type', 'application/json');headers: header,
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/Disable2FA`, {  withCredentials: true });
+  public disableAuthenticator(): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/Disable2FA`, {}, { withCredentials: true });
   }
 
   // delete all data related to the user
-  public deleteAllUserData() : Observable<AuthResponse>
+  public deleteAllUserData() : Observable<ApiResponse<AuthResponse>>
   {
-    // const header = new HttpHeaders().set('Content-Type', 'application/json');headers: header, 
-    return this.http.post<AuthResponse>(`${this.baseUrl}Auth/DeleteUserData`, { withCredentials: true });
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/DeleteUserData`, {}, { withCredentials: true });
   }
   
   // delete all data related to the user
-  public GetCurrentUser() : Observable<AuthResponse>
+  public GetCurrentUser() : Observable<ApiResponse<AuthResponse>>
   {
-    return this.http.get<AuthResponse>(`${this.baseUrl}Auth/GetCurrentUser`, { withCredentials: true });
+    return this.http.get<ApiResponse<AuthResponse>>(`${this.baseUrl}Auth/GetCurrentUser`, { withCredentials: true });
   }
-  // ================================================Token related =====================================
-  // this can be sfifted to another service
-  // public updateToken(status: boolean) {
-  //   this.isAuthenticated = status;
-  //   let ch = this.isAuthenticated;
-  //   console.log("from  user status", ch)
-  // }
 
+  // ================================================Token related =====================================
 
   public saveToken(key : string, value : any) {
     //set that is authenticated behavior 
     this.isAuthenticated$.next(true);
-    // not using localstorage because converted this to SSR so uisng ssr cookie
-    // and set the user to localstorage
-    // localStorage.setItem("curr-app-user", userId);
     this.cookie.set(key, JSON.stringify(value));
-    // this.cookie.set("x-user-name", username);
-    // get the user user email or something and set to cookie for ui interaction according to it
-    // this.cookie.set("curr-app-user", userId, 1, "/", "localhost", true, "None");
   }
 
   // when reload happens but already a logged in , that time behaviour subject resets , so that time can get 
-  // the user from localstorage
+  // the user from cookie
   public getUserFromLocal(): any {
     
     let fromCookie = this.cookie.get("x-app-user");
@@ -134,9 +140,6 @@ export class AuthenticationService {
   // gets user name from local
   public getCurrentUserName() : string
   {
-    // this.authService.saveToken("x-app-user", res.userId);
-    // this.authService.saveToken("x-user-name", res.userName);
-    // this.authService.saveToken("twofa-enable", res.twoFAEnabled);
     let fromCookie = this.cookie.get("x-user-name");
     if (fromCookie !== null || fromCookie !== '' || fromCookie !== undefined) {
       return fromCookie;
@@ -151,44 +154,9 @@ export class AuthenticationService {
     return JSON.parse(data) as boolean;
   }
 
-  // public isLoggegIn(): boolean
-  // {
-  //   this.getCurrentUser().subscribe({
-  //     next: res => {
-  //       // console.log("After checking froms erver also --> ", res);
-  //       this.saveToken(res.userId);
-  //       // this.isAuthenticated = check == null || undefined ? false : true;
-  //       // console.log("autheee -->", this.isAuthenticated);
-  //     },
-  //     error: err => {
-  //       console.log("Invaliddd -->", err);
-  //     }
-  //   });
-
-  //   // after matchis from server also
-  //   const user = this.getToken();
-  //   if(user !== null)
-  //   {
-  //     this.isAuthenticated = true;
-  //     return true;
-  //   }
-  //   else
-  //   {
-  //     this.isAuthenticated = false;
-  //     return false;
-  //   }
-  // }
-
   public removeToken() {
-    // localStorage.removeItem("curr-app-user");
+    this.cookie.delete("twofa-enable");
     this.cookie.deleteAll();
-    // window.location.reload();
   }
 
-  // public getToken(): string | null {
-  //   // will get current token , else return null
-  //   return this.cookie.get("curr-app-user") || null;
-  // }
 }
-
-// ================================================ Token related Ends=====================================

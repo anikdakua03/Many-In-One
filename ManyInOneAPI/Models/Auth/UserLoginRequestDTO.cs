@@ -6,9 +6,9 @@ namespace ManyInOneAPI.Models.Auth
     public class UserLoginRequestDTO
     {
         [Required, EmailAddress]
-        public string Email { get; set; } = String.Empty;
+        public string Email { get; set; } = string.Empty;
 
         [Required, MinLength(6), PasswordPropertyText]
-        public string Password { get; set; } = String.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }

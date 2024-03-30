@@ -1,5 +1,4 @@
 ﻿using ManyInOneAPI.Models.Auth;
-using ManyInOneAPI.Models.ImageFile;
 using ManyInOneAPI.Models.Payment;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +19,6 @@ namespace ManyInOneAPI.Data
             base.OnModelCreating(builder);
         }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<Image> Images { get; set; }
         public DbSet<PaymentDetail> PaymentDetails { get; set; }
     }
 }
