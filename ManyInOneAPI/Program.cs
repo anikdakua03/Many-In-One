@@ -143,7 +143,6 @@ builder.Services.AddCors(options =>
         policyBuilder
              .WithOrigins("http://localhost:4200","https://localhost:7150", "https://localhost:8081") // Allow requests from only this origin
             // .WithOrigins(builder.Configuration.GetSection("Auth:Audience").Value!, builder.Configuration.GetSection("Auth:Issuer").Value!) // for cloud run will be both api for(confirming email and client for other req)
-            //.WithOrigins("https://manyinone-gq6db2ujvq-ue.a.run.app", "https://manyinoneapi-gq6db2ujvq-ue.a.run.app") // for cloud run will be both api , trying with exact for(confirming email and client for other req)
             .AllowAnyMethod() 
             .AllowCredentials()
             .AllowAnyHeader(); 
