@@ -3,17 +3,20 @@ import { PaymentService } from '../../../shared/services/payment.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-payment-details-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
   templateUrl: './payment-details-form.component.html',
   styles: ``
 })
 export class PaymentDetailsFormComponent {
 
   isLoading: boolean = false;
+  dots = FAIcons.ELLIPSES;
 
   paymentForm: FormGroup = new FormGroup({
     paymentDetailId: new FormControl(0),

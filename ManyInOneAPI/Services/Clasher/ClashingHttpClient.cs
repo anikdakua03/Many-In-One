@@ -1,7 +1,7 @@
 ﻿using ManyInOneAPI.Configurations;
+using ManyInOneAPI.Constants;
 using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.Clasher;
-using ManyInOneAPI.Models.GenAI;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
@@ -14,7 +14,8 @@ namespace ManyInOneAPI.Services.Clasher
     {
         private readonly HttpClient _httpClient;
         private readonly ClasherConfig _clasherConfig;
-        private readonly string ClasherAPIURL = "https://api.clashofclans.com/v1/";
+        private readonly string ClasherAPIURL = AppConstant.ClashAPIUrl; 
+        
         public ClashingHttpClient(HttpClient httpClient, IOptionsMonitor<ClasherConfig> optionsMonitor)
         {
             _httpClient = httpClient;

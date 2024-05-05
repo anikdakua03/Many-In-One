@@ -2,11 +2,13 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { GenAIService } from '../../../shared/services/gen-ai.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-generate-speech',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './generate-speech.component.html',
   styles: ``
 })
@@ -15,6 +17,7 @@ export class GenerateSpeechComponent {
   @ViewChild('myTextArea') myTextArea!: ElementRef;
   
   response: string = "";
+  dots = FAIcons.ELLIPSES;
 
   inputForm: FormGroup = new FormGroup({
     inputText: new FormControl("", [Validators.required, Validators.minLength(4)]),

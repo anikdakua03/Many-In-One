@@ -7,6 +7,7 @@ import { PaginationComponent } from "../../../pagination/pagination.component";
 import { isPlatformBrowser } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ClashOfClanService } from '../../../../shared/services/clash-of-clan.service';
+import { ClashData } from '../../../../shared/constants/static.clashing-data';
 
 @Component({
   selector: 'app-clan-details',
@@ -17,7 +18,7 @@ import { ClashOfClanService } from '../../../../shared/services/clash-of-clan.se
 })
 export class ClanDetailsComponent implements OnInit{
 
-  clanData?: IClanInfo;
+  clanData?: IClanInfo = ClashData.CLAN_INFO;
   staticImgs: any = Images;
   memberData?: IPlayer;
   isLoading : boolean = false;

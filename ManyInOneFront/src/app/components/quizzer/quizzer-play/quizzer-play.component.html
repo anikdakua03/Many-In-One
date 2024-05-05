@@ -1,0 +1,194 @@
+<div class="mt-[45px] min-h-[94vh] bg-inherit text-gray-900 rounded-md">
+    <div class="py-8 px-8 mx-auto lg:py-16 lg:px-6">
+        <div class="container mx-auto p-4 mt-2">
+            <p>Its Quiz Time !!</p>
+            <div class="sm:text-lg text-gray-400 mt-12 bg-[gray] rounded-md shadow-md shadow-[purple]">
+
+                <!-- Heading section for the particular quiz  -->
+                <div class="p-2 m-2 rounded-t-md items-center ">
+                    <p class="font-bold bg-[#c3c977] rounded-sm text-[#642323] text-center">
+                        <span class="font-normal"> Category : </span>
+                        {{questionList[currentQuestion].categoryName}}
+                    </p>
+                </div>
+
+                <!-- Timing and question count section -->
+
+                <div
+                    class="m-2 rounded-md text-center rounded-b-md flex md:flex-row mt-1 md:gap-2 flex-col justify-between content-between">
+
+                    <div class="bg-[green] text-[white] p-2 rounded-md">
+                        Qs : {{currentQuestion + 1}} / {{questionList.length}}
+                    </div>
+
+                    <div class="text-xl rounded-sm bg-[#c39dee] font-bold p-2 text-[#413c13]">
+                        <span class="font-normal">Question Type : </span> {{
+                        getQsTypeValue(questionList[currentQuestion]!.questionType.toLowerCase()) }}
+                    </div>
+
+                    <div class="bg-[#206480] text-[white] p-2 rounded-md">
+                        <fa-icon class="fa-lg mr-2" [icon]="stopwatch" style="color: #a77d7d;"></fa-icon> 
+                        {{ formatTime(hours) }} : {{ formatTime(minutes) }} : {{ formatTime(seconds) }}
+                    </div>
+
+                </div>
+
+                <!-- Question section  -->
+                <div class="p-2 m-2 rounded-md">
+                    <div class="mt-1 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl">
+                        <div class="p-2">
+                            <div
+                                class="block font-sans select-none text-2xl text-center antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
+                                <fa-icon class="ml-2 fa-sm" [icon]="q" style="color: #330505;"></fa-icon> .
+                                <markdown class="text-wrap" [data]="questionList[currentQuestion]!.questionText" lineNumbers lineHighlight katex [katexOptions]="options">
+                                </markdown>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Options section bg-[#0059ff] -->
+                <div class=" p-2 m-2 rounded-md">
+                    @for(op of questionList[currentQuestion]!.options; track $index)
+                    {
+                    <div
+                        class="mt-6 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl hover:border-[3px] hover:border-[#f7f467] hover:bg-[orange] md:transform-none">
+                        <!-- (click)="storeAnswer(questionList[currentQuestion].questionId, op.optionValue, op.optionId)" -->
+                        <div (click)="onSelectOption(questionList[currentQuestion]!.questionId, op)"
+                            [ngClass]="op.optionSelected === true ? 'bg-sky-600 rounded-xl text-[white]' : ''"
+                            class="p-2 hover:shadow-lg cursor-pointer ">
+                            <h5
+                                class="block font-sans text-xl text-center antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
+                                {{op.optionValue}}
+                            </h5>
+                        </div>
+
+                    </div>
+                    }
+                </div>
+
+                <!-- Navigation section bg-[#493711] -->
+                <div
+                    class=" text-center p-2 m-2 rounded-b-md flex md:flex-row mt-1 md:gap-2 flex-col justify-between content-between">
+
+                    <div>
+                        <button (click)="prevQuestion()" [ngClass]="currentQuestion === 0 || isLoading ? 'hidden' : ''"
+                            class="hover:bg-[brown] p-2 rounded-md">
+                            <fa-icon class="fa-2x" [icon]="leftArr" style="color: #330505;"></fa-icon>
+                        </button>
+                    </div>
+
+                    <div>
+                        <button (click)="onQuizSubmit()" [disabled]="isLoading"
+                            [ngClass]="currentQuestion === questionList.length - 1 ? '' : 'hidden'"
+                            class="bg-[green] w-[110%] h-12 p-2 rounded-md text-[white]">
+                            @if(isLoading)
+                            {
+                            <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                                animation="bounce"></fa-icon>
+                            <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s"
+                                [icon]="dots" animation="bounce"></fa-icon>
+                            <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s"
+                                [icon]="dots" animation="bounce"></fa-icon>
+                            }
+                            @else{Submit}
+                        </button>
+                    </div>
+
+                    <div>
+                        <button (click)="nextQuestion()"
+                            [ngClass]="currentQuestion === questionList.length - 1 ? 'hidden' : ''"
+                            class="hover:bg-[#1e628f] p-2 rounded-md">
+                            <fa-icon class="fa-2x" [icon]="rightArr" style="color: #330505;"></fa-icon>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Quiz score modal  -->
+@if(openQuizScore)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div
+            class="w-full mt-4 p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-5xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Quiz Result
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2 p-1 conatiner max-auto">
+                <div class="border-t flex-col gap-6 border-gray-700 p-3">
+
+                    <div class="text-lg">
+                        <li>Total Questions : {{quizScore.totalQs}}</li>
+                        <li>Total Correct : {{quizScore.totalCorrect}}</li>
+                        <li>Total Score : {{quizScore.totalScore}}</li>
+                        <li>Total Time Taken : {{quizScore.totalTime}} </li>
+                        <li>Percentage : {{quizScore.percentage}} %</li>
+                        <li>Passed : @if(quizScore.hasPassed)
+                            {
+                            <fa-icon class="fa-lg p-1" style="color:#19c93f;" [icon]="tick"></fa-icon>
+                            }
+                            @else{
+                            <fa-icon class="fa-lg p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                            }
+                        </li>
+                    </div>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Try different quiz
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="showAnswers()" disabled
+                            title="Currently not available to view all answers."
+                            class="inline-flex items-center justify-center cursor-not-allowed py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#1e4580] hover:text-[black] hover:bg-[#df5349] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Show all answers
+                                </span>
+                            </span>
+
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}

@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { GenAIService } from '../../../shared/services/gen-ai.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-text-to-image',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './text-to-image.component.html',
   styles: ``
 })
@@ -19,6 +21,7 @@ export class TextToImageComponent {
   });
 
   isLoading: boolean = false;
+  dots = FAIcons.ELLIPSES;
 
   constructor(public service: GenAIService, private toaster: ToastrService) {
   }
@@ -38,6 +41,7 @@ export class TextToImageComponent {
             },
             error: err => {
               this.isLoading = false;
+              this.toaster.error("Service is not available right now !!", "Service Error");
             }
           }
         );

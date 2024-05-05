@@ -1,26 +1,31 @@
 declare var google: any;
 
-import { Component, Inject, NgZone, PLATFORM_ID} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, Inject, NgZone, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
+import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../environments/environment';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
-import { ToastrService } from 'ngx-toastr';
-import { Router, RouterLink } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
   templateUrl: './login.component.html',
   styles: ``,
 })
 export class LoginComponent {
 
   clientId: string = environment.clientId;
-
+  dots = FAIcons.ELLIPSES;
+  longRightArrow = FAIcons.LONG_RIGHT_ARROW;
+  at = FAIcons.AT;
+  lock = FAIcons.LOCK;
   authResponseDto: AuthResponse = new AuthResponse();
   loginForm!: FormGroup;
   twoFALoginForm!: FormGroup;
@@ -76,13 +81,13 @@ export class LoginComponent {
       if (res.isSuccess) {      
         this._ngZone.run(() => {
           this.isLoading = false;
-        this.authService.isAuthenticated$.next(true);
+          this.authService.isAuthenticated$.next(true);
+          this.authService.userName$.next(res.data.userName);
           this.authService.saveToken("x-app-user", res.data.userId);
           this.authService.saveToken("x-user-name", res.data.userName);
           this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
-        this.router.navigate(['/home']);
-        window.location.reload();
-        this.toaster.success("Login Successful !!", "User Logged in");
+          this.router.navigate(['/home']);
+          this.toaster.success("Login Successful !!", "User Logged in");
       });
       }
       else
@@ -107,10 +112,11 @@ export class LoginComponent {
             if (res.isSuccess && !res.data.twoFAEnabled) {
               this.isLoading = false;
               // get the user user email or something and set to cookie for ui interaction according to it
+              this.authService.isAuthenticated$.next(true);
+              this.authService.userName$.next(res.data.userName);
               this.authService.saveToken("x-app-user", res.data.userId);
               this.authService.saveToken("x-user-name", res.data.userName);
               this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
-              // window.location.reload();
               this.toaster.success("Login Successful !!", "User Logged in");
               this.router.navigateByUrl("/home");
             }
@@ -125,6 +131,10 @@ export class LoginComponent {
               this.isLoading = false;
               this.emailNotConfirmed = true;
               this.router.navigateByUrl("/account/send-email/resend-confirmation-mail");
+            }
+            else {
+              this.isLoading = false;
+              this.toaster.error(res.error.description, "User Log in Error");
             }
           },
         error:
@@ -150,10 +160,11 @@ export class LoginComponent {
           res => {
             this.isLoading = false;
             // get the user user email or something and set to cookie for ui interaction according to it
+            this.authService.isAuthenticated$.next(true);
+            this.authService.userName$.next(res.data.userName);
             this.authService.saveToken("x-app-user", res.data.userId);
             this.authService.saveToken("x-user-name", res.data.userName);
             this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
-            window.location.reload();
             this.toaster.success("Login Successful !!", "User Logged in");
             this.router.navigateByUrl("/home");
           },

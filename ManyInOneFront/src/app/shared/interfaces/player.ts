@@ -61,9 +61,9 @@ export interface ILeague {
 }
 
 export interface IIconUrls {
-    small: string;
-    tiny: string;
-    medium: string;
+    small?: string;
+    tiny?: string;
+    medium?: string;
 }
 
 export interface IBuilderBaseLeague {
@@ -101,7 +101,7 @@ export interface IAchievement {
     value: number;
     target: number;
     info: string;
-    completionInfo?: string;
+    completionInfo?: string | null;
     village: string;
 }
 
@@ -126,7 +126,7 @@ export interface IHero {
     name: string;
     level: number;
     maxLevel: number;
-    equipment?: IEquipment[];
+    equipment?: IEquipment[] | null;
     village: string;
 }
 

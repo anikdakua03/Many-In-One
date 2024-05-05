@@ -1,17 +1,19 @@
 import { Component } from '@angular/core';
-import { QRCodeModule } from 'angularx-qrcode';
-import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { QRCodeModule } from 'angularx-qrcode';
 import { SsrCookieService } from 'ngx-cookie-service-ssr';
-import { AuthenticationService } from '../../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
+import { FAIcons } from '../../../../shared/constants/font-awesome-icons';
+import { AuthenticationService } from '../../../../shared/services/authentication.service';
 
 @Component({
     selector: 'app-enable2-fa',
     standalone: true,
     templateUrl: './enable2-fa.component.html',
     styles: ``,
-    imports: [QRCodeModule, ReactiveFormsModule, RouterLink]
+  imports: [QRCodeModule, ReactiveFormsModule, RouterLink, FontAwesomeModule]
 })
 export class Enable2FAComponent {
 
@@ -19,7 +21,7 @@ export class Enable2FAComponent {
   qrURI: string = "";
   is2FAEnabled : boolean = false;
   isLoading: boolean = false;
-
+  dots = FAIcons.ELLIPSES;
   twoFAForm!: FormGroup;
   
   constructor(private authService : AuthenticationService, private fb : FormBuilder, private toaster : ToastrService, private cookie : SsrCookieService, private router : Router)

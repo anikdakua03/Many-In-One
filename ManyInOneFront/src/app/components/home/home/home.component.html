@@ -3,90 +3,89 @@
         <br />
     </h1>
     <div class="mt-5">
+        <p class="text-[18px] text-center p-3 text-[#ecec46] animate-pulse animate-infinite animate-ease-in">
+            Some of external options which are using public sources may not work or give output as their billing may
+            have changed.
+        </p>
         <div class="grid grid-flow-row grid-cols-1 md:grid-cols-3 justify-evenly content-evenly gap-4 p-6">
-            <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <div
+                class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[rgb(238,151,151)] underline">
+                    <h5
+                        class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[rgb(238,151,151)] underline">
                         Basic
                         Payment</h5>
                 </a>
-                <p class="mb-3 text-lg font-normal text-gray-700 dark:text-gray-400">This is a simple CRUD operations with
+                <p class="mb-3 text-lg font-normal text-gray-700 dark:text-gray-400">This is a simple CRUD operations
+                    with
                     payment
                     details.
                 </p>
-    
+
                 <a routerLink="/payment-details"
                     class="inline-flex items-center px-3 py-4 text-sm font-medium text-center text-[#d2ee6b] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Payment
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">Get your
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">Get
+                        your
                         query
                         answered
                     </h5>
                 </a>
-                <p class="mb-3 text-lg font-normal text-gray-700 dark:text-gray-400">Ask your query and get answers related
+                <p class="mb-3 text-lg font-normal text-gray-700 dark:text-gray-400">Ask your query and get answers
+                    related
                     to your query.
                 </p>
                 <a routerLink="/genAI/textonly"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#7ee8f0] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Text
                     only
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">Ask your
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">Ask
+                        your
                         query with
                         image</h5>
                 </a>
                 <p class="mb-3 text-lg font-normal text-gray-700 dark:text-gray-400">This is also answers your query
                     relating to the image.</p>
-    
+
                 <a routerLink="/genAI/textandimageonly"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#66eca2] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Text
                     and Image
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">Ask your long text to summarize
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">Ask
+                        your long text to summarize
                     </h5>
                 </a>
                 <p class="mb-3 font-normal text-lg text-gray-700 dark:text-gray-400">
                     This summarizes your query and give a simple answer to it.
                 </p>
-    
+
                 <a routerLink="/genAI/summarize"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#66eca2] bg-blue-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     Text Summarization
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">
                         Generate Image
@@ -95,19 +94,16 @@
                 <p class="mb-3 font-normal text-lg text-gray-500 dark:text-gray-400">
                     This generates image based on some descriptions given as input.
                 </p>
-    
+
                 <a routerLink="/genAI/text-to-image"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#66eca2] bg-blue-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     Text to Image
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">
                         Generate Speech
@@ -116,42 +112,53 @@
                 <p class="mb-3 font-normal text-lg text-gray-500 dark:text-gray-400">
                     This generates a speech according to your input text query.
                 </p>
-    
+
                 <a routerLink="/genAI/generate-speech"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#66eca2] bg-blue-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     Text to Speech
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-[rgb(253,253,253)] border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#60c55d] underline">
                         Question and Answer
                     </h5>
                 </a>
                 <p class="mb-3 font-normal text-lg text-gray-400 dark:text-gray-400">
-                    This is a continuous question and answer part where user can continue conversation and can ask queries based on the conversation history.
+                    This is a continuous question and answer part where user can continue conversation and can ask
+                    queries based on the conversation history.
                 </p>
-    
+
                 <a routerLink="/genAI/conversation"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#66eca2] bg-blue-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     Conversation
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
-    
-            <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+            <div
+                class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <a>
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#f3d862] underline">Clash of
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#f3d862] underline">
+                        Quizzers
+                    </h5>
+                </a>
+                <p class="mb-3 font-normal text-lg text-gray-500 dark:text-gray-400">Play some quizes on different available topics as well as create your own quiz and play with it.</p>
+
+                <a routerLink="/quizzer"
+                    class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#f8f548] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Try some quiz
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
+                </a>
+            </div>
+
+            <div
+                class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                <a>
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-[#f3d862] underline">Clash
+                        of
                         Clans
                         Details
                     </h5>
@@ -160,15 +167,11 @@
                     troops ,
                     levels ,
                     records and many more ...</p>
-    
+
                 <a routerLink="/clashOfClans"
                     class="inline-flex items-center px-3 py-4 text-md font-medium text-center text-[#f8f548] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Clash
                     of Clans
-                    <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
+                    <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
                 </a>
             </div>
         </div>

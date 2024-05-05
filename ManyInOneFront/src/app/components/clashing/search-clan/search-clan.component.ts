@@ -9,13 +9,16 @@ import { SearchClansRequest } from '../../../shared/models/Clasher/search-clans-
 import { IResultClan } from '../../../shared/interfaces/search-clan-response';
 import { NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
 import { PaginationComponent } from "../../pagination/pagination.component";
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
+import { ClashData } from '../../../shared/constants/static.clashing-data';
 
 @Component({
     selector: 'app-search-clan',
     standalone: true,
     templateUrl: './search-clan.component.html',
     styles: ``,
-    imports: [ReactiveFormsModule, NgSelectModule, NgTemplateOutlet, PaginationComponent]
+    imports: [ReactiveFormsModule, NgSelectModule, NgTemplateOutlet, PaginationComponent, FontAwesomeModule]
 })
 export class SearchClanComponent implements OnInit {
 
@@ -36,8 +39,8 @@ export class SearchClanComponent implements OnInit {
   });
 
 
-  clanData?: IClanInfo;
-  searchedClans: IResultClan[] = [];
+  clanData?: IClanInfo = ClashData.CLAN_INFO;
+  searchedClans: IResultClan[] = ClashData.SEARCHED_CLAN_RESULT;
 
   isTroopsOpen: boolean = false;
   isAchievementOpen: boolean = false;
@@ -46,11 +49,14 @@ export class SearchClanComponent implements OnInit {
   itemsPerPage : number = 5;
   currentPage : number = 1;
 
-  allPlayerLabels: ILabel[] = [];
-  allClanLabels: ILabel[] = [];
-  allLocs: ILocation[]  = [];
+  allPlayerLabels: ILabel[] = ClashData.PLAYER_LABELS;
+
+  allClanLabels: ILabel[] = ClashData.CLAN_LABELS;
+
+  allLocs: ILocation[]  = ClashData.ALL_LOCATIONS;
 
   preparedSearchReq: SearchClansRequest = {}
+  dots = FAIcons.ELLIPSES;
 
   constructor(private clashingService: ClashOfClanService, private toaster: ToastrService, private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
   }
@@ -58,16 +64,16 @@ export class SearchClanComponent implements OnInit {
   ngOnInit(): void {
     if(isPlatformBrowser(this.platformId))
     {
-      const clans = localStorage.getItem("clans");
-      const clan = JSON.parse(clans!);
-      this.searchedClans = (clan!);
-      const locsItems = localStorage.getItem("loc");
-      const locs = JSON.parse(locsItems!) as ILocation[];
-      const processedLocs = locs.filter(a => a.name !== "");
-      this.allLocs = (processedLocs!);
-      const lableItems = localStorage.getItem("clanlabels");
-      const labels = JSON.parse(lableItems!) as ILabel[];
-      this.allClanLabels = (labels!);
+      // const clans = localStorage.getItem("clans");
+      // const clan = JSON.parse(clans!);
+      // this.searchedClans = (clan!);
+      // const locsItems = localStorage.getItem("loc");
+      // const locs = JSON.parse(locsItems!) as ILocation[];
+      // const processedLocs = locs.filter(a => a.name !== "");
+      // this.allLocs = (processedLocs!);
+      // const lableItems = localStorage.getItem("clanlabels");
+      // const labels = JSON.parse(lableItems!) as ILabel[];
+      // this.allClanLabels = (labels!);
     }
   }
 

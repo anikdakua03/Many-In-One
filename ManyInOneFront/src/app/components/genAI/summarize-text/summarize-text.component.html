@@ -1,4 +1,4 @@
-<div class="mt-12 min-h-screen">
+<div class="mt-12 min-h-[94vh]">
     <div class="p-5 justify-center items-center">
         <div class="pt-16">
             <h1 class="text-blue-600 text-2xl font-bold text-center underline">Ask to summarize</h1> <br />
@@ -7,10 +7,10 @@
             </p>
             <br />
             <form [formGroup]="inputForm" (submit)="getAnswer()" [class.submitted]="service.formSubmitted" novalidate
-            autocomplete="off">
-            <div class="mt-4">
-                <label for="input" class="block mb-2 text-lg font-medium text-gray-100">Type your long text or paste
-                    here..</label>
+                autocomplete="off">
+                <div class="mt-4">
+                    <label for="input" class="block mb-2 text-lg font-medium text-gray-100">Type your long text or paste
+                        here..</label>
                     <p class="text-[16px] text-right text-[yellow]">
                         Current Word count : {{currentWordCount}}
                     </p>
@@ -20,11 +20,12 @@
                 </div>
                 @if(isLoading)
                 {<div class="flex justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="animate-bounce animate-infinite animate-ease-in h-16 w-44" viewBox="0 0 448 512">
-                        <path fill="#63E6BE"
-                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                    </svg>
+                    <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                        animation="bounce"></fa-icon>
+                    <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                        animation="bounce"></fa-icon>
+                    <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                        animation="bounce"></fa-icon>
                 </div>
                 }
                 @else {
@@ -32,7 +33,8 @@
                     <button type="submit" [disabled]="isLoading"
                         class="text-white mt-4 bg-green-700 w-52 h-12 hover:bg-yellow-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">ASK</button>
                     <button type="button" (click)="clearAll()"
-                        class="text-white bg-red-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg h-12 w-52 text-[14px] px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">CLEAR ALL</button>
+                        class="text-white bg-red-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg h-12 w-52 text-[14px] px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">CLEAR
+                        ALL</button>
                 </div>
                 }
             </form>

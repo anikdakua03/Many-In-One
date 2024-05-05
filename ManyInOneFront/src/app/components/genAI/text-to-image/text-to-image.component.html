@@ -1,11 +1,11 @@
-<div class="mt-12 min-h-screen">
+<div class="mt-12 min-h-[94vh]">
     <div class="ml-6 justify-center items-center">
         <div class="pt-16">
             <h1 class="text-blue-600 text-2xl font-bold text-center underline">Ask to generate Image</h1> <br />
-                                <p class="text-[16px] text-center text-[yellow] animate-pulse animate-infinite animate-ease-in">
-                                    Do not share any personal details. This is only for educational purpose.
-                                </p>
-                                <br />
+            <p class="text-[16px] text-center text-[yellow] animate-pulse animate-infinite animate-ease-in">
+                Do not share any personal details. This is only for educational purpose.
+            </p>
+            <br />
             <form [formGroup]="inputForm" (submit)="getAnswer()" [class.submitted]="service.formSubmitted" novalidate
                 autocomplete="off">
                 <div class="mt-4">
@@ -14,22 +14,24 @@
                     <input type="text" formControlName="inputText"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Ask your query.." required>
-                    </div>
-                    @if(isLoading)
-                    {<div class="flex justify-center items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="animate-bounce animate-infinite animate-ease-in h-16 w-44" viewBox="0 0 448 512">
-                            <path fill="#63E6BE"
-                                d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                        </svg>
-                    </div>
-                    }
-            @else{<div class="flex-row space-y-2 lg:flex lg:justify-evenly lg:items-baseline lg:gap-2">
-                <button type="submit" [disabled]="isLoading"
-                    class="text-white mt-4 bg-green-700 w-52 h-12 hover:bg-yellow-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">ASK</button>
-                <button type="button" (click)="clearAll()"
-                    class="text-white bg-red-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg h-12 w-52 text-[14px] px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">CLEAR ALL</button>
-            </div>}
+                </div>
+                @if(isLoading)
+                {<div class="flex justify-center items-center">
+                    <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                        animation="bounce"></fa-icon>
+                    <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                        animation="bounce"></fa-icon>
+                    <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                        animation="bounce"></fa-icon>
+                </div>
+                }
+                @else{<div class="flex-row space-y-2 lg:flex lg:justify-evenly lg:items-baseline lg:gap-2">
+                    <button type="submit" [disabled]="isLoading"
+                        class="text-white mt-4 bg-green-700 w-52 h-12 hover:bg-yellow-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">ASK</button>
+                    <button type="button" (click)="clearAll()"
+                        class="text-white bg-red-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg h-12 w-52 text-[14px] px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">CLEAR
+                        ALL</button>
+                </div>}
             </form>
         </div>
     </div>

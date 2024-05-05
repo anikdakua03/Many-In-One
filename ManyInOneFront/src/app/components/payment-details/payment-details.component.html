@@ -77,20 +77,16 @@
 
                     <div class="flex justify-evenly items-center gap-2">
                         <button type="submit" [disabled]="!updateForm.valid || isLoading"
-                            class="text-white h-10 mr-12 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                            class="text-white h-[48px] mr-12 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                             @if(isLoading)
                             {
-                            <svg xmlns="http://www.w3.org/2000/svg" height="28" width="56"
-                                class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in"
-                                viewBox="0 0 448 512">
-                                <path fill="#b9c9f8"
-                                    d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                            </svg>
+                            <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                                animation="bounce"></fa-icon>
                             }
                             @else { <p class="text-[16px]">Submit</p>}
                         </button>
                         <button
-                            class="text-white h-10 bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                            class="text-white h-[48px] bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-[14px] cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                             (click)="closePop()">Close</button>
                     </div>
 
@@ -145,17 +141,8 @@
                             class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">Edit</a>
                     </td>
 
-                    <td class="px-6 py-4">
-
-                        <span class="cursor-pointer" (click)="onDelete(pd.paymentDetailId)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                class="bi bi-trash" viewBox="0 0 16 16">
-                                <path
-                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
-                                <path
-                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
-                            </svg>
-                        </span>
+                    <td class="px-6 py-4 cursor-pointer" (click)="onDelete(pd.paymentDetailId)">
+                        <fa-icon class="ml-2 fa-lg" [icon]="trash" style="color: white;"></fa-icon>
                     </td>
 
                 </tr>
@@ -165,11 +152,12 @@
             <div>
                 <h1 class="px-6 py-4 font-extrabold items-center content-center text-red-500"> No payment details added
                     yet !! OR <div class="flex justify-center items-center bg-inherit">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="animate-bounce animate-infinite animate-ease-in h-16 w-44" viewBox="0 0 448 512">
-                            <path fill="#63E6BE"
-                                d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                        </svg>
+                        <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                            animation="bounce"></fa-icon>
+                        <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s"
+                            [icon]="dots" animation="bounce"></fa-icon>
+                        <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s"
+                            [icon]="dots" animation="bounce"></fa-icon>
                     </div>
                 </h1>
             </div>

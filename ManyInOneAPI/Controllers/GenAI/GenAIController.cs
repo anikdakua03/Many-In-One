@@ -22,7 +22,7 @@ namespace ManyInOneAPI.Controllers.GenAI
         }
 
         [HttpPost("TextOnly")]
-        [EnableRateLimiting("sliding")]
+        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> GetTextOnlyInput([Required] TextOnly input)
         {
             Result<GenAIResponse>? res = await _genAIHttpClient.TextOnlyInput(input, HttpContext.RequestAborted);
@@ -37,7 +37,7 @@ namespace ManyInOneAPI.Controllers.GenAI
         }
 
         [HttpPost("TextAndImage"), DisableRequestSizeLimit]
-        //[Consumes("multipart/form-data")]
+        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> TextAndImageAsInput() // [FromForm] IFormFile formFile, string inputText
         {
             // get from request
@@ -49,6 +49,7 @@ namespace ManyInOneAPI.Controllers.GenAI
         }
 
         [HttpPost("MultiConversation")]
+        [EnableRateLimiting("fixed")]
         public async Task<IActionResult> MultiConversation([Required] Conversation input)
         {
             var res = await _genAIHttpClient.MultiTurnConversation(input, HttpContext.RequestAborted);
