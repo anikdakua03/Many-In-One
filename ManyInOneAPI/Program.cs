@@ -147,6 +147,9 @@ var builder = WebApplication.CreateBuilder(args);
                 .AllowAnyHeader();
         });
     });
+});
+});
+});
 
     // for handling multipart body length
     builder.Services.Configure<FormOptions>(options =>
@@ -259,5 +262,4 @@ var app = builder.Build();
     app.UseExceptionHandler();
     app.MapControllers();
 
-    app.Run();
-}
+app.Run();
