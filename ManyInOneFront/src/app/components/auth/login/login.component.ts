@@ -8,13 +8,12 @@ import { AuthResponse } from '../../../shared/models/auth-response.model';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router, RouterLink } from '@angular/router';
-import { NgxLoadingModule } from 'ngx-loading';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgxLoadingModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styles: ``,
 })
@@ -28,11 +27,7 @@ export class LoginComponent {
   isLoading: boolean = false;
   showTwoFA: boolean = false;
   userIdWith2FA: string = ""; // when have 2fa login enabled then it will set and will be passed for 2fa code verification
-  localUser : any = {
-    userId: "",
-    userName : "",
-    is2FaEnabled : false
-  };
+  emailNotConfirmed: boolean = false;
 
 
   constructor(protected authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private _ngZone: NgZone, @Inject(PLATFORM_ID) private platformId: Object) 
@@ -48,7 +43,6 @@ export class LoginComponent {
   }
   
   ngOnInit(): void {
-    // console.log("platform id for login -->", this.platformId);
     if (isPlatformBrowser(this.platformId)) {
       // we do not need this on google library load , it is causing not rendering button properly
       // (window as any).onGoogleLibraryLoad = async () => {
@@ -77,19 +71,28 @@ export class LoginComponent {
 
   handleCredentialResponse(response: CredentialResponse) {
   // then will send it to our api to confirm and check
+    this.isLoading = true;
     this.authService.logInWithGoogle(response.credential).subscribe(res => {
-      this._ngZone.run(() => {
+      if (res.isSuccess) {      
+        this._ngZone.run(() => {
+          this.isLoading = false;
         this.authService.isAuthenticated$.next(true);
-        this.authService.saveToken("x-app-user",res.userId);
-        this.authService.saveToken("x-user-name",res.userName);
-        this.authService.saveToken("twofa-enable",res.twoFAEnabled);
+          this.authService.saveToken("x-app-user", res.data.userId);
+          this.authService.saveToken("x-user-name", res.data.userName);
+          this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
         this.router.navigate(['/home']);
         window.location.reload();
         this.toaster.success("Login Successful !!", "User Logged in");
       });
+      }
+      else
+      {
+        this.isLoading = false;
+        this.toaster.error(res.error?.description, "User Login error !");
+      }
     },
       (err: any) => {
-        console.log(err);
+        this.isLoading = false;
         this.toaster.error(err.message, "User Logged in failed !!");
       });
   }
@@ -101,23 +104,27 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next:
           res => {
-            console.log(res.userId);
-            if (!res.twoFAEnabled) {
+            if (res.isSuccess && !res.data.twoFAEnabled) {
               this.isLoading = false;
               // get the user user email or something and set to cookie for ui interaction according to it
-              this.authService.saveToken("x-app-user", res.userId);
-              this.authService.saveToken("x-user-name", res.userName);
-              this.authService.saveToken("twofa-enable", res.twoFAEnabled);
-              // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+              this.authService.saveToken("x-app-user", res.data.userId);
+              this.authService.saveToken("x-user-name", res.data.userName);
+              this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
+              // window.location.reload();
               this.toaster.success("Login Successful !!", "User Logged in");
               this.router.navigateByUrl("/home");
             }
-            else {
+            else if (res.isSuccess && res.data.twoFAEnabled) {
               this.isLoading = false;
-              // this.router.navigateByUrl("/login/2FA");
               this.toaster.info("Enter two FA code from authenticator !!", "Two Factor Verification !!");
               this.showTwoFA = true;
-              this.userIdWith2FA = res.userId;
+              this.userIdWith2FA = res.data.userId;
+            }
+            else if (!res.isSuccess && res.error.description.includes("User email not confirmed yet. ")) {
+              // not a confirmed email
+              this.isLoading = false;
+              this.emailNotConfirmed = true;
+              this.router.navigateByUrl("/account/send-email/resend-confirmation-mail");
             }
           },
         error:
@@ -133,7 +140,6 @@ export class LoginComponent {
   }
 
   on2FALogin() {
-    // console.log(this.twoFALoginForm.value);
     if (this.twoFALoginForm.valid) {
       this.isLoading = true;
       // let code = this.twoFALoginForm.get('twoFACode')?.value;
@@ -144,10 +150,10 @@ export class LoginComponent {
           res => {
             this.isLoading = false;
             // get the user user email or something and set to cookie for ui interaction according to it
-            this.authService.saveToken("x-app-user", res.userId);
-            this.authService.saveToken("x-user-name", res.userName);
-            this.authService.saveToken("twofa-enable", res.twoFAEnabled);
-            // sessionStorage.setItem("two-fa", res.twoFAEnabled.toString());
+            this.authService.saveToken("x-app-user", res.data.userId);
+            this.authService.saveToken("x-user-name", res.data.userName);
+            this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
+            window.location.reload();
             this.toaster.success("Login Successful !!", "User Logged in");
             this.router.navigateByUrl("/home");
           },

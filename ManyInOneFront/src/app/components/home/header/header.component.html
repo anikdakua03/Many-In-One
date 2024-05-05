@@ -1,6 +1,6 @@
-<nav class="absolute w-full top-0 left-0 h-screen z-50 {{ isSidebarShowing ?  'flex' : 'hidden' }}">
-    <div class="bg-blue-600 w-full md:max-w-sm shadow-2xl">
-        <div class="flex justify-end p-5">
+<nav class="absolute w-full top-4 left-0 h-screen z-50" [ngClass]="isSidebarShowing ?  'flex' : 'hidden'">
+    <div class="bg-[#226992] w-full md:max-w-sm shadow-2xl">
+        <div class="hidden justify-end p-5">
             <svg (click)="closeSidebar()" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40"
                 viewBox="0 0 50 50">
                 <path
@@ -19,18 +19,49 @@
                         class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Home</a>
                 </li>
                 <li>
-                    <a routerLink="/paymentdetails"
+                    <a routerLink="/payment-details"
                         class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Payment</a>
                 </li>
-                <li>
-                    <a routerLink="genAI/textonly"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Text
-                        Only</a>
-                </li>
-                <li>
-                    <a routerLink="genAI/textandimageonly"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Text
-                        and Image</a>
+                <li class="relative group">
+                    <a routerLink="/home"
+                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600">Gen AI</a>
+                    <!-- <ul class="absolute bg-blue-400 rounded-md text-blue-800 text-lg top-[30px]  hidden group-hover:block w-56">
+                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold hover:scale-100">
+                        <a routerLink="genAI/textonly">
+                            Text Only
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-red-600 hover:text-green-200 px-6 py-2 font-bold">
+                        <a routerLink="genAI/textandimageonly" class="">
+                            Text and Image
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold">
+                        <a routerLink="genAI/summarize" class="">
+                            Summarize Text
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold">
+                        <a routerLink="genAI/text-to-image" class="">
+                            Text to Image
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold">
+                        <a routerLink="genAI/generate-speech" class="">
+                            Text to Speech
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-red-400 px-6 py-2 text-3xl font-bold">
+                        <a routerLink="genAI/conversation" class="font-bold">
+                            Question & Answer
+                        </a>
+                    </li>
+                    <li>
+                        <a routerLink="genAI/textandimageonly"
+                            class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Text
+                            and Image</a>
+                    </li>
+                </ul> -->
                 </li>
                 <li>
                     <a routerLink="clashOfClans"
@@ -39,40 +70,38 @@
                         Clans</a>
                 </li>
             </ul>
-            <ul class="gap-3 p-5 mt-2" (click)="closeSidebar()">
-                @if(checkCurrUser)
-                {
-                <li>
-                    <a routerLink="/manage"><span>Welcome <strong>{{currUserName}}</strong></span></a>
-                    &nbsp; | &nbsp;
-                </li>
-                <li>
-                    <a (click)="onLogout()"
-                        class="bg-red-400 px-4 py-2 rounded text-white cursor-pointer font-bold hover:bg-indigo-500 text-sm mt-4">Log
-                        out</a>
-                </li>
-                }
-                @else {
-                <li>
-                    <a routerLink="/login"
-                        class="text-gray-200 text-md font-semibold hover:bg-cyan-500 cursor-pointer">LOGIN</a>
-                </li>
-                <li>
-                    <a routerLink="/register"
-                        class="text-green-500 text-md font-semibold cursor-pointer hover:bg-yellow-500 text-md">SIGN
-                        UP</a>
-                </li>
-                }
-            </ul>
+        </div>
+        <div class="flex justify-evenly gap-3 p-5 mt-2" (click)="closeSidebar()">
+            @if(checkCurrUser)
+            {
+            <div>
+                <a routerLink="/manage"><span>Welcome <strong>{{currUserName}}</strong></span></a>
+                &nbsp; | &nbsp;
+            </div>
+            <div>
+                <a (click)="onLogout()"
+                    class="bg-red-400 px-4 py-2 rounded text-white cursor-pointer font-bold hover:bg-indigo-500 text-sm mt-4">Log
+                    out</a>
+            </div>
+            }
+            @else {
+            <div>
+                <a routerLink="/login"
+                    class="text-gray-200 text-md font-semibold hover:bg-cyan-500 cursor-pointer">LOGIN</a>
+            </div>
+            <div>
+                <a routerLink="/register"
+                    class="text-green-500 text-md font-semibold cursor-pointer hover:bg-yellow-500 text-md">SIGN
+                    UP</a>
+            </div>
+            }
         </div>
     </div>
-    <div (click)="closeSidebar()" class="bg-gray-800 hidden md:block md:w-full opacity-60">
+    <div (click)="closeSidebar()" class="bg-gray-800 hidden md:block md:w-full opacity-100">
     </div>
 </nav>
-<header class="fixed w-full bg-blue-800 z-40">
-    <!-- class="" h-[70px] z-10 bg-blue-900 sticky top-0 items-center justify-between rounded-sm shadow-sm-->
+<header class="fixed w-full bg-blue-800 z-50 top-0">
     <!-- Logo + nav items -->
-    <!-- <nav class="conatiner mx-auto p-3 flex items-center justify-between rounded-sm shadow-sm"> -->
     <div class="flex justify-between items-center gap-8 ml-10 p-2 rounded-md shadow-md">
         <a routerLink="/" class="text-xl text-yellow-500 lg:text-2xl font-bold cursor-pointer">Many In
             One</a>
@@ -91,18 +120,45 @@
                     class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Home</a>
             </li>
             <li>
-                <a routerLink="/paymentdetails"
+                <a routerLink="/payment-details"
                     class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Payment</a>
             </li>
-            <li>
-                <a routerLink="genAI/textonly"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Text
-                    Only</a>
-            </li>
-            <li>
-                <a routerLink="genAI/textandimageonly"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Text
-                    and Image</a>
+            <li class="relative group">
+                <a routerLink="/home"
+                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600">Gen AI</a>
+                <ul
+                    class="absolute bg-blue-800 shadow-md rounded-md text-gray-200 text-lg top-[30px]  hidden group-hover:block w-56">
+                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold hover:scale-100">
+                        <a routerLink="genAI/textonly">
+                            Text Only
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
+                        <a routerLink="genAI/textandimageonly" class="">
+                            Text and Image
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
+                        <a routerLink="genAI/summarize" class="">
+                            Summarize Text
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
+                        <a routerLink="genAI/text-to-image" class="">
+                            Text to Image
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
+                        <a routerLink="genAI/generate-speech" class="">
+                            Text to Speech
+                        </a>
+                    </li>
+                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
+                        <a routerLink="genAI/conversation" class="font-bold">
+                            Question & Answer
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li>
                 <a routerLink="clashOfClans"
@@ -115,13 +171,26 @@
             @if(checkCurrUser)
             {
             <li>
-                <a routerLink="/manage"><span class="text-lg">Welcome &nbsp; <strong>{{currUserName}}</strong></span></a>
+                <a routerLink="/manage"><span class="text-lg">Welcome &nbsp;
+                        <strong>{{currUserName}}</strong></span></a>
                 &nbsp; | &nbsp;
             </li>
             <li>
-                <a (click)="onLogout()"
-                    class="hover:bg-red-600 hover:text-gray-100 px-4 py-2 rounded text-red-400 cursor-pointer font-bold text-lg mr-4">Log
-                    out</a>
+                <button (click)="onLogout()" [disabled]="isLoading"
+                    class="hover:bg-red-600 hover:text-gray-100 px-4 py-2 rounded text-red-400 cursor-pointer font-bold text-lg mr-4">
+                    @if(isLoading)
+                    {
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in h-[24px] w-[70px]"
+                        viewBox="0 0 448 512">
+                        <path fill="#b9c9f8"
+                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
+                    </svg>
+                    }
+                    @else {
+                    Log out
+                    }
+                </button>
             </li>
             }
             @else {

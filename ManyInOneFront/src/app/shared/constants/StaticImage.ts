@@ -56,6 +56,7 @@ export const Images : { [key: string]: string } = {
     "Drop Ship": "assets/Clasher/Drop_Ship_info.webp",
     // "Baby Dragon": "assets/Clasher/PEKKA1", // used as same
     "Night Witch": "assets/Clasher/Night_Witch_info.webp",
+    "Electrofire Wizard": "assets/Clasher/Electrofire_Wizard_info.webp",
     // Machines
     "Wall Wrecker": "assets/Clasher/Avatar_Wall_Wrecker.webp",
     "Battle Blimp": "assets/Clasher/Avatar_Battle_Blimp.webp",
@@ -98,6 +99,9 @@ export const Images : { [key: string]: string } = {
     "Giant Arrow": "assets/Clasher/Giant_Arrow.webp",
     "Healing Tome": "assets/Clasher/Healing_Tome.webp",
     "Frozen Arrow": "assets/Clasher/Frozen_Arrow.webp",
+    "Hog Rider Puppet": "assets/Clasher/Hog_Rider_Puppet.webp",
+    "Haste Vial": "assets/Clasher/Haste_Vial.webp",
+    "Fireball": "assets/Clasher/Fireball_Equipment.webp",
     // Spells
     "Lightning Spell": "assets/Clasher/Lightning_Spell_info.jpg",
     "Healing Spell": "assets/Clasher/Healing_Spell_info.webp",
@@ -112,4 +116,5 @@ export const Images : { [key: string]: string } = {
     "Haste Spell": "assets/Clasher/Haste_Spell_info.webp",
     "Skeleton Spell": "assets/Clasher/Skeleton_Spell_info.webp",
     "Bat Spell": "assets/Clasher/Bat_Spell_info.webp",
+    "Overgrowth Spell": "assets/Clasher/Overgrowth_Spell_info.webp",
 };

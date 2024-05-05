@@ -13,7 +13,7 @@ namespace ManyInOneAPI.Models.Payment
         public string CardOwnerName { get; set; } = "";
 
         [Column(TypeName = "nvarchar(16)")]
-        public string cardNumber { get; set; } = "";
+        public string CardNumber { get; set; } = "";
 
         [Column(TypeName = "nvarchar(3)")]
         [Category("Security")]

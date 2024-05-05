@@ -1,17 +1,18 @@
-﻿using ManyInOneAPI.Models.Payment;
+﻿using ManyInOneAPI.Infrastructure.Shared;
+using ManyInOneAPI.Models.Payment;
 
 namespace ManyInOneAPI.Repositories.Payment
 {
     public interface IPaymentDetailRepository
     {
-        public Task<IEnumerable<PaymentDetail>> GetPaymentDetails();
+        public Task<Result<IEnumerable<PaymentDetail>>> GetPaymentDetails(CancellationToken cancellationToken = default);
 
-        public Task<PaymentDetail> GetPaymentDetailById(int id);
+        public Task<Result<PaymentDetail>> GetPaymentDetailById(int id, CancellationToken cancellationToken = default);
 
-        public Task<PaymentDetail> AddPaymentDetail(PaymentDetail paymentDetail);
+        public Task<Result<PaymentDetail>> AddPaymentDetail(PaymentDetail paymentDetail, CancellationToken cancellationToken = default);
 
-        public Task<PaymentDetail> UpdatePaymentDetailById(int id, PaymentDetail paymentDetail);
+        public Task<Result<PaymentDetail>> UpdatePaymentDetailById(int id, PaymentDetail paymentDetail, CancellationToken cancellationToken = default);
 
-        public Task<string> DeletePaymentDetailById(int id);
+        public Task<Result<string>> DeletePaymentDetailById(int id, CancellationToken cancellationToken = default);
     }
 }

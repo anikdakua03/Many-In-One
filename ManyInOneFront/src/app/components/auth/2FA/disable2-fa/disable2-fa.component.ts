@@ -12,7 +12,7 @@ import { AuthenticationService } from '../../../../shared/services/authenticatio
 })
 export class Disable2FAComponent {
 
-    isLoading : boolean = false;
+  isLoading : boolean = false;
 
   constructor(private authService: AuthenticationService, private toaster: ToastrService) {
 
@@ -20,15 +20,20 @@ export class Disable2FAComponent {
 
   onDisable2FA() 
   {
-    this.authService.disableAuthenticator().subscribe({
-      next: res => {
+    var res = confirm("Do you really want to disable 2 factor authentication ??");
+    if (res) 
+    {
+      this.authService.disableAuthenticator().subscribe({
+        next: res => {
+          this.isLoading = false;
+          this.authService.saveToken("twofa-enable", "false");
+          this.toaster.success("Disabled successfully !!", "2 FA code disable");
+        },
+        error: err => {
         this.isLoading = false;
-        this.toaster.success("Disabled successfully !!", "2 FA code disable");
-      },
-      error: err => {
-      this.isLoading = false;
-        this.toaster.error("Unable to disable 2FA !!", "2 FA code disable");
-      }
-    });
-  }
+          this.toaster.error("Unable to disable 2FA !!", "2 FA code disable");
+        }
+      });
+    }
+}
 }

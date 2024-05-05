@@ -73,9 +73,9 @@ export interface IBuilderBaseLeague {
 
 export interface ILegendStatistics {
     legendTrophies: number;
-    previousSeason: IPreviousSeason;
-    bestSeason: IBestSeason;
-    currentSeason: IICurrentSeason;
+    previousSeason?: IPreviousSeason;
+    bestSeason?: IBestSeason;
+    currentSeason?: IICurrentSeason;
 }
 
 export interface IPreviousSeason {

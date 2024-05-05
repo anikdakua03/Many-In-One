@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ClashOfClanService } from '../../../shared/services/clash-of-clan.service';
 import { ToastrService } from 'ngx-toastr';
@@ -7,15 +7,15 @@ import { IClanInfo, ILabel, ILocation } from '../../../shared/interfaces/clan-in
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SearchClansRequest } from '../../../shared/models/Clasher/search-clans-request.model';
 import { IResultClan } from '../../../shared/interfaces/search-clan-response';
-import { NgTemplateOutlet } from '@angular/common';
-import { NgxLoadingModule } from 'ngx-loading';
+import { NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
+import { PaginationComponent } from "../../pagination/pagination.component";
 
 @Component({
-  selector: 'app-search-clan',
-  standalone: true,
-  imports: [ReactiveFormsModule, NgSelectModule, NgTemplateOutlet, NgxLoadingModule],
-  templateUrl: './search-clan.component.html',
-  styles: ``
+    selector: 'app-search-clan',
+    standalone: true,
+    templateUrl: './search-clan.component.html',
+    styles: ``,
+    imports: [ReactiveFormsModule, NgSelectModule, NgTemplateOutlet, PaginationComponent]
 })
 export class SearchClanComponent implements OnInit {
 
@@ -43,6 +43,8 @@ export class SearchClanComponent implements OnInit {
   isAchievementOpen: boolean = false;
   isBuilderBaseOpen: boolean = true;
   isLoading : boolean = false;
+  itemsPerPage : number = 5;
+  currentPage : number = 1;
 
   allPlayerLabels: ILabel[] = [];
   allClanLabels: ILabel[] = [];
@@ -50,68 +52,41 @@ export class SearchClanComponent implements OnInit {
 
   preparedSearchReq: SearchClansRequest = {}
 
-  constructor(private clashingService: ClashOfClanService, private toaster: ToastrService, private router: Router) {
-
-    // const locsItems = localStorage.getItem("loc");
-    // const locs = JSON.parse(locsItems!);
-    // this.allLocs= (locs!);
-    // const lableItems = localStorage.getItem("clanlabels");
-    // const labels = JSON.parse(lableItems!) ;
-    // this.allClanLabels= (labels);
-    // console.log("loccs", this.allClanLabels);
+  constructor(private clashingService: ClashOfClanService, private toaster: ToastrService, private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
   }
 
   ngOnInit(): void {
-    // const clans = localStorage.getItem("clans");
-    // const clan = JSON.parse(clans!) as IResultClan[];
-    // this.searchedClans = (clan!);
-    const locsItems = localStorage.getItem("loc");
-    const locs = JSON.parse(locsItems!) as ILocation[];
-    const processedLocs = locs.filter(a => a.name !== "");
-    this.allLocs = (processedLocs!);
-    const lableItems = localStorage.getItem("clanlabels");
-    const labels = JSON.parse(lableItems!) as ILabel[];
-    this.allClanLabels = (labels!);
+    if(isPlatformBrowser(this.platformId))
+    {
+      const clans = localStorage.getItem("clans");
+      const clan = JSON.parse(clans!);
+      this.searchedClans = (clan!);
+      const locsItems = localStorage.getItem("loc");
+      const locs = JSON.parse(locsItems!) as ILocation[];
+      const processedLocs = locs.filter(a => a.name !== "");
+      this.allLocs = (processedLocs!);
+      const lableItems = localStorage.getItem("clanlabels");
+      const labels = JSON.parse(lableItems!) as ILabel[];
+      this.allClanLabels = (labels!);
+    }
   }
 
+  get paginatedData()
+  {
+    const start = (this.currentPage - 1) * (this.itemsPerPage);
+    const end = start + this.itemsPerPage;
+
+    return this.searchedClans.slice(start, end);
+  }
+
+  changePage(page : number)
+  {
+    this.currentPage = page;
+  }
 
   onSearchClanByTag() {
     if (this.clanByTagForm.valid) {
-      // check localstorage player tag if there
-      this.isLoading = true;
-      const data = localStorage.getItem("clan");
-      // console.log("clannnn", this.clanData);
-      if (data === null || data === undefined || JSON.parse(data!).tag !== this.clanByTagForm.value.clanTag) {
-        this.clashingService.getClanByTag(this.clanByTagForm.value.clanTag).subscribe({
-          next: res => {
-            if (res.succeed) {
-              this.isLoading = false;
-              this.clanData = res.result;
-              // storing in local storage for dev purpose to restrict api call
-              localStorage.setItem("clan", JSON.stringify(res.result))
-              this.router.navigateByUrl(`clashOfClans/search-clan/clan-details`);
-              this.toaster.success("Clan found", "Clan  found!!");
-            }
-            else {
-              this.isLoading = false;
-              this.toaster.error("No clan found with this tag", "No clan  found!!");
-            }
-          },
-          error: err => {
-            this.isLoading = false;
-            // console.log(err);
-          }
-        });
-      }
-      else {
-        // get from localstorage
-        this.isLoading = false;
-        this.clanData = JSON.parse(data!);
-        this.router.navigateByUrl(`clashOfClans/search-clan/clan-details`);
-      }
-      // will re direct to clan details page
-      this.isLoading = false;
-      
+      this.router.navigate(['/clashOfClans/search-clan/clan-details'], { queryParams: { clanTag: this.clanByTagForm.value.clanTag } });
     }
     else {
       this.toaster.error("Put clan tag ...", "Search Clan");
@@ -122,8 +97,6 @@ export class SearchClanComponent implements OnInit {
 
     if (this.clanSearchForm.valid) {
       this.isLoading = true;
-      // const data = this.clanSearchForm.value.minMembers;
-      // console.log("Before preparation --> ", data);
       this.preparedSearchReq.name = this.clanSearchForm.value.clanNamePhrase;
       this.preparedSearchReq.warFrequency = this.clanSearchForm.value.warFrequency;
       this.preparedSearchReq.locationId = this.clanSearchForm.value.clanLocation === "" ? 0 : this.clanSearchForm.value.clanLocation;
@@ -133,16 +106,15 @@ export class SearchClanComponent implements OnInit {
       this.preparedSearchReq.minClanPoints = this.clanSearchForm.value.minClanPoints === "" ? 0 : this.clanSearchForm.value.minClanPoints;
       this.preparedSearchReq.labels = this.clanSearchForm.value.clanLabels;
       this.preparedSearchReq.limit = this.clanSearchForm.value.searchLimit;
-      // console.log("After preparation --> ", this.preparedSearchReq);
       
       // send to get results
       this.clashingService.searchClan(this.preparedSearchReq).subscribe({
         next: res => {
-          if (res.result !== null) {
+          if (res.isSuccess) {
             this.isLoading = false;
-            this.searchedClans = res.result;
-            localStorage.setItem("clans", JSON.stringify(res.result));
-            this.toaster.success(res.message, "Clans  found!!");
+            this.searchedClans = res.data.result;
+            localStorage.setItem("clans", JSON.stringify(res.data.result));
+            this.toaster.success(res.data.message, "Clans  found!!");
           }
           else {
             this.isLoading = false;
@@ -151,7 +123,6 @@ export class SearchClanComponent implements OnInit {
         },
         error: err => {
           this.isLoading = false;
-          console.log("Any error ", err);
         }
       });
     }
@@ -161,29 +132,8 @@ export class SearchClanComponent implements OnInit {
   }
 
   getClanDetails(clanTag: string) {
-        this.isLoading = true;
-        this.clashingService.getClanByTag(clanTag).subscribe(
-      {
-        next: res => {
-          if (res.result !== null) {
-            this.isLoading = false;
-            this.clanData = res.result;
-            // storing in local storage for dev purpose to restrict api call
-            localStorage.setItem("clan", JSON.stringify(res.result))
-            // console.log("clan data", this.clanData);
-            this.router.navigateByUrl("clashOfClans/search-clan/clan-details");
-            this.toaster.success("Clan found", "Clan  found!!");
-          }
-          else {
-            this.isLoading = false;
-          }
-        },
-        error: err => {
-          this.isLoading = false;
-          this.toaster.error("No clan found with this tag", "No clan  found!!");
-          console.log(err)
-        }
-      });
+    // route to clan details with this tag
+    this.router.navigate(['/clashOfClans/search-clan/clan-details'], { queryParams: { clanTag: clanTag } });
   }
 
   onClear() {

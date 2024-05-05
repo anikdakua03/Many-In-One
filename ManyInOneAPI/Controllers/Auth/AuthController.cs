@@ -1,8 +1,10 @@
 ﻿using Google.Apis.Auth;
 using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
+using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.Auth;
 using ManyInOneAPI.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -36,305 +39,190 @@ namespace ManyInOneAPI.Controllers.Auth
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDTO userRequestDTO)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    var res = await _authService.Register(userRequestDTO);
+                var res = await _authService.Register(userRequestDTO);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Errors);
-
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            // return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
         [HttpPost]
         [Route("RegisterWithGoogleLogIn")]
         public async Task<IActionResult> RegisterWithGoogle([FromBody] string credentials)
         {
-            try
+            if (!credentials.IsNullOrEmpty())
             {
-                if (!credentials.IsNullOrEmpty())
-                {
-                    var res = await _authService.RegisterWithGoogle(credentials);
+                var res = await _authService.RegisterWithGoogle(credentials);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Errors);
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("ConfirmEmail")]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmail confirmEmailBody)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var res = await _authService.ConfirmUserEmail(userId, code);
+                var res = await _authService.ConfirmUserEmail(confirmEmailBody);
 
-                if (res.Result && res.Errors is null || res.Errors!.Count() == 0)
-                {
-                    //string htmlContent = $"<p>Your account has been confirmed!</p><p>Click here to login: <a href='/login'>Login</a></p>";
-                    return new ContentResult()
-                    {
-                        Content = res.Message,
-                        ContentType = "text/html",
-                        StatusCode = 200
-                    };
-                }
-                return BadRequest(res.Errors);
+                return Ok(res);
             }
-            catch (Exception ex)
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
+        }
+
+        [HttpPost]
+        [Route("ResendConfirmationEmail/{userEmail}")]
+        public async Task<IActionResult> ResendConfirmEmail([Required] string userEmail)
+        {
+            if (!userEmail.IsNullOrEmpty())
             {
-                return BadRequest(ex.Message);
+                var res = await _authService.ResendConfirmationMail(userEmail);
+
+                return Ok(res);
             }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
+        }
+
+        [HttpPost]
+        [Route("ForgotPasswordEmail/{userEmail}")]
+        public async Task<IActionResult> ResetPasswordMail([Required] string userEmail)
+        {
+            if (!userEmail.IsNullOrEmpty())
+            {
+                var res = await _authService.ForgotPasswordMail(userEmail);
+
+                return Ok(res);
+            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
+        }
+
+        [HttpPut]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetUserPassword([FromBody] ResetPasswordDTO resetPasswordDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var res = await _authService.ResetPassword(resetPasswordDTO);
+
+                return Ok(res);
+            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
+
         }
 
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDTO userRequestDTO)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    var res = await _authService.Login(userRequestDTO);
+                var res = await _authService.Login(userRequestDTO);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Errors);
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
         [HttpPost]
         [Route("LogInWithGoogle")]
         public async Task<IActionResult> LoginWithGoogle([FromBody] string credentials)
         {
-            try
+            if (!credentials.IsNullOrEmpty())
             {
-                if (!credentials.IsNullOrEmpty())
-                {
-                    var res = await _authService.LoginWithGoogle(credentials);
+                var res = await _authService.LoginWithGoogle(credentials);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Errors);
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
         [HttpPost]
         [Route("VerifyAndLoginWith2FA")]
         public async Task<IActionResult> LoginWith2FA([FromBody] Login2FARequest login2FARequest)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    var res = await _authService.VerifyAndLoginWith2FA(login2FARequest);
+                var res = await _authService.VerifyAndLoginWith2FA(login2FARequest);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Message);
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
         [HttpPost]
         [Route("Verify2FA")]
         public async Task<IActionResult> Verify2FA([FromBody] string code)
         {
-            try
+            if (!code.IsNullOrEmpty())
             {
-                if (!code.IsNullOrEmpty())
-                {
-                    var res = await _authService.Verify2FA(code);
+                var res = await _authService.Verify2FA(code);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Errors);
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
         [HttpPost]
         [Route("Get2FAQRCode")]
         public async Task<IActionResult> Enable2FAAndGetQR([FromBody] string userId)
         {
-            try
+            if (!userId.IsNullOrEmpty())
             {
-                if (!userId.IsNullOrEmpty())
-                {
-                    var res = await _authService.LoadSharedKeyAndQrCodeUriAsync(userId);
+                var res = await _authService.LoadSharedKeyAndQrCodeUriAsync(userId);
 
-                    if (res.Result)
-                    {
-                        return Ok(res);
-                    }
-
-                    return BadRequest(res.Message);
-                }
-                return BadRequest("Invalid request !! ");
+                return Ok(res);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(Result<object>.Failure(Error.Failure("Failed", "Invalid request !! ")));
         }
 
         [HttpPost]
         [Route("Disable2FA")]
         public async Task<IActionResult> Disable2FA()
         {
-            try
-            {
-                var res = await _authService.Disable2FA();
+            var res = await _authService.Disable2FA();
 
-                if (res.Result)
-                {
-                    return Ok(res);
-                }
-
-                return BadRequest(res.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
 
         [HttpPost]
         [Route("SignOut")]
         public async Task<IActionResult> SignOutuser()
         {
-            try 
-            {
-                var res = await _authService.SignOutUser();
+            var res = await _authService.SignOutUser();
 
-                if (res.Errors is null)
-                {
-                    return Ok(res);
-                }
-                return Unauthorized(res.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
 
         [HttpGet]
         [Route("GetRefreshToken")]
         public async Task<IActionResult> GetRefreshToken()
         {
-            try
-            { 
-                var res = await _authService.GetRefreshToken();
+            var res = await _authService.GetRefreshToken();
 
-                if (res.Result == true)
-                {
-                    return Ok(res);
-                }
-
-                return BadRequest(res.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
 
         [HttpGet]
         [Route("GetCurrentUser")]
         public async Task<IActionResult> CheckCurrentUser()
         {
-            try
-            { 
-                var res = await _authService.CheckCurrentUser();
+            var res = await _authService.CheckCurrentUser();
 
-                if (res.Errors is null)
-                {
-                    return Ok(res);
-                }
-
-                return Unauthorized(res.Errors); 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("RevokeToken")]
-        public async Task<IActionResult> RevokeToken() //string token/ should be by user id
+        public async Task<IActionResult> RevokeToken()
         {
-            try
-            {
-                var res = await _authService.RevokeToken();
+            var res = await _authService.RevokeToken();
 
-                if (res.Result)
-                {
-                    return Ok(res);
-                }
-                return BadRequest(res.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
 
 
@@ -342,21 +230,9 @@ namespace ManyInOneAPI.Controllers.Auth
         [Route("DeleteUserData")]
         public async Task<IActionResult> DeleteUserData()
         {
-            try
-            {
-                var res = await _authService.DeleteAllData();
+            var res = await _authService.DeleteAllData();
 
-                if (res.Result)
-                {
-                    return Ok(res);
-                }
-
-                return BadRequest(res.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(res);
         }
     }
 }

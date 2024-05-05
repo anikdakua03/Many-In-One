@@ -2,6 +2,7 @@ using HealthChecks.UI.Client;
 using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
 using ManyInOneAPI.Health;
+using ManyInOneAPI.Infrastructure;
 using ManyInOneAPI.Repositories.Payment;
 using ManyInOneAPI.Services.Auth;
 using ManyInOneAPI.Services.Clasher;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -20,13 +22,14 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//var pgConnectionString = builder.Configuration.GetConnectionString("PgConnection");
-
+// related to Postgres only
+var pgConnectionString = builder.Configuration.GetSection("Auth:PgConnection").Value!;
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // adding healthcheck
 builder.Services.AddHealthChecks()
     //.AddCheck<DatabaseHealthCheck>("DatabasehealthCheck") // for custom check
     .AddSqlServer(connectionString!)
-     //.AddNpgSql(pgConnectionString!)
+    //.AddNpgSql(pgConnectionString!)
     ;
 // Add services to the container.
 builder.Services.AddControllers();
@@ -51,30 +54,26 @@ builder.Services.AddDbContext<ManyInOneDbContext>(options =>
     });
 });
 
-// builder.Services.AddDbContext<ManyInOnePgDbContext>(options =>
-// {
-//     options.UseNpgsql(pgConnectionString,
-//     // for connection failure check if any
-//     pgSqlOptions =>
-//     {
-//         pgSqlOptions.EnableRetryOnFailure(
-//             maxRetryCount: 5,
-//             maxRetryDelay: TimeSpan.FromSeconds(30),
-//             errorCodesToAdd : null);
-//     });
-// });
+builder.Services.AddDbContext<ManyInOnePgDbContext>(options =>
+{
+    options.UseNpgsql(pgConnectionString,
+    // for connection failure check if any
+    pgSqlOptions =>
+    {
+        pgSqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: null);
+    });
+});
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddHttpContextAccessor(); // AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<IGenAIHttpClient, GenAIHttpClient>();
-builder.Services.AddHttpClient<IClashingHttpClient, ClashingHttpClient>(client =>
-{
-    var baseUrl = builder.Configuration.GetSection("Clasher").GetValue<string>("ClasherAPIURL");
-    client.BaseAddress = new Uri(baseUrl!);
-});
+builder.Services.AddHttpClient<IClashingHttpClient, ClashingHttpClient>();
 
 // for user 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
@@ -83,7 +82,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.SignIn.RequireConfirmedPhoneNumber = false;
     options.SignIn.RequireConfirmedEmail = true;
 
-}).AddEntityFrameworkStores<ManyInOneDbContext>(); //.AddEntityFrameworkStores<ManyInOnePgDbContext>(); //.
+}).AddEntityFrameworkStores<ManyInOneDbContext>();//AddEntityFrameworkStores<ManyInOnePgDbContext>(); 
 
 
 // google authentication and jwt added together
@@ -92,9 +91,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    //--------------
-    //options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
     .AddCookie(ck =>
     {
@@ -119,7 +115,7 @@ builder.Services.AddAuthentication(options =>
             ValidateLifetime = false
         };
 
-        // adding this to specify that jwt will be added with cookies when there will be any reqest , so to get the token only 
+        // adding this to specify that jwt will be added with cookies when there will be any request , so to get the token only 
         // from the cookie
         jwt.Events = new JwtBearerEvents
         {
@@ -142,8 +138,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policyBuilder =>
     {
+        // Console.WriteLine(builder.Configuration.GetSection("Auth:Audience").Value!);
+        // Console.WriteLine(builder.Configuration.GetSection("Auth:Issuer").Value!);
         policyBuilder
-            .WithOrigins("http://localhost:4200","https://localhost:7150", "https://localhost:8081") // Allow requests from only this origin
+             .WithOrigins("http://localhost:4200","https://localhost:7150", "https://localhost:8081") // Allow requests from only this origin
+            // .WithOrigins(builder.Configuration.GetSection("Auth:Audience").Value!, builder.Configuration.GetSection("Auth:Issuer").Value!) // for cloud run will be both api for(confirming email and client for other req)
             .AllowAnyMethod() 
             .AllowCredentials()
             .AllowAnyHeader(); 
@@ -187,6 +186,48 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Rate limiting
+builder.Services.AddRateLimiter(rateLimiterOptions =>
+{
+    rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    // all 4 types of rate limitting
+    // Fixed Window
+    rateLimiterOptions.AddFixedWindowLimiter("fixed",options =>
+    {
+        options.Window = TimeSpan.FromSeconds(30);
+        options.PermitLimit = 3;
+        options.QueueLimit = 3;
+        options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+    // Sliding Window
+    rateLimiterOptions.AddSlidingWindowLimiter("sliding", options =>
+    {
+        options.Window = TimeSpan.FromSeconds(30);
+        options.PermitLimit = 5;
+        options.SegmentsPerWindow = 5;
+        options.QueueLimit = 3;
+        options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+    // Token Bucket 
+    rateLimiterOptions.AddTokenBucketLimiter("bucket", options =>
+    {
+        options.TokenLimit = 10;
+        options.QueueLimit = 3;
+        options.ReplenishmentPeriod = TimeSpan.FromSeconds(30);
+        options.TokensPerPeriod = 5;
+        options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+    // Concurrency
+    rateLimiterOptions.AddConcurrencyLimiter("concurrency", options =>
+    {
+        options.PermitLimit = 3; // 3 at a time
+    });
+});
+
+// adding global exception handling to dependency
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -212,7 +253,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
+// using rate limitting
+app.UseRateLimiter();
+// app to use thta exception handing middleware
+app.UseExceptionHandler();
 app.MapControllers();
 
 app.Run();

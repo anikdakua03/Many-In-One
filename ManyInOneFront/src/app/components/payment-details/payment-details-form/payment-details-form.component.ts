@@ -13,55 +13,54 @@ import { RouterLink } from '@angular/router';
 })
 export class PaymentDetailsFormComponent {
 
+  isLoading: boolean = false;
+
   paymentForm: FormGroup = new FormGroup({
     paymentDetailId: new FormControl(0),
     cardOwnerName: new FormControl("", [Validators.required, Validators.minLength(4), Validators.maxLength(50)]),
     cardNumber: new FormControl("", [Validators.required, Validators.minLength(16), Validators.maxLength(16)]),
     securityCode: new FormControl("", [Validators.required, Validators.minLength(3), Validators.maxLength(3)]),
-    expirationDate: new FormControl("", [Validators.required, Validators.minLength(5), Validators.maxLength(5)])
+    expirationDate: new FormControl("", [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]) // for like MM/YY [valid month]
   });
 
-  constructor(public service: PaymentService, private toaster: ToastrService) //
-  {
+  constructor(public service: PaymentService, private toaster: ToastrService) {
 
   }
 
   // resetting the form after successful addition
   resetForm() {
     this.paymentForm.reset();
-    // console.log("Form -->", this.paymentForm);
     this.service.formSubmitted = false;
   }
 
   onSubmit() {
     if (this.paymentForm.valid) {
       this.service.formSubmitted = true; // making flag true
-      // we are inserting if details id == 0 , mneans fresh
+      // we are inserting if details id == 0 , means fresh
       if (this.service.formData.paymentDetailId === 0) {
         this.insertRecord();
       }
-      // otherwise it is a exisiting so , updating that
+      // otherwise it is a existing so , updating that
       else {
         this.updateRecord();
       }
 
     }
     else {
-      console.log("Fill payment details correctly !");
       this.toaster.error("Fill details correctly !", "Payment Detail Register", { tapToDismiss: true });
     }
   }
 
   // when adding  records
   insertRecord() {
+    this.isLoading = true;
     const obj = this.paymentForm.value;
     delete this.paymentForm.value.paymentDetailId; // Remove the property
-    console.log(obj);
     this.service.addPaymentDetails(obj)
       .subscribe(
         {
           next: res => {
-            console.log("Lets check --->",res);
+            this.isLoading = false;
             // resetting the form also
             this.resetForm();
             // toaster success message
@@ -72,8 +71,8 @@ export class PaymentDetailsFormComponent {
 
           },
           error: err => {
-            console.log(err.message);
-            this.toaster.error(err.message, "Payment Detail Registeration Faild !!");
+            this.isLoading = false;
+            this.toaster.error("Payment method failed to add!", "Payment Detail Registration Failed !!");
           }
         });
   }
@@ -81,24 +80,28 @@ export class PaymentDetailsFormComponent {
   // updating records
   updateRecord() {
     const obj = this.paymentForm.value;
-    // console.log("Before patching --> ", obj);
-
-    // const obj1 = this.paymentForm.patchValue(obj);
-    // console.log("After patching --> ", obj1);
-
+    this.isLoading = true;
     this.service.updatePaymentDetails(obj)
       .subscribe(
         {
           next: res => {
-            // resetting the form also
-            this.resetForm();
-            // toaster success message
-            this.toaster.info("Payment method updated successfully !", "Payment Detail Update");
+            this.isLoading = false;
+            if (res.isSuccess) {
+              // resetting the form also
+              this.resetForm();
+              // toaster success message
+              this.toaster.info("Payment method updated successfully !", "Payment Detail Update");
 
-            // for updating the lsit
-            this.service.refreshList();
+              // for updating the list
+              this.service.refreshList();
+            }
+            else {
+              // resetting the form also
+              this.resetForm();
+              // toaster success message
+              this.toaster.error(res.error.description, "Payment Detail Update");
+            }
           },
-          error: err => { console.log(err); }
         });
   }
 }

@@ -1,12 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { IClanInfoResponse } from '../interfaces/clan-info';
 import { ISearchClanResponse } from '../interfaces/search-clan-response';
-import { IPlayer, IPlayerResponse } from '../interfaces/player';
+import { IPlayerResponse } from '../interfaces/player';
 import { SearchClansRequest } from '../models/Clasher/search-clans-request.model';
-import { SsrCookieService } from 'ngx-cookie-service-ssr';
+import { ApiResponse } from '../interfaces/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class ClashOfClanService {
   baseURL: string = environment.apiBaseUrl;
 
 
-  constructor(private http: HttpClient, private cookie: SsrCookieService) { }
+  constructor(private http: HttpClient) { }
 
   //#region  Clans Specific
   //   
@@ -28,16 +28,16 @@ export class ClashOfClanService {
   // GET
   //   / clans / { clanTag }
   // Get clan information
-  public getClanByTag(clanTag: string): Observable<IClanInfoResponse> {
+  public getClanByTag(clanTag: string): Observable<ApiResponse<IClanInfoResponse>> {
     const header = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<IClanInfoResponse>(`${this.baseURL}Clash/GetClanInfoById`, JSON.stringify(clanTag), { headers: header, withCredentials: true });
+    return this.http.post<ApiResponse<IClanInfoResponse>>(`${this.baseURL}Clash/GetClanInfoById`, JSON.stringify(clanTag), { headers: header, withCredentials: true });
   }
   
   // GET
-  // Search clans by name and warfrequency or location, minimummembers , max members, min clan points, min clan level
-  public searchClan(searchClansRq: SearchClansRequest): Observable<ISearchClanResponse> {
+  // Search clans by name and war frequency or location, minimum members , max members, min clan points, min clan level
+  public searchClan(searchClansRq: SearchClansRequest): Observable<ApiResponse<ISearchClanResponse>> {
     const header = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<ISearchClanResponse>(`${this.baseURL}Clash/SearchClans`, searchClansRq, { headers: header, withCredentials: true });
+    return this.http.post<ApiResponse<ISearchClanResponse>>(`${this.baseURL}Clash/SearchClans`, searchClansRq, { headers: header, withCredentials: true });
   }
 
 
@@ -58,9 +58,9 @@ export class ClashOfClanService {
   //   GET
   //   / players / { playerTag }
   // Get player information
-  public getPlayer(playerTag : string): Observable<IPlayerResponse> {
+  public getPlayer(playerTag : string): Observable<ApiResponse<IPlayerResponse>> {
     const header = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<IPlayerResponse>(`${this.baseURL}Clash/GetPlayerInfo`, JSON.stringify(playerTag), { headers : header, withCredentials: true });
+    return this.http.post<ApiResponse<IPlayerResponse>>(`${this.baseURL}Clash/GetPlayerInfo`, JSON.stringify(playerTag), { headers : header, withCredentials: true });
   }
 
   //#endregion
@@ -87,8 +87,8 @@ export class ClashOfClanService {
   //     / locations
   // List locations
   // will store in local storage when logged in and will stay for some time
-  public getAllLocations(): Observable<any> {
-    return this.http.get(`${this.baseURL}Clash/GetAllLocations`, {withCredentials : true});
+  public getAllLocations(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseURL}Clash/GetAllLocations`, {withCredentials : true});
   }
 
   // GET
@@ -103,12 +103,12 @@ export class ClashOfClanService {
 
   //#region Labels related
   // Get all player labels
-  public getPlayerLabels(): Observable<any> {
-    return this.http.get(`${this.baseURL}Clash/GetAllPlayerLabels`, { withCredentials: true });
+  public getPlayerLabels(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseURL}Clash/GetAllPlayerLabels`, { withCredentials: true });
   }
   // Get all clan labels
-  public getClanLabels(): Observable<any> {
-    return this.http.get(`${this.baseURL}Clash/GetAllClanLabels`, { withCredentials: true });
+  public getClanLabels(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseURL}Clash/GetAllClanLabels`, { withCredentials: true });
   }
   //#endregion
 }
