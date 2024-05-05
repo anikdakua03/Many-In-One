@@ -147,9 +147,6 @@ var builder = WebApplication.CreateBuilder(args);
                 .AllowAnyHeader();
         });
     });
-});
-});
-});
 
     // for handling multipart body length
     builder.Services.Configure<FormOptions>(options =>
@@ -254,7 +251,7 @@ var app = builder.Build();
 
     app.UseHttpsRedirection();
     app.UseAuthentication();
-    
+
     app.UseAuthorization();
     // using rate limitting
     app.UseRateLimiter();
@@ -262,4 +259,5 @@ var app = builder.Build();
     app.UseExceptionHandler();
     app.MapControllers();
 
-app.Run();
+    app.Run();
+}
