@@ -179,21 +179,20 @@
                                 Delete </button>
                         </div>
 
-                        <article class="px-4 pb-4">
+                        <article class="px-4 pb-4 text-[18px] text-[#ececec]">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <p><strong>Type :</strong> {{qs.questionType}}</p>
-                                <p><strong>Level : </strong>{{qs.questionLevel}}</p>
-                                <p><strong>Image Link : </strong>{{qs.questionImageLink}}</p>
-                                <p><strong>Category : </strong>{{qs.categoryName}}</p>
+                                <p><strong class="text-[#5f212f]">Type :</strong> {{getQsTypeValue(qs.questionType)}}</p>
+                                <p><strong class="text-[#5f212f]">Level : </strong>{{getQsLevelValue(qs.questionLevel)}}</p>
+                                <p><strong class="text-[#5f212f]">Image Link : </strong>{{qs.questionImageLink}}</p>
+                                <p><strong class="text-[#5f212f]">Category : </strong>{{qs.categoryName}}</p>
                             </div>
 
-                            <p>Tags : {{qs.questionTags.join(',')}}</p>
-                            <label class="mt-2 text-bold text-[#ecb46b]"> Options : </label>
+                            <p><strong class="text-[#5f212f]">Tags : </strong>  {{qs.questionTags.join(', ')}}</p>
                             @for(op of qs.options ; track idx; let idx = $index) {
-                            <div [ngClass]="op.isAnswer ? 'bg-[#3ad47a] rounded-sm p-1 text-semibold' : ''"
+                            <div [ngClass]="op.isAnswer ? 'bg-[#2ea861] rounded-sm p-1 text-semibold' : ''"
                                 class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <p><strong>Option {{idx + 1}} : </strong>{{op.optionValue}}</p>
-                                <p><strong>Explanation : </strong>{{op.answerExplanation}}</p>
+                                <p><strong class="text-[#5f212f]">Option {{idx + 1}} : </strong>{{op.optionValue}}</p>
+                                <p><strong class="text-[#5f212f]">Explanation : </strong>{{op.answerExplanation}}</p>
                             </div>
                             }
                         </article>

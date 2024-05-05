@@ -229,6 +229,16 @@ export class QuizzerManageComponent implements OnInit {
         this.searchText = event.target.value;
     }
 
+    getQsTypeValue(typeId: string): string {
+        const matchingType = this.allQsTypes.find(type => type.id === typeId.toLowerCase());
+        return matchingType ? matchingType.value : 'Any';
+    }
+
+    getQsLevelValue(lvlId: string): string {
+        const matchingType = this.allQsLevels.find(level => level.id === lvlId.toLowerCase());
+        return matchingType ? matchingType.value : 'Any';
+    }
+
     // region : Add / update / remove question / category
     onAddQuestion() {
         if (this.questionForm.valid) {
@@ -258,6 +268,7 @@ export class QuizzerManageComponent implements OnInit {
                         this.toaster.error(res.data, "Question Addition Failed.")
                     }
                     this.closeModal();
+                    this.questionForm.reset();
                     this.isLoading = false;
                 },
                 error: err => {
@@ -379,6 +390,7 @@ export class QuizzerManageComponent implements OnInit {
                         this.toaster.error(res.data, "Question Updation Failed.")
                     }
                     this.closeModal();
+                    this.questionForm.reset();
                     this.isLoading = false;
                 },
                 error: err => {
@@ -435,6 +447,7 @@ export class QuizzerManageComponent implements OnInit {
                         this.toaster.error(res.data, "Category Updation.")
                     }
                     this.closeModal();
+                    this.categoryForm.reset();
                     this.isLoading = false;
                 },
                 error: err => {
@@ -469,6 +482,7 @@ export class QuizzerManageComponent implements OnInit {
                         this.toaster.error(res.data, "Category Updation Failed.")
                     }
                     this.closeModal();
+                    this.categoryForm.reset();
                     this.isLoading = false;
                 },
                 error: err => {

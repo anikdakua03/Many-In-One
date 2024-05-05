@@ -43,9 +43,12 @@ export class ClashingComponent {
     else {
       this.clashingService.getAllLocations().subscribe({
         next: res => {
-          this.locations = res.data.result as LocationItem[];
+          if(res.isSuccess)
+          {
+            this.locations = res.data.result as LocationItem[];
 
-          localStorage.setItem("loc", JSON.stringify(this.locations));
+            localStorage.setItem("loc", JSON.stringify(this.locations));
+          }
         },
         error: err => {
         }
@@ -64,9 +67,12 @@ export class ClashingComponent {
     else {
       this.clashingService.getClanLabels().subscribe({
         next: res => {
-          this.allClanLabels = res.data.result as ILabel[];
+          if(res.isSuccess)
+          {
+            this.allClanLabels = res.data.result as ILabel[];
 
-          localStorage.setItem("clanlabels", JSON.stringify(res.data.result));
+            localStorage.setItem("clanlabels", JSON.stringify(res.data.result));
+          }
         },
         error: err => {
         }
@@ -85,9 +91,12 @@ export class ClashingComponent {
     else {
       this.clashingService.getPlayerLabels().subscribe({
         next: res => {
-          this.allPlayerLabels = res.data.result as ILabel[]; 
+          if(res.isSuccess)
+          {
+            this.allPlayerLabels = res.data.result as ILabel[]; 
 
-          localStorage.setItem("playerlabels", JSON.stringify(res.data.result));
+            localStorage.setItem("playerlabels", JSON.stringify(res.data.result));
+          }
         },
         error: err => {
         }
