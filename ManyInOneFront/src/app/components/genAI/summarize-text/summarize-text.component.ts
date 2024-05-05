@@ -4,11 +4,13 @@ import { KatexOptions, MarkdownModule } from 'ngx-markdown';
 import { ToastrService } from 'ngx-toastr';
 import { CopyToClipboardComponent } from '../../copy-to-clipboard/copy-to-clipboard.component';
 import { GenAIService } from '../../../shared/services/gen-ai.service';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-summarize-text',
   standalone: true,
-  imports: [ReactiveFormsModule, MarkdownModule],
+  imports: [ReactiveFormsModule, MarkdownModule, FontAwesomeModule],
   templateUrl: './summarize-text.component.html',
   styles: ``
 })
@@ -33,6 +35,7 @@ export class SummarizeTextComponent implements OnInit {
   });
 
   isLoading: boolean = false;
+  dots = FAIcons.ELLIPSES;
 
   constructor(public service: GenAIService, private toaster: ToastrService) {
   }
@@ -70,13 +73,21 @@ export class SummarizeTextComponent implements OnInit {
         .subscribe(
           {
             next: res => {
-              // this.loader?.showLoader(true);
-              this.response = res.data.responseMessage;
-              this.isLoading = false;
-              this.toaster.success("Here is your response", "Response");
+              if(res.isSuccess)
+              {
+                this.response = res.data.responseMessage;
+                this.isLoading = false;
+                this.toaster.success("Here is your response", "Response");
+              }
+              else
+              {
+                this.isLoading = false;
+                this.toaster.error("Maybe service isn't available right now, please try again now or later.", "Response");
+              }
             },
             error: err => {
               this.isLoading = false;
+              this.toaster.error("Maybe service isn't available right now, please try again now or later.", "Response");
             }
           }
         );

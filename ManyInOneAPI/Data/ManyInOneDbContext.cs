@@ -1,5 +1,6 @@
 ﻿using ManyInOneAPI.Models.Auth;
 using ManyInOneAPI.Models.Payment;
+using ManyInOneAPI.Models.Quizz;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +18,12 @@ namespace ManyInOneAPI.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(typeof(ManyInOneDbContext).Assembly);
         }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<PaymentDetail> PaymentDetails { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<OptionsWithAnswer> Options { get; set; }
     }
 }

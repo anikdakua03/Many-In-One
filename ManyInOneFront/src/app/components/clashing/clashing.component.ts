@@ -4,11 +4,13 @@ import { ClashOfClanService } from '../../shared/services/clash-of-clan.service'
 import { LocationItem } from '../../shared/models/Clasher/LocationItem';
 import { ILabel } from '../../shared/interfaces/clan-info';
 import { isPlatformBrowser } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-clashing',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FontAwesomeModule],
   templateUrl: './clashing.component.html',
   styles: ``
 })
@@ -16,9 +18,9 @@ export class ClashingComponent {
 
   locations : LocationItem[] = [];
 
-  allPlayerLabels: [{}] = [{}];
-  allClanLabels: [{}] = [{}];
-
+  allPlayerLabels: ILabel[] = [];
+  allClanLabels: ILabel[] = [];
+  longRightArrow = FAIcons.LONG_RIGHT_ARROW;
 
   constructor(private router: Router, private clashingService: ClashOfClanService, @Inject(PLATFORM_ID) private platformId: Object) {
     if(isPlatformBrowser(platformId))
@@ -57,12 +59,12 @@ export class ClashingComponent {
     // const newwww = JSON.parse(clnlbl);
     if (clnlbl !== null && clnlbl !== undefined && clnlbl !== "") {
       const newww = JSON.parse(clnlbl!);
-      this.allClanLabels.push(newww as ILabel[]);
+      this.allClanLabels = newww as ILabel[];
     }
     else {
       this.clashingService.getClanLabels().subscribe({
         next: res => {
-          this.allClanLabels.push(res.data.result as ILabel[]);
+          this.allClanLabels = res.data.result as ILabel[];
 
           localStorage.setItem("clanlabels", JSON.stringify(res.data.result));
         },
@@ -78,12 +80,12 @@ export class ClashingComponent {
     // const newwww = JSON.parse(localLoc);
     if (localLoc !== null && localLoc !== undefined && localLoc !== "") {
       const newww = JSON.parse(localLoc!);
-      this.allPlayerLabels.push(newww as ILabel[]);
+      this.allPlayerLabels = newww as ILabel[];
     }
     else {
       this.clashingService.getPlayerLabels().subscribe({
         next: res => {
-          this.allPlayerLabels.push(res.data.result as ILabel[]); 
+          this.allPlayerLabels = res.data.result as ILabel[]; 
 
           localStorage.setItem("playerlabels", JSON.stringify(res.data.result));
         },

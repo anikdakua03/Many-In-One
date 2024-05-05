@@ -1,19 +1,19 @@
-<div class="pt-12 px-4 min-h-screen bg-cover bg-fixed"
+<div class="pt-12 min-h-[140vh] px-4 bg-cover bg-fixed"
     style="background-image: url('../../../../assets/Clasher/coc-bg-2.jpg');">
-    <div class="pt-12 px-4 h-full">
+    <div class="pt-6 px-4 ">
         <h1 class="text-center text-green-600 font-bold underline text-4xl">Search clans</h1>
         <!-- <hr /> -->
         <div class="grid grid-rows-4 grid-flow-row mt-8 gap-x-4 gap-y-5">
 
             <div class="flext justify-between w-auto h-40 py-3 px-6 bg-transparent border-b">
                 <div>
-                    <div class="flex justify-center items-center w-full min-w-[200px] h-4 mt-10 space-x-5">
+                    <div class="flex justify-center items-center w-full h-4 mt-3 space-x-5">
                         <form [formGroup]="clanByTagForm" (submit)="onSearchClanByTag()" autocomplete="off">
 
                             <div class="relative flex w-full max-w-[24rem] p-2 gap-2">
                                 <div class="relative h-14 w-full min-w-[200px]">
                                     <input type="text" formControlName="clanTag"
-                                        class="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 pr-20 font-sans text-[16px] font-bold text-[white] outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                        class="peer h-[60px] w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 pr-20 font-sans text-[16px] font-bold text-[white] outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                                         placeholder=" " value="" />
                                     @if(clanByTagForm.controls['clanTag'].errors &&
                                     clanByTagForm.controls['clanTag'].touched)
@@ -28,15 +28,14 @@
                                 </div>
                                 <div class="flex justify-center">
                                     <button type="submit" [disabled]="isLoading"
-                                        class="right-1 top-1 w-[150px] select-none rounded-md bg-blue-gray-500 py-2 px-4 text-center align-middle font-sans text-[12px] font-bold bg-yellow-700 text-white shadow-md shadow-blue-gray-500/20 transition-all hover:shadow-lg  hover:shadow-blue-gray-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
+                                        class="right-1 top-1 h-[60px] w-[150px] select-none rounded-md bg-blue-gray-500 py-2 px-4 text-center align-middle font-sans text-[12px] font-bold bg-yellow-700 text-white shadow-md shadow-blue-gray-500/20 transition-all hover:shadow-lg  hover:shadow-blue-gray-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
                                         @if(isLoading)
                                         {
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="28" width="56"
-                                            class="ml-[22px] flex items-center justify-center animate-bounce animate-infinite animate-ease-in"
-                                            viewBox="0 0 448 512">
-                                            <path fill="#b9c9f8"
-                                                d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                                        </svg>
+                                        <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots" animation="bounce"></fa-icon>
+                                        <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                                            animation="bounce"></fa-icon>
+                                        <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                                            animation="bounce"></fa-icon>
                                         }
                                         @else { <p class="text-[16px]">Search Clan</p>}
                                     </button>
@@ -48,16 +47,16 @@
 
             </div>
 
-            <div class="h-11 py-3 px-1 mt-2 bg-transparent">
+            <div class="h-4 py-3 px-1 bg-transparent">
                 <div class="gap-6 mb-6 md:grid-cols-2">
-                    <div class="justify-center items-center w-full min-w-[200px] h-4 mt-2 space-x-8 space-y-4 ">
+                    <div class="justify-center items-center w-full h-4 mt-2 space-x-8 space-y-4 ">
                         <form [formGroup]="clanSearchForm" (submit)="onSearchByFilter()" autocomplete="off"
                             class="bg-amber-700 bg-gradient-to-r p-4 rounded-md shadow-xl shadow-amber-400">
                             <h1 class="text-center font-bold text-purple-400 text-3xl underline px-2 py-4"> Search by
                                 filters </h1>
 
                             <input formControlName="clanNamePhrase"
-                                class="px-3 py-2 ml-4 mr-4 font-bold w-auto placeholder-slate-800 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
+                                class="px-3 py-3 ml-4 mr-4 font-bold w-auto placeholder-slate-800 text-black rounded-lg border-none ring-2 ring-gray-300 focus:ring-gray-500 foucs:ring-2"
                                 placeholder="Search by Name" />
                             @if(clanSearchForm.controls['clanNamePhrase'].errors &&
                             clanSearchForm.controls['clanNamePhrase'].touched)
@@ -150,22 +149,23 @@
                                     </ng-template>
                                 </ng-select>
                             </div>
-                            <button [disabled]="isLoading"
-                                class="text-white bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-1 dark:focus:ring-blue-800">
-                                @if(isLoading)
-                                {
-                                <svg xmlns="http://www.w3.org/2000/svg" height="28" width="66"
-                                    class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in"
-                                    viewBox="0 0 448 512">
-                                    <path fill="#b9c9f8"
-                                        d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                                </svg>
-                                }
-                                @else { <p class="text-[16px]">Search Clans</p>}
-                            </button>
-                            <button
-                                class="text-white bg-red-700 mt-2 flex justify-center items-center hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 ml-10 mb-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                                (click)="onClear()">Reset</button>
+                            <div class="flex-row lg:flex lg:justify-center lg:items-center lg:gap-5">
+                                <button [disabled]="isLoading"
+                                    class="text-white h-[50px] w-[300px] bg-yellow-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg cursor-pointer p-2 dark:bg-yellow-600 dark:hover:bg-blue-700 focus:outline-1 dark:focus:ring-blue-800">
+                                    @if(isLoading)
+                                    {
+                                    <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots" animation="bounce"></fa-icon>
+                                    <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                                        animation="bounce"></fa-icon>
+                                    <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                                        animation="bounce"></fa-icon>
+                                    }
+                                    @else { <p class="text-[16px]">Search Clans</p>}
+                                    </button>
+                                    <button
+                                    class="text-white h-[50px] w-[300px] bg-red-700 hover:bg-red-400 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg cursor-pointer p-2 dark:bg-red-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                                    (click)="onClear()">Reset</button>
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -15,6 +15,7 @@ export class AuthenticationService {
   // if user reloads then it will be set to initial , as here false 
   // so that time we will fill it from localstorage based on that user id
   isAuthenticated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(this.getUserFromLocal());
+  userName$: BehaviorSubject<string> = new BehaviorSubject<string>(this.getCurrentUserName());
 
   baseUrl: string = environment.apiBaseUrl;
 
@@ -151,7 +152,7 @@ export class AuthenticationService {
   public CheckUser2FA() : boolean
   {
     const data = this.cookie.get("twofa-enable");
-    return JSON.parse(data) as boolean;
+    return (data === null || data === undefined) ? false : JSON.parse(data) as boolean;
   }
 
   public removeToken() {

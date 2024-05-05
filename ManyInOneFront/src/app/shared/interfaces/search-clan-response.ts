@@ -29,11 +29,11 @@ export interface IResultClan {
     labels: ILabel[]
     requiredBuilderBaseTrophies: number
     requiredTownhallLevel: number
-    chatLanguage: IChatLanguage
+    chatLanguage: IChatLanguage | null
 }
 
 export interface ILocation {
-    countryCode?: string
+    countryCode?: string | null
     id: number
     name: string
     isCountry: boolean

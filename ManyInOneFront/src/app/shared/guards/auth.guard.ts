@@ -6,11 +6,9 @@ export const authGuard = () => {
     const authService = inject(AuthenticationService);
     const route = inject(Router);
 
-    // if(authService.currUserSignal !== null && authService.currUserSignal !== undefined)
-
     // get the user if there 
     let user = authService.isAuthenticated$.value;
-    if (user) // true
+    if (user) 
     {
         return true;
     }

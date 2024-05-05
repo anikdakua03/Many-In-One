@@ -21,12 +21,14 @@ import "prismjs/components/prism-jsx.min.js"
 import "prismjs/components/prism-css.min.js"
 import { CopyToClipboardComponent } from '../../copy-to-clipboard/copy-to-clipboard.component';
 import { GenAIService } from '../../../shared/services/gen-ai.service';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 
 @Component({
   selector: 'app-text-only',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, MarkdownModule],
+  imports: [RouterLink, ReactiveFormsModule, MarkdownModule, FontAwesomeModule],
   templateUrl: './text-only.component.html',
   styles: ``
 })
@@ -51,6 +53,7 @@ export class TextOnlyComponent {
   });
 
   isLoading : boolean = false;
+  dots = FAIcons.ELLIPSES;
 
   constructor(public service: GenAIService, private toaster: ToastrService)
   {
@@ -71,6 +74,7 @@ export class TextOnlyComponent {
             },
             error: err => {
               this.isLoading = false;
+              this.toaster.error("Service is not available right now !!", "Service Error");
             }
           }
         );

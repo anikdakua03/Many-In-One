@@ -21,11 +21,13 @@ import "prismjs/components/prism-yaml.min.js"
 import "prismjs/components/prism-v.min.js"
 import "prismjs/components/prism-jsx.min.js"
 import "prismjs/components/prism-css.min.js"
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-conversation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MarkdownModule],
+  imports: [CommonModule, ReactiveFormsModule, MarkdownModule, FontAwesomeModule],
   templateUrl: './conversation.component.html',
   styles: ``
 })
@@ -45,6 +47,7 @@ export class ConversationComponent implements AfterViewChecked{
 
   response: string = "";
   allChats : Content[] = [];
+  sendPaperPlane = FAIcons.PAPER_PLANE;
 
   sendChat: Conversation = {
     contents: this.allChats

@@ -3,6 +3,7 @@ using ManyInOneAPI.Configurations;
 using ManyInOneAPI.Data;
 using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.Auth;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ namespace ManyInOneAPI.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly ManyInOneDbContext _dbContext;
-        //  private readonly ManyInOnePgDbContext _dbContext;
+        //private readonly ManyInOnePgDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AuthConfig _authConfig;
@@ -43,7 +44,7 @@ namespace ManyInOneAPI.Services.Auth
         public async Task<Result<AuthResult>> Register(UserRegistrationRequestDTO userRequestDTO)
         {
             var emailExists = await _userManager.FindByEmailAsync(userRequestDTO.Email);
-            
+
             if (emailExists is not null)
             {
                 return Result<AuthResult>.Failure(Error.Conflict("Conflict", "User already exists. "));
@@ -57,12 +58,12 @@ namespace ManyInOneAPI.Services.Auth
                 EmailConfirmed = false // making it false explicitly, to make sure of
             };
             var isCreated = await _userManager.CreateAsync(newUser, userRequestDTO.Password!);
-            
+
             if (isCreated.Succeeded)
             {
                 // will send a verification code to that email to confirm
                 var userId = await _userManager.GetUserIdAsync(newUser);
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser); 
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
                 var emailSend = await _emailService.SendMailAsync(newUser.Id, newUser.Email, WebUtility.UrlEncode(code));
 
@@ -141,8 +142,13 @@ namespace ManyInOneAPI.Services.Auth
 
             var emailSend = await _emailService.SendGreetingMailAsync(newUser.Email);
             // other wise generate token for the user and allow to log in
-            var jwttoken = GenerateJwtToken(newUser);
-                
+            // other wiser generate refresh token
+            var newRefToken = GenerateJwtToken(newUser);
+
+            // also add to the database in the refresh token table
+            await _dbContext.RefreshTokens.AddAsync(newRefToken);
+            await _dbContext.SaveChangesAsync();
+
             return Result<AuthResult>.Success(new AuthResult()
             {
                 Message = "Registration with google log in successful and shipped also!! ",
@@ -188,7 +194,7 @@ namespace ManyInOneAPI.Services.Auth
             var user = await _userManager.FindByEmailAsync(userEmail!);
 
             // will send a verification code to that user s email if valid user, again
-            if(user is null)
+            if (user is null)
             {
                 return Result<AuthResult>.Failure(Error.NotFound("Not Found", "Invalid User. "));
             }
@@ -199,7 +205,7 @@ namespace ManyInOneAPI.Services.Auth
                 return Result<AuthResult>.Failure(Error.Conflict("Conflict", "User email confirmed already , please log in to continue !!"));
             }
 
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user!); 
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user!);
 
             var emailSend = await _emailService.SendMailAsync(user.Id, user.Email!, WebUtility.UrlEncode(code));
 
@@ -314,11 +320,18 @@ namespace ManyInOneAPI.Services.Auth
             // sign in the user
             var useCookieScheme = true;
             var isPersistent = true;
+
             _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
 
             var result = await _signInManager.PasswordSignInAsync(userRequestDTO.Email, userRequestDTO.Password, isPersistent, lockoutOnFailure: true); // this things need to check , why it is failing
 
-            var jwttoken = GenerateJwtToken(existingUser);
+            // other wiser generate refresh token
+            var newRefToken = GenerateJwtToken(existingUser);
+
+            // also add to the database in the refresh token table
+
+            await _dbContext.RefreshTokens.AddAsync(newRefToken);
+            await _dbContext.SaveChangesAsync();
 
             return Result<AuthResult>.Success(new AuthResult()
             {
@@ -356,7 +369,12 @@ namespace ManyInOneAPI.Services.Auth
             }
 
             // other wise generate token for th euser and allow to log in
-            var jwttoken = GenerateJwtToken(existingUser);
+            // other wiser generate refresh token
+            var newRefToken = GenerateJwtToken(existingUser);
+
+            // also add to the database in the refresh token table
+            await _dbContext.RefreshTokens.AddAsync(newRefToken);
+            await _dbContext.SaveChangesAsync();
 
             return Result<AuthResult>.Success(new AuthResult()
             {
@@ -378,14 +396,19 @@ namespace ManyInOneAPI.Services.Auth
             }
 
             bool validCode = await _userManager.VerifyTwoFactorTokenAsync(currUser!, _userManager.Options.Tokens.AuthenticatorTokenProvider, login2FARequest.TwoFACode!);
-            
+
             if (!validCode)
             {
                 return Result<AuthResult>.Failure(Error.Validation("Invalid Code", "Code is invalid. Try with correct code. "));
             }
 
             // other wise generate token for the user and allow to log in
-            var jwttoken = GenerateJwtToken(currUser);
+            // other wiser generate refresh token
+            var newRefToken = GenerateJwtToken(currUser);
+
+            // also add to the database in the refresh token table
+            await _dbContext.RefreshTokens.AddAsync(newRefToken);
+            await _dbContext.SaveChangesAsync();
 
             return Result<AuthResult>.Success(new AuthResult()
             {
@@ -522,7 +545,6 @@ namespace ManyInOneAPI.Services.Auth
         public async Task<Result<AuthResult>> SignOutUser()
         {
             await _signInManager.SignOutAsync();
-
             await RevokeToken();
 
             return Result<AuthResult>.Success(new AuthResult()
@@ -542,7 +564,7 @@ namespace ManyInOneAPI.Services.Auth
             }
 
             // get the jwt token id linked with this refresh token
-            var userId = await _dbContext.RefreshTokens.Where(a => a.Token == refreshToken).Select(b => b.UserId).FirstOrDefaultAsync();
+            var userId = await _dbContext.RefreshTokens.AsNoTracking().Where(a => a.Token == refreshToken).Select(b => b.UserId).FirstOrDefaultAsync();
 
             // get from database from refresh token table
             var user = await _userManager.Users.FirstOrDefaultAsync(a => a.Id == userId);
@@ -551,8 +573,13 @@ namespace ManyInOneAPI.Services.Auth
             {
                 return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
             }
+
             // other wiser generate refresh token
-            await GenerateJwtToken(user);
+            var newRefToken = GenerateJwtToken(user);
+
+            // also add to the database in the refresh token table
+            await _dbContext.RefreshTokens.AddAsync(newRefToken);
+            await _dbContext.SaveChangesAsync();
 
             return Result<AuthResult>.Success(new AuthResult()
             {
@@ -580,7 +607,7 @@ namespace ManyInOneAPI.Services.Auth
                     return Result<AuthResult>.Failure(Error.Failure("Failed", "All session , token expired, please log again to continue. "));
                 }
 
-                var currUserId = await _dbContext.RefreshTokens.Where(a => a.Token == token).Select(b => b.UserId).FirstOrDefaultAsync();
+                var currUserId = await _dbContext.RefreshTokens.AsNoTracking().Where(a => a.Token == token).Select(b => b.UserId).FirstOrDefaultAsync();
 
                 var user = await _userManager.FindByIdAsync(currUserId!);
 
@@ -589,7 +616,13 @@ namespace ManyInOneAPI.Services.Auth
                     return Result<AuthResult>.Failure(Error.NotFound("Not Found", "User doesn't exists. "));
                 }
                 //  aslo set the access token
-                await GenerateJwtToken(user!);
+                // other wiser generate refresh token
+                var newRefToken = GenerateJwtToken(user);
+
+                // also add to the database in the refresh token table
+
+                await _dbContext.RefreshTokens.AddAsync(newRefToken);
+                await _dbContext.SaveChangesAsync();
 
                 currUserRes.UserId = currUserId!;
                 currUserRes.TwoFAEnabled = user!.TwoFactorEnabled;
@@ -604,8 +637,6 @@ namespace ManyInOneAPI.Services.Auth
                 // after that also verifies from user manager
                 var isvalidUser = await _userManager.FindByEmailAsync(user.Email!);
 
-                // need to check what does it return
-                //var check = await _signInManager.IsSignedIn(jwt.Claims);
 
                 if (isvalidUser is null)
                 {
@@ -631,27 +662,34 @@ namespace ManyInOneAPI.Services.Auth
 
             if (token.IsNullOrEmpty())
             {
-                // delete these also
+                // delete these also , for ensuring nothing left
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-access-token");
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("twofa-enable");
 
                 return Result<AuthResult>.Failure(Error.Failure("Failed", "All session , token expired, please log again to continue. "));
             }
             // get the related user id first
-            var currUsersToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(a => a.Token == token);
+            var currUsersToken = await _dbContext.RefreshTokens.AsNoTracking().FirstOrDefaultAsync(a => a.Token == token);
             if (currUsersToken is null)
             {
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-access-token");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("twofa-enable");
                 return Result<AuthResult>.Failure(Error.Failure("Failed", "Error occurred, login again to continue !. "));
             }
             // get prev refresh token from request and remove all refresh token related to this user
-            var refTokens = await _dbContext.RefreshTokens.Where(a => a.UserId == currUsersToken!.UserId).ToListAsync();
+            var refTokens = await _dbContext.RefreshTokens.AsNoTracking().Where(a => a.UserId == currUsersToken!.UserId).ToListAsync();
 
             // set the refresh token as invalid
             _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-access-token");
             _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
             _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
             _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
-
+            _httpContextAccessor.HttpContext!.Response.Cookies.Delete("twofa-enable");
 
             // delete from database
             _dbContext.RefreshTokens.RemoveRange(refTokens!);
@@ -674,7 +712,7 @@ namespace ManyInOneAPI.Services.Auth
                     return Result<AuthResult>.Failure(Error.Failure("Failed", "All session , token expired, please log again to continue. "));
                 }
 
-                var currUserId = await _dbContext.RefreshTokens.Where(a => a.Token == token).Select(b => b.UserId).FirstOrDefaultAsync();
+                var currUserId = await _dbContext.RefreshTokens.AsNoTracking().Where(a => a.Token == token).Select(b => b.UserId).FirstOrDefaultAsync();
 
                 currUser = await _userManager.FindByIdAsync(currUserId!);
 
@@ -687,6 +725,7 @@ namespace ManyInOneAPI.Services.Auth
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("twofa-enable");
             }
             else
             {
@@ -713,6 +752,7 @@ namespace ManyInOneAPI.Services.Auth
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-refresh-token");
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-app-user");
                 _httpContextAccessor.HttpContext!.Response.Cookies.Delete("x-user-name");
+                _httpContextAccessor.HttpContext!.Response.Cookies.Delete("twofa-enable");
             }
             // delete all things 
             var result = await _userManager.DeleteAsync(currUser!);
@@ -722,7 +762,7 @@ namespace ManyInOneAPI.Services.Auth
                 return Result<AuthResult>.Failure(Error.Failure("Failed", "Unexpected error occurred deleting user. Try again . "));
             }
             // get prev refresh token from request and remove all refresh token related to this user
-            var refTokens = await _dbContext.RefreshTokens.Where(a => a.UserId == currUser!.Id).ToListAsync();
+            var refTokens = await _dbContext.RefreshTokens.AsNoTracking().Where(a => a.UserId == currUser!.Id).ToListAsync();
             if (refTokens is null)
             {
                 return Result<AuthResult>.Failure(Error.Validation("Invalid", "Unexpected error occurred deleting user. Try again . "));
@@ -738,10 +778,9 @@ namespace ManyInOneAPI.Services.Auth
         }
 
         #region All Utilities
-        private async Task<string> GenerateJwtToken(IdentityUser user)
+        private RefreshToken GenerateJwtToken(IdentityUser user)
         {
             var jwtTokenhandler = new JwtSecurityTokenHandler();
-            //_configuration.GetSection("JwtConfig:Secret").Value!
 
             var key = Encoding.UTF8.GetBytes(_authConfig.Secret!);
 
@@ -769,16 +808,47 @@ namespace ManyInOneAPI.Services.Auth
 
             // attach to cookies
             // before attaching encrypt the token
-            SetJWTToken(encryptedToken);
+            //SetJWTToken(encryptedToken);
+
+            // this will set access token into cookies
+            _httpContextAccessor.HttpContext!.Response.Cookies.Append("x-access-token", encryptedToken,
+             new CookieOptions
+             {
+                 Expires = DateTime.Now.ToLocalTime().AddHours(1),
+                 Secure = true,
+                 HttpOnly = true,
+                 IsEssential = true,
+                 SameSite = SameSiteMode.Lax
+             });
 
 
-            var refreshToken = GenerateRefreshToken();
+            //var refreshToken = GenerateRefreshToken();
+            var refreshToken = new RefreshToken()
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                UserId = user.Id,
+                JWTId = token.Id, // attaching linked jwt token id
+                IsUsed = true,
+                IsRevoked = false,
+                AddedDate = DateTime.Now.ToLocalTime(),
+                ExpiryDate = DateTime.Now.ToLocalTime().AddDays(5)
+            };
 
-            await SetRefreshToken(refreshToken, token.Id, user);
+            //await SetRefreshToken(refreshToken, token.Id, user);
+            // this will set refresh token into cookies
+            _httpContextAccessor.HttpContext!.Response.Cookies.Append("x-refresh-token", refreshToken.Token!, new CookieOptions
+            {
+                Expires = refreshToken.ExpiryDate,
+                Secure = true,
+                HttpOnly = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax // none is not good 
+            });
 
-            return encryptedToken;
+            return refreshToken;
         }
 
+        #region Not needed currently
         private RefreshToken GenerateRefreshToken()
         {
             // this can be random string or another jwt token
@@ -802,7 +872,7 @@ namespace ManyInOneAPI.Services.Auth
                  Secure = true,
                  HttpOnly = true,
                  IsEssential = true,
-                 SameSite = SameSiteMode.None // changed to none , to check if it is working?!
+                 SameSite = SameSiteMode.Lax
              });
         }
 
@@ -815,7 +885,7 @@ namespace ManyInOneAPI.Services.Auth
                 Secure = true,
                 HttpOnly = true,
                 IsEssential = true,
-                SameSite = SameSiteMode.None // changed to none , to check if it is working?!
+                SameSite = SameSiteMode.Lax // none is not good 
             });
 
             // also add to the database in the refresh token table
@@ -829,12 +899,21 @@ namespace ManyInOneAPI.Services.Auth
                 AddedDate = DateTime.Now.ToLocalTime(),
                 ExpiryDate = DateTime.Now.ToLocalTime().AddDays(5)
             };
-
-            await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
-            await _dbContext.SaveChangesAsync();
+            try
+            {
+                await _dbContext.RefreshTokens.AddAsync(newRefreshToken);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var er = ex;
+                return false;
+            }
 
             return true;
         }
+
+        #endregion
 
         private async Task<IdentityUser> GetUserFromJWT(string credential)
         {

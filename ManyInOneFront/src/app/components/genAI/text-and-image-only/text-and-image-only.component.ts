@@ -21,11 +21,13 @@ import "prismjs/components/prism-yaml.min.js"
 import "prismjs/components/prism-v.min.js"
 import "prismjs/components/prism-jsx.min.js"
 import "prismjs/components/prism-css.min.js"
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-text-and-image-only',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, MarkdownModule],
+  imports: [RouterLink, ReactiveFormsModule, MarkdownModule, FontAwesomeModule],
   templateUrl: './text-and-image-only.component.html',
   styles: ``
 })
@@ -38,9 +40,7 @@ export class TextAndImageOnlyComponent {
     // delimiters: [...],
 };
   response: any = "";
-
-  
-  
+  dots = FAIcons.ELLIPSES;
   isLoading : boolean = false;
   readonly clipBoardButton = CopyToClipboardComponent;
   myForm: FormGroup;
@@ -93,7 +93,8 @@ export class TextAndImageOnlyComponent {
             this.toaster.success("Got response", "Success");
           },
           error: err => {
-            this.toaster.show(err.error);
+            this.isLoading = false;
+            this.toaster.show(err.error, "Error");
           }
         }
       );

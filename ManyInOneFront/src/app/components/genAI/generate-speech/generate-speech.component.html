@@ -1,4 +1,4 @@
-<div class="mt-12 min-h-screen">
+<div class="mt-12 min-h-[94vh]">
     <div class="ml-6 justify-center items-center">
         <div class=" mt-[45px] pt-16">
             <h1 class="text-blue-600 text-2xl font-bold text-center underline">Ask to transform your text to a speech
@@ -18,11 +18,12 @@
                 </div>
                 @if(isLoading)
                 {<div class="flex justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="animate-bounce animate-infinite animate-ease-in h-16 w-44" viewBox="0 0 448 512">
-                        <path fill="#63E6BE"
-                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                    </svg>
+                        <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                            animation="bounce"></fa-icon>
+                        <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                            animation="bounce"></fa-icon>
+                        <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                            animation="bounce"></fa-icon>
                 </div>
                 }
                 @else{ 

@@ -4,18 +4,22 @@ import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PaymentDetailsFormComponent } from './payment-details-form/payment-details-form.component';
+import { FAIcons } from '../../shared/constants/font-awesome-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-payment-details',
     standalone: true,
     templateUrl: './payment-details.component.html',
     styles: ``,
-  imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent]
+  imports: [RouterLink, ReactiveFormsModule, PaymentDetailsFormComponent, FontAwesomeModule]
 })
 export class PaymentDetailsComponent implements OnInit {
 
   isOpen: boolean = false;
   isLoading : boolean = false;
+  dots = FAIcons.ELLIPSES;
+  trash = FAIcons.TRASH;
 
   updateForm: FormGroup = new FormGroup({
     paymentDetailId: new FormControl(0),
@@ -58,6 +62,8 @@ export class PaymentDetailsComponent implements OnInit {
           this.toaster.info("Payment method updated successfully !", "Payment Detail updated");
         },
         error: err => {
+          this.isLoading = false;
+          this.toaster.error("Service is not available right now !!", "Service Error");
         }
       });
       this.updateForm.reset();

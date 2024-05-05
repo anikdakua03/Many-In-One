@@ -80,9 +80,9 @@ export interface ILeague {
 }
 
 export interface IIconUrls {
-    small: string
-    tiny: string
-    medium: string
+    small?: string
+    tiny?: string
+    medium?: string
 }
 
 export interface IPlayerHouse {
@@ -102,7 +102,7 @@ export interface IBuilderBaseLeague {
 export interface ILabel {
     id: number
     name: string
-    iconUrls: IIconUrls
+    iconUrls?: IIconUrls
 }
 
 

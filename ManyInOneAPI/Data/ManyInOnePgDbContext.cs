@@ -16,6 +16,8 @@ namespace ManyInOneAPI.Data
         // correctly configure all key relation mapping to identity table.
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            // explicitely mentioned to use "varchar" for this , bcs causing issue while updating db after migartion
+            builder.Entity<PaymentDetail>().Property(p => p.CardNumber).HasColumnType("varchar");
             base.OnModelCreating(builder);
         }
         public DbSet<RefreshToken> RefreshTokens { get; set; }

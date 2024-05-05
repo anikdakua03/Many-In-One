@@ -1,33 +1,145 @@
-<div class="">
-    <div class="mt-[15px] min-h-screen">
+<div class="mt-[50px] min-h-[92vh]">
+    <div class="md:flex p-3">
+        <ul
+            class="flex-column space-y space-y-4 text-[16px] font-medium text-gray-500 md:me-4 mb-4 md:mb-0">
+            <li>
+                <button (click)="onClickOverview()" [ngClass]="isDefaultOpen ? 'text-[white]' : 'bg-gray-800 text-gray-500' "
+                    class="inline-flex items-center px-4 py-3 bg-blue-600 rounded-lg active w-full"
+                    aria-current="page">
+                    <fa-icon class="fa-lg p-2" style="color:#8db5e9;" [icon]="summary"></fa-icon>
+                    Overview
+                </button>
+            </li>
+            <li>
+                <button (click)="onClickEnable()" [ngClass]="isEnable2FAOpen ? 'bg-[green] text-[white]' : 'bg-gray-800' "
+                    class="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 hover:bg-gray-100 w-full  cursor-pointer">
+                    <fa-icon class="fa-lg p-1" style="color:#1c5dd6;" [icon]="lock"></fa-icon>
+                    Enable Two factor
+                </button>
+            </li>
+            <li>
+                <button (click)="onClickDisable()" [ngClass]="isDisable2FAOpen ? 'bg-[#bb7924] text-[white]' : 'bg-gray-800' "
+                    class="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 hover:bg-gray-100 w-full">
+                    <fa-icon class="fa-lg p-1" style="color:#1c5dd6;" [icon]="openedLock"></fa-icon>
+                    Disable Two Factor
+                </button>
+            </li>
+            <li>
+                <button (click)="onClickQuizzer()" [ngClass]="isQuizzerOpen ? 'bg-[#3c9ed6] text-[white]' : 'bg-gray-800' "
+                    class="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 hover:bg-gray-100 w-full">
+                    <fa-icon class="fa-lg p-1" style="color:#1664ca;" [icon]="qs"></fa-icon>
+                    Quizzer
+                </button>
+            </li>
+            <li>
+                <button (click)="onClickDelete()" [ngClass]="isDeleteOpen ? 'bg-[#e64040] text-[white]' : 'bg-gray-800' "
+                    class="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 w-full">
+                    <fa-icon class="fa-lg" style="color:#ca1616;" [icon]="delUser"></fa-icon>
+                    Delete your account
+                </button>
+            </li>
 
-        <div class=" justify-center items-center mt-2 md-4 py-4 pt-20">
+        </ul>
 
-            <div class="flex justify-evenly items-center mt-26 md-4 pt-14 py-3 ">
-                <div class="text-white-600 fixed mt-10 font-bold p-8 underline-offset-4">
-                    <a routerLink="enable-2FA"
-                        class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Enable
-                        Two FA
-                    </a>
-                    <a routerLink="disable-2FA"
-                        class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Disable
-                        2FA
-                    </a>
-                    <button type="button" (click)="deleteAllUserData()" [disabled]="isLoading"
-                        class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-                        @if(isLoading)
-                        {
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in h-5 w-28"
-                            viewBox="0 0 448 512">
-                            <path fill="#b9c9f8"
-                                d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                        </svg>
-                        }
-                        @else { Delete All user Data }
-                    </button>
+        <!-- Dynamic content  -->
+        <div class="p-2 bg-gray-800 text-medium text-gray-500 rounded-lg h-fit w-full">
+            @if(isDefaultOpen)
+            {
+                <div class="flex ml-1 flex-col justify-center items-center">
+
+                    <h3 class="text-4xl font-bold text-[#f7f7f7] mb-2"> Profile Tab </h3>
+                    <p class="text-3xl mb-2 text-[yellow]">Here you can manage your account settings like : </p>
+
+                    <div class=" grid grid-cols-1 gap-3 font-medium text-left border-b border-gray-700 text-gray-400">
+                        <div class="text-[18px] me-2">
+                            1. Enabling two factor authentication.
+                        </div>
+                        <div class="text-[18px] me-2">
+                            2. Disabling two factor authentication.
+                        </div>
+                        <div class="text-[18px] me-2">
+                            3. Managing your quiz categories and questions
+                        </div>
+                        <div class="text-[18px] me-2">
+                            4. Delete your account and it's related data permanently.
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
+
+            @if(isEnable2FAOpen)
+            {
+                <app-enable2-fa />
+            }
+
+            @if(isDisable2FAOpen)
+            {
+                <app-disable2-fa />
+            }
+
+            @if(isQuizzerOpen)
+            {
+                <app-quizzer-manage />
+            }
+
+            @if(isDeleteOpen)
+            {
+                    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+                        <div class="w-full p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-3xl">
+
+                            <div class="space-y-2 p-2">
+                                <div class="p-4 space-y-2 text-center text-white">
+                                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                                        Delete Your Data
+                                    </h2>
+                                </div>
+                            </div>
+                
+                            <div class="space-y-2">
+                
+                                <div aria-hidden="true" class="border-t text-[white] text-[17px] border-gray-700 p-4">
+                                    <p class="underline text-xl font-bold text-[#d93030] mb-2"> Following things will happen if you choose to
+                                        delete :
+                                    </p>
+                                    <li>
+                                        All added category will be permanently deleted .
+                                    </li>
+                                    <li>
+                                        All added questions belonging to this category will also be permanently deleted .
+                                    </li>
+                                    <li>
+                                        Your data like email, passwords for this applications , two factor authenticator and those categories and questions cannot be recovered once deleted .
+                                    </li>
+                
+                                    <p class="text-xl mt-4 font-bold text-[#d9bd30]"> Are you sure of deleting ? </p>
+                                </div>
+                
+                                <!-- Buttons -->
+                                <div class="px-6 py-2">
+                                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+
+                                        <button type="button" (click)="deleteAllUserData()" [disabled]="isLoading"
+                                            class="text-white bg-red-700 h-[46px] w-[250px] hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-lg p-4 px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                                            @if(isLoading)
+                                            {
+                                            <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                                                animation="bounce"></fa-icon>
+                                            <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                                                animation="bounce"></fa-icon>
+                                            <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                                                animation="bounce"></fa-icon>
+                                            }
+                                            @else { Delete All user Data }
+                                        </button>
+                                    </div>
+                                </div>
+                
+                            </div>
+                
+                        </div>
+                </div>
+            }
         </div>
     </div>
+
 </div>

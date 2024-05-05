@@ -60,18 +60,14 @@
 
         <div class="d-grid">
             <button type="submit" [disabled]="!paymentForm.valid || isLoading"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                class="text-white h-[48px] bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-l cursor-pointer px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                 @if(isLoading)
                 {
-                <svg xmlns="http://www.w3.org/2000/svg" height="28" width="56"
-                    class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in"
-                    viewBox="0 0 448 512">
-                    <path fill="#b9c9f8"
-                        d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                </svg>
+                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                    animation="bounce"></fa-icon>
                 }
                 @else { <p class="text-[16px]">Submit</p>}
-                </button>
+            </button>
         </div>
     </form>
 </div>

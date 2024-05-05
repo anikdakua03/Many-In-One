@@ -64,6 +64,10 @@
                 </ul> -->
                 </li>
                 <li>
+                    <a routerLink="quizzer"
+                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Quizzer</a>
+                </li>
+                <li>
                     <a routerLink="clashOfClans"
                         class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Clash
                         of
@@ -161,6 +165,10 @@
                 </ul>
             </li>
             <li>
+                <a routerLink="quizzer"
+                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Quizzer</a>
+            </li>
+            <li>
                 <a routerLink="clashOfClans"
                     class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Clash
                     of
@@ -171,7 +179,7 @@
             @if(checkCurrUser)
             {
             <li>
-                <a routerLink="/manage"><span class="text-lg">Welcome &nbsp;
+                <a routerLink="/manage" class="px-6 py-2 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 text-white rounded-sm transition-transform transform-gpu hover:-translate-y-1 hover:shadow-md"><span class="text-lg text-[white]">Welcome &nbsp;
                         <strong>{{currUserName}}</strong></span></a>
                 &nbsp; | &nbsp;
             </li>
@@ -180,15 +188,14 @@
                     class="hover:bg-red-600 hover:text-gray-100 px-4 py-2 rounded text-red-400 cursor-pointer font-bold text-lg mr-4">
                     @if(isLoading)
                     {
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in h-[24px] w-[70px]"
-                        viewBox="0 0 448 512">
-                        <path fill="#b9c9f8"
-                            d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                    </svg>
+                        <fa-icon class="fa-lg" style="color: #eff5a1; --fa-animation-duration :0.5s" [icon]="dots" animation="bounce"></fa-icon>
+                        <fa-icon class="fa-lg ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                            animation="bounce"></fa-icon>
+                        <fa-icon class="fa-lg ml-2" style="color:#ee3069; --fa-animation-duration : 1.5s" [icon]="dots"
+                            animation="bounce"></fa-icon>
                     }
                     @else {
-                    Log out
+                    Sign Out
                     }
                 </button>
             </li>
@@ -197,11 +204,11 @@
             <div class="flex justify-center gap-3 mr-4">
                 <li>
                     <a routerLink="/login"
-                        class="text-gray-200 hover:text-gray-800 p-1 hover:bg-yellow-400 hover:rounded-md text-lg font-semibold cursor-pointer">LOGIN</a>
+                        class="text-gray-200 hover:text-gray-800 p-2.5 hover:bg-yellow-400 hover:rounded-md text-lg font-semibold cursor-pointer">LOGIN</a>
                 </li>
                 <li>
                     <a routerLink="/register"
-                        class="text-green-500 text-lg font-semibold p-1 cursor-pointer hover:rounded-md  hover:bg-indigo-500 hover:text-gray-800">SIGN
+                        class="text-green-500 text-lg font-semibold p-2 cursor-pointer hover:rounded-md  hover:bg-indigo-500 hover:text-gray-800">SIGN
                         UP</a>
                 </li>
             </div>

@@ -20,6 +20,9 @@ export const appConfig: ApplicationConfig = {
       timeOut: 10000,
       positionClass: 'toast-top-center',
       preventDuplicates: true,
+      progressBar : true,
+      autoDismiss : true,
+      countDuplicates : true
     }),
     provideMarkdown({
       clipboardOptions: {

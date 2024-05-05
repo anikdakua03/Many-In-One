@@ -36,7 +36,7 @@ namespace ManyInOneAPI.Infrastructure
             }
 
             await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-            Console.WriteLine(httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken));
+            //Console.WriteLine(httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken));
             return true;
         }
     }

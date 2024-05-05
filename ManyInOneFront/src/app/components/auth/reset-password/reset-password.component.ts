@@ -1,14 +1,16 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthenticationService } from '../../../shared/services/authentication.service';
-import { ToastrService } from 'ngx-toastr';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ToastrService } from 'ngx-toastr';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 import { IResetPassword } from '../../../shared/models/auth-response.model';
+import { AuthenticationService } from '../../../shared/services/authentication.service';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
   templateUrl: './reset-password.component.html',
   styles: ``
 })
@@ -19,6 +21,7 @@ export class ResetPasswordComponent {
   formSubmitted: boolean = false;
   resetCode: string | undefined;
   userEmail: string | undefined;
+  dots = FAIcons.ELLIPSES;
 
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private activatedRoute: ActivatedRoute) {
 
@@ -55,7 +58,6 @@ export class ResetPasswordComponent {
   initializeForm(userEmail: string) {
     this.resetPasswordForm = this.fb.group({
       email: [{ value: userEmail, disabled: true }],
-      // code: new FormControl("", [Validators.required]),
       newPassword: ["", [Validators.required, Validators.minLength(6)]],
       confirmPassword: ["", [Validators.required, Validators.minLength(6)]], // validator with new password
     });

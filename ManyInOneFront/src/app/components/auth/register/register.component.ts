@@ -1,27 +1,30 @@
 declare var google: any;
 
-import { Component, Inject, NgZone, PLATFORM_ID } from '@angular/core';
-import { AuthenticationService } from '../../../shared/services/authentication.service';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { Router, RouterLink } from '@angular/router';
-import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
-import { AuthResponse } from '../../../shared/models/auth-response.model';
-import { environment } from '../../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
+import { Component, Inject, NgZone, PLATFORM_ID } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from '../../../../environments/environment';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
+import { AuthResponse } from '../../../shared/models/auth-response.model';
+import { AuthenticationService } from '../../../shared/services/authentication.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
   templateUrl: './register.component.html',
   styles: ``
 })
 export class RegisterComponent {
 
   clientId: string = environment.clientId;
-
-
+  dots = FAIcons.ELLIPSES;
+  user = FAIcons.USER;
+  longRightArrow = FAIcons.LONG_RIGHT_ARROW;
   authResponseDto: AuthResponse = new AuthResponse();
   registerForm!: FormGroup;
   isLoading: boolean = false;
@@ -76,7 +79,6 @@ export class RegisterComponent {
           this.authService.saveToken("x-user-name", res.data.userName);
           this.authService.saveToken("twofa-enable", res.data.twoFAEnabled);
           this.router.navigateByUrl('/home');
-          window.location.reload();
           this.toaster.success("Registration with google Successful !!", "User Registered successfully !!");
         });
       }
@@ -102,7 +104,7 @@ export class RegisterComponent {
             // roue to login
             this.isLoading = false;
             this.router.navigateByUrl('/login');
-            this.toaster.success("Registration successful, please confirm email to continue.", "User registered");
+            this.toaster.success("Registration successful, please confirm email from your inbox to continue.", "User registered");
           }
           else {
             this.isLoading = false;

@@ -1,0 +1,89 @@
+<div class="mt-[45px] min-h-[94vh] bg-inherit text-gray-900 flex justify-center rounded-md">
+    <div class="hidden md:block container mx-auto w-[48%] m-2 bg-[teal] px-4 mt-9 shadow-md">
+        <div class="flex-row justify-center items-center">
+            <h1 class="text-2xl text-[#b1b93c] text-center"> Some guidelines ...</h1>
+            <ol class="text-center items-center mt-5">
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+                <li>1 sidhtiosh dput poertu p [urt p uper utpre </li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 mt-4 shadow-md">
+        <h1 class="text-2xl text-[#64dbd5] bg-[#7a1e7a] rounded-sm text-center"> Create Your Quiz </h1>
+        <form class="max-w-sm mx-auto mt-9" [formGroup]="quizForm">
+            <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Select questions
+                count</label>
+            <select formControlName="questionCount"
+                class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
+                @for(count of allQsNumberCounts; track $index)
+                {
+                <option class="p-4" [value]="count"> {{count}}
+                </option>
+                }
+            </select>
+
+            <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Select a
+                category </label>
+            <select formControlName="category"
+                class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
+
+                @for(cate of allCategories.categories; track $index)
+                {
+                <option class="p-4" [value]="cate.categoryId"> {{cate.categoryName}}
+                </option>
+                }
+                @if(quizForm.controls['category'].errors && quizForm.controls['category'].touched)
+                {
+                <span class="mt-2 text-lg text-red-600">
+                    <p class="font-medium"> Select a category
+                </span>
+                }
+            </select>
+
+            <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Select question
+                type </label>
+            <select formControlName="questionType"
+                class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
+
+                @for(type of allQsTypes; track $index)
+                {
+                <option class="p-4" [value]="type.id"> {{type.value}}
+                </option>
+                }
+            </select>
+
+            <label class="block mb-2 text-lg font-medium text-gray-900 dark:text-white">Select question
+                level </label>
+            <select formControlName="questionLevel"
+                class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
+                @for(lvl of allQsLevels; track $index)
+                {
+                <option class="p-4" [value]="lvl.id"> {{lvl.value}}
+                </option>
+                }
+            </select>
+            <button (click)="onQuizMaking()" type="submit" [disabled]="isLoading"
+                class="p-3 h-16 mt-4 tracking-wider rounded-lg ease-in-out shadow-md hover:shadow-[#6aa4b6] bg-[#24459e] w-full text-[white] text-center font-bold">
+                @if(isLoading)
+                {
+                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                    animation="bounce"></fa-icon>
+                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                    animation="bounce"></fa-icon>
+                <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                    animation="bounce"></fa-icon>
+                }
+                @else{Create quiz}
+            </button>
+        </form>
+    </div>
+</div>

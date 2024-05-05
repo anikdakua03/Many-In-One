@@ -1,6 +1,13 @@
 <div class="text-center pt-28 top-56 bg-inherit min-h-screen font-bold text-2xl">
     <h1 class="text-center top-28 text-yellow-400 font-bold text-3xl underline">Clashing Options </h1>
-
+    <div class="flex justify-center mb-4">
+        <div class="rounded py-2 px-4">
+            <p class="text-[18px] text-red-400 animate-pulse animate-infinite animate-ease-in">
+                This two options may not work due to some limitations while using Clash of Clans API .
+                So presented with static data.
+            </p>
+        </div>
+    </div>
     <div
         class="grid grid-flow-row grid-cols-1 md:grid-cols-2 justify-evenly content-evenly justify-items-center  gap-4 p-6 m-10">
         <div
@@ -18,11 +25,7 @@
             <a routerLink="/clashOfClans/search-player"
                 class="inline-flex items-center px-3 py-4 text-sm font-medium text-center text-[#fde090] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Player
                 Search
-                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 14 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M1 5h12m0 0L9 1m4 4L9 9" />
-                </svg>
+                <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
             </a>
         </div>
         <div
@@ -40,11 +43,7 @@
             <a routerLink="/clashOfClans/search-clan"
                 class="inline-flex items-center px-3 py-4 text-sm font-medium text-center text-[#d9ee7b] bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search
                 clans
-                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 14 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M1 5h12m0 0L9 1m4 4L9 9" />
-                </svg>
+                <fa-icon class="ml-2 fa-lg" [icon]="longRightArrow" style="color: white;"></fa-icon>
             </a>
         </div>
     </div>

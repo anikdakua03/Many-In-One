@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ToastrService } from 'ngx-toastr';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
+import { AuthenticationService } from '../../../shared/services/authentication.service';
 
 @Component({
   selector: 'app-send-email',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './send-email.component.html',
   styles: ``
 })
@@ -17,6 +19,7 @@ export class SendEmailComponent implements OnInit {
   isLoading: boolean = false;
   formSubmitted: boolean = false;
   mode: string | undefined;
+  dots = FAIcons.ELLIPSES;
 
   constructor(private authService: AuthenticationService, private fb: FormBuilder, private toaster: ToastrService, private router: Router, private activatedRoute: ActivatedRoute) {
 

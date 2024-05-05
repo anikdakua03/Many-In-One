@@ -1,5 +1,5 @@
-﻿using Azure;
-using ManyInOneAPI.Configurations;
+﻿using ManyInOneAPI.Configurations;
+using ManyInOneAPI.Constants;
 using ManyInOneAPI.Infrastructure.Shared;
 using ManyInOneAPI.Models.GenAI;
 using Microsoft.Extensions.Options;
@@ -50,7 +50,7 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             // Send POST request with error handling
-            var address = $"{_genAiConfig.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
+            var address = $"{AppConstant.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
 
             var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
 
@@ -105,7 +105,7 @@ namespace ManyInOneAPI.Services.GenAI
             var requestJson = JsonSerializer.Serialize(requestContent);
 
             // Set up address and headers
-            string uri = $"{_genAiConfig.ProVisionUrl}key={_genAiConfig.API_KEY}";
+            string uri = $"{AppConstant.ProVisionUrl}key={_genAiConfig.API_KEY}";
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -134,7 +134,7 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var address = $"{_genAiConfig.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
+            var address = $"{AppConstant.GenAIBaseUrl}:generateContent?key={_genAiConfig.API_KEY}";
 
             var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
 
@@ -170,8 +170,14 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _genAiConfig.HF_KEY);
 
-            var response = await _httpClient.PostAsync("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+            string[] links = AppConstant.TextSummarizationApiUrls;
 
+            Random randomNum = new Random();
+            // Generate a random index less than the size of the array.
+            int index = randomNum.Next(links.Length);
+
+            var response = await _httpClient.PostAsync(links[index], new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
+            
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
@@ -197,10 +203,11 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _genAiConfig.HF_KEY);
 
-            string[] links = { "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5" };
-            Random rand = new Random();
+            string[] links = AppConstant.TextToImageApiUrls;
+            
+            Random randomNum = new Random();
             // Generate a random index less than the size of the array.
-            int index = rand.Next(links.Length);
+            int index = randomNum.Next(links.Length);
 
             var response = await _httpClient.PostAsync(links[index], new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
 
@@ -229,7 +236,7 @@ namespace ManyInOneAPI.Services.GenAI
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _genAiConfig.HF_KEY);
 
-            string address = "https://api-inference.huggingface.co/models/facebook/mms-tts-eng";
+            string address = AppConstant.TextToSpeechApiUrl;
 
             var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken);
 

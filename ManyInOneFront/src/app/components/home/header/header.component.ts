@@ -3,11 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthenticationService } from '../../../shared/services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FAIcons } from '../../../shared/constants/font-awesome-icons';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, FontAwesomeModule],
   templateUrl: './header.component.html',
   styles: ``
 })
@@ -17,6 +19,7 @@ export class HeaderComponent implements OnInit {
   currUserName: string = "";
   isSidebarShowing: boolean = false;
   isLoading : boolean = false;
+  dots = FAIcons.ELLIPSES;
 
   constructor(protected authService: AuthenticationService, private router: Router, private toaster: ToastrService) {
 
@@ -26,8 +29,11 @@ export class HeaderComponent implements OnInit {
       this.authService.isAuthenticated$.subscribe((data) => {
       this.checkCurrUser = data;
     });
-    const data = this.authService.getCurrentUserName();
-    this.currUserName = data === "" ? "User" : data.replaceAll('"', '');
+    const data = this.authService.userName$.subscribe({
+      next : res => {
+        this.currUserName = res === "" ? "User" : res.replaceAll('"', '');
+      }
+    });
   }
 
   openSidebar() {
@@ -47,7 +53,6 @@ export class HeaderComponent implements OnInit {
           this.isLoading = false;
           this.authService.isAuthenticated$.next(false); // set false
           this.authService.removeToken();
-          window.location.reload();
           this.router.navigateByUrl('/'); // go to home
           this.toaster.success("Signed out successfully.", "User Sign out");
         }
@@ -58,6 +63,7 @@ export class HeaderComponent implements OnInit {
       },
       error: err => {
         this.isLoading = false;
+        this.toaster.error("Service is not available right now !!", "Service Error");
       }
     })
   }

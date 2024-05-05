@@ -2,7 +2,7 @@
     @if(mode !== undefined)
     {
     <section class="bg-gray-900 shadow-md shadow-[#232746]">
-        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div class="flex flex-col items-center justify-center px-6 py-8 min-h-[94vh] mx-auto lg:py-0">
             <div class="w-full p-6 rounded-lg shadow border md:mt-0 sm:max-w-md bg-gray-800 border-gray-700 sm:p-8">
                 <h2 class="mb-1 text-xl text-center font-bold leading-tight tracking-tight md:text-2xl text-[#c966f0]">
                     @if(mode.includes("resend-confirmation-mail")) {Resend Confirmation Mail}
@@ -22,7 +22,7 @@
                         }
                     </div>
 
-                    <div class="flex-row space-y-2 lg:flex lg:justify-between lg:items-baseline lg:gap-2">
+                    <div class="flex-row space-y-2 lg:flex lg:justify-center lg:items-baseline lg:gap-2">
                         @if(!isLoading)
                         {
                         <button type="submit"
@@ -32,13 +32,14 @@
                             class="w-full h-12 text-[#d4d1d1] bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-[16px] p-3 text-center bg-red-500 hover:bg-primary-700 focus:ring-cyan-800 hover:text-[#f3a5a5]">Cancel</button>
                         }
                         @else {
-                        <div class="flex justify-items-center ml-[70px]">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in h-16 w-44"
-                                viewBox="0 0 448 512">
-                                <path fill="#63E6BE"
-                                    d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                            </svg>
+                        <div class="flex">
+                            <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s" [icon]="dots"
+                                animation="bounce"></fa-icon>
+                            <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                                animation="bounce"></fa-icon>
+                            <fa-icon class="fa-3x ml-2" style="color:#7b28c9; --fa-animation-duration : 1.5s" [icon]="dots"
+                                animation="bounce"></fa-icon>
+
                         </div>
                         }
                     </div>

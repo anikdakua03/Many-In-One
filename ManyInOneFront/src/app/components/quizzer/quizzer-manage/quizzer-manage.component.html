@@ -1,0 +1,1140 @@
+<!-- <div class=""> -->
+<div class="w-full mt-[2px]">
+    <!-- Tab Buttons -->
+    <div>
+        <ul class="flex flex-wrap text-lg font-medium text-center border-b border-gray-700 text-gray-400">
+            <li class="me-2">
+                <a (click)="openCategories()"
+                    [ngClass]="isCategoryOpen ? 'active border-spacing-2 underline shadow-md shadow-[#7777d1] text-[#4848db]  border-[#cdcdec]' : 'text-[#b1afab]' "
+                    aria-current="page" class="inline-block p-4 cursor-pointer rounded-t-lg active bg-gray-800 ">Quiz
+                    Categories</a>
+            </li>
+            <li class="me-2">
+                <a (click)="openQss()"
+                    [ngClass]="isQssOpen ? 'active border-spacing-2 underline shadow-md shadow-[#7777d1] border-[#cdcdec] text-[#4848db]' : 'text-[gray]' "
+                    class="inline-block p-4 rounded-t-lg cursor-pointer">All Questions</a>
+            </li>
+        </ul>
+    </div>
+
+
+    <!-- Tab Content -->
+    <div class="p-2">
+        @if(isCategoryOpen)
+        {
+        <div class="container mx-auto p-4 mt-2 bg-[#ccd9ec] max-w-screen-xl shadow-md rounded-lg">
+            <div class="flex-col justify-center items-center md:flex md:justify-evenly p-1">
+                <h2 class="text-2xl text-left font-semibold mb-2 text-blue-700"> - : All Categories : - </h2>
+
+                <div>
+                    <button (click)="openCategoryModal()" class="bg-[#dee03b] text-bold text-[#3d5ab8] p-2 rounded-md">
+                        <span> <fa-icon class="fa-lg p-1" style="color:#1d5ea8;" [icon]="add"> </fa-icon> </span>
+                        Add category
+                    </button>
+                </div>
+            </div>
+            <div class="shadow-lg rounded-lg overflow-hidden overflow-x-scroll p-1 mx-1 md:mx-10">
+                @if(allCategories !== null)
+                {
+                <table class="w-full table-fixed rounded-md">
+                    <thead class="bg-[#63d4eb]">
+                        <tr class="bg-gray-100  ">
+                            <th class="w-[10%] p-3 text-center text-gray-600 font-bold uppercase">#</th>
+                            <th class="w-[25%] p-3 text-center text-gray-600 font-bold truncate uppercase">Category Name
+                            </th>
+                            <th class="w-[20%] p-3 text-center text-gray-600 font-bold truncate uppercase">Description
+                            </th>
+                            <th class="w-[25%] p-3 text-center text-gray-600 font-bold truncate uppercase">Question
+                                Count</th>
+                            <th class="w-[20%] p-3 text-center text-gray-600 font-bold truncate uppercase">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="bg-[#e1e6e7]">
+                        @for(category of allCategories.categories; track idx; let idx = $index){
+
+                        <tr class="odd:bg-[white] text-lg hover:bg-[#8ae3f3] hover:scale-y-[1.1] even:bg-[#dddcdc]">
+                            <td class="w-[10%] text-center p-3 border-b border-gray-200">{{idx + 1}}</td>
+                            <td class="w-[25%] text-center p-3 border-b border-gray-200 truncate">
+                                {{category.categoryName}}</td>
+                            <td class="w-[20%] text-center p-3 border-b border-gray-200 truncate">
+                                {{category.description}}
+                            </td>
+                            <td class="w-[25%] text-center p-3 border-b border-gray-200 truncate">
+                                {{category.questionCount}}</td>
+                            <td class="w-[20%] text-center p-3 border-b border-gray-200">
+                                <div class="">
+                                    <button class="p-1" (click)="openEditCategoryModal(category)">
+                                        <span class="bg-[gray] text-white py-1 px-2 rounded-full text-xs">Edit</span>
+                                    </button>
+                                    <button class="p-1" (click)="openDeleteCategoryModal(category.categoryId)">
+                                        <span class="bg-red-500 text-white py-1 px-2 rounded-full text-xs">Delete</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+
+                </table>
+                }
+                @else {
+                <div class="ml-10 justify-center text-[#b9562f] text-xl">
+                    No categories are available !!
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        @if (isQssOpen)
+        {
+        <div class="container mx-auto lg:w-[1380px] p-4 mt-2 bg-[#3c95dd] max-w-screen-xl shadow-md rounded-lg">
+            <h2 class="text-2xl text-center font-semibold mb-2 text-[#f1eaaa]"> - : All Questions : - </h2>
+
+            <div class="grid grid-cols-1 gap-[0.625rem] mb-2 p-1 md:grid-cols-3 md:gap-x-4">
+                <div class="flex justify-center items-center">
+                    <a title="Download excel template for multiple question addition"
+                        href="../../../../assets/General/QuestionTemplate.xlsx" target="_self"
+                        class="text-[white] truncate hover:underline hover:cursor-pointer">
+                        <span> <fa-icon class="fa-lg p-1" style="color:#b7cee9;" [icon]="download"> </fa-icon> </span>
+                        Download template
+                    </a>
+                </div>
+
+                <div title="Add many question at once from excel." class="bg-[#5bb6e0] p-1 disabled rounded-md h-12">
+                    <div class="flex justify-between text-[#fafabf]">
+                        <div class="relative z-0 flex w-full -space-x-px">
+                            <input id="excelfile" type="file" class="block w-full cursor-pointer" #fileInput>
+                        <!-- </div>
+                        <div> -->
+                            <button (click)="onQsExcelUpload()" [disabled]="isUploading" type="submit"
+                                class="hover:bg-[#425cb3] hover:text-[white] rounded-md p-2 inline-flex w-auto cursor-pointer select-none appearance-none items-center justify-center space-x-1 rounded-r border text-sm font-medium text-gray-800 transition focus:z-10  focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                @if(isUploading)
+                                {
+                                <fa-icon class="fa-2x" style="color: #b928be; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-2x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-2x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                                }
+                                @else{
+                                Upload
+                                <span>
+                                    <fa-icon class="fa-lg p-1" style="color:#b7cee9;" [icon]="upload"> </fa-icon>
+                                </span>
+                                }
+                            </button>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <div>
+                    <button (click)="openAddQsModal()" class="bg-[#dee03b] text-bold text-[#3d5ab8] p-2 rounded-md">
+                        <span> <fa-icon class="fa-lg p-1" style="color:#1d5ea8;" [icon]="add"> </fa-icon> </span>
+                        Add question
+                    </button>
+                </div>
+
+            </div>
+
+            @if(paginatedData !== undefined && paginatedData.length > 0)
+            {
+            <div class="flex justify-center mb-2">
+                <div class="relative">
+                    <div class="absolute right-0 inset-y-0 flex items-center">
+                        <fa-icon class="fa-lg p-2" style="color:#1d5ea8;" [icon]="search"> </fa-icon>
+                    </div>
+                    <input
+                        class="appearance-none border-2 pl-2 border-gray-300 hover:border-gray-400 transition-colors rounded-md max-w-6xl py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:ring-purple-600 focus:border-purple-600 focus:shadow-outline"
+                        type="text" placeholder="Search questions..." (change)="onInputChange($event)">
+                </div>
+            </div>
+
+            <ul class="max-w-6xl mx-auto mt-1 divide-y shadow text-[#353530] bg-[#2f8aa1] shadow-blue-600 rounded-xl">
+                @for(qs of paginatedData | tableSearchFilter : searchText ; track idx; let idx = $index)
+                {
+                <li>
+                    <details class="group">
+                        <summary
+                            class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
+                            <fa-icon class="fa-2x transition group-open:rotate-90" style="color:#afc5ee;"
+                                [icon]="rightArrow"></fa-icon>
+                            <markdown class="text-[white] text-[18px] text-ellipsis" [data]="qs.questionText" lineNumbers lineHighlight katex
+                                [katexOptions]="options">
+                            </markdown>
+                        </summary>
+
+                        <div class="flex justify-around p-4">
+                            <button (click)="openEditQsModal(qs)"
+                                class="mt-8 inline-flex items-center justify-center rounded-xl bg-[#336cc2] py-3 px-3 font-dm text-base font-medium text-white shadow-sm transition-transform duration-200 ease-in-out hover:scale-[1.02] cursor-pointer hover:underline ">
+                                Edit </button>
+
+                            <button (click)="openDeleteQsModal(qs.questionId)"
+                                class="mt-8 inline-flex items-center justify-center rounded-xl bg-[#db3131] py-3 px-3 font-dm text-base font-medium text-white shadow-sm  transition-transform duration-200 ease-in-out hover:scale-[1.02] cursor-pointer hover:underline">
+                                Delete </button>
+                        </div>
+
+                        <article class="px-4 pb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <p><strong>Type :</strong> {{qs.questionType}}</p>
+                                <p><strong>Level : </strong>{{qs.questionLevel}}</p>
+                                <p><strong>Image Link : </strong>{{qs.questionImageLink}}</p>
+                                <p><strong>Category : </strong>{{qs.categoryName}}</p>
+                            </div>
+
+                            <p>Tags : {{qs.questionTags.join(',')}}</p>
+                            <label class="mt-2 text-bold text-[#ecb46b]"> Options : </label>
+                            @for(op of qs.options ; track idx; let idx = $index) {
+                            <div [ngClass]="op.isAnswer ? 'bg-[#3ad47a] rounded-sm p-1 text-semibold' : ''"
+                                class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <p><strong>Option {{idx + 1}} : </strong>{{op.optionValue}}</p>
+                                <p><strong>Explanation : </strong>{{op.answerExplanation}}</p>
+                            </div>
+                            }
+                        </article>
+                    </details>
+                </li>
+                }
+            </ul>
+
+            <div class="flex flex-shrink justify-center mt-2">
+
+                <app-pagination [totalItems]="allQuestions === null ? 0 : allQuestions.length!"
+                    [itemsPerPage]="qsPerPage" [currentPage]="currentPage"
+                    (onClick)="changePage($event)"></app-pagination>
+            </div>
+            }
+            @else{
+            <div class="flex justify-center text-[white] text-xl">
+                No questions are available !!
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+
+
+<!-- Modals pop up using if block -->
+@if(addCategoryModal)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div class="w-full  p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-3xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Add New Category
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div aria-hidden="true" class="border-t border-gray-700 px-2">
+                    <form [formGroup]="categoryForm" class="p-2 container mx-auto">
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Category Name</label>
+                            <input type="text" id="name" name="name" placeholder="Category name"
+                                formControlName="categoryName"
+                                class="text-[16px] border placeholder-opacity-50 bg-[#4d4c4c] placeholder-[white] text-[white] border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                            @if(categoryForm.controls['categoryName'].errors &&
+                            categoryForm.controls['categoryName'].touched)
+                            {
+                            <p class="mt-2 text-sm text-[#fd7272]"> - Category name is required.
+                            </p>
+                            }
+                        </div>
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Description </label>
+
+                            <textarea type="text" formControlName="description" rows="1" (input)="onInput($event)"
+                                class="border text-lg rounded-lg block mb-1 w-full p-3.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white placeholder-opacity-50 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                placeholder="Some description about this category, write here.." required>
+                            </textarea>
+                            @if(categoryForm.controls['categoryName'].errors &&
+                            categoryForm.controls['categoryName'].touched)
+                            {
+                            <p class="mt-2 text-sm text-[#fd7272]"> - Little description is required.
+                            </p>
+                            }
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        @if(isLoading)
+                        {
+                        <button
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                            </span>
+
+                        </button>
+
+                        }
+
+                        @else{
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="onAddCategory()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Add
+                                </span>
+                            </span>
+
+                        </button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}
+
+@if(editCategoryModal)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div class="w-full p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-3xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Update Category name
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div aria-hidden="true" class="border-t border-gray-700 px-2">
+
+                    <form [formGroup]="updateCategoryForm" class="p-2 container mx-auto">
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Old Category Name</label>
+                            <input type="text" id="name" name="name" formControlName="categoryName"
+                                class="text-[16px] border bg-[#4d4c4c] placeholder-[white] placeholder-opacity-50 text-[white] border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">New Category Name</label>
+                            <input type="text" id="name" name="name" formControlName="newCategoryName"
+                                placeholder="Updated category name here..."
+                                class="text-[16px] border bg-[#4d4c4c] placeholder-[white] placeholder-opacity-50 text-[white] border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                                @if(updateCategoryForm.controls['newCategoryName'].errors &&
+                                updateCategoryForm.controls['newCategoryName'].touched)
+                                {
+                                <p class="mt-2 text-sm text-[#fd7272]"> - New category name is required.
+                                </p>
+                                }
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Description </label>
+
+                            <textarea type="text" formControlName="description" rows="2" (input)="onInput($event)"
+                                class="border text-lg placeholder-opacity-50 rounded-lg block mb-1 w-full p-3.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                placeholder="If answer explanation is there, write here.." required>
+                            </textarea>
+                            @if(updateCategoryForm.controls['description'].errors &&
+                            updateCategoryForm.controls['description'].touched)
+                            {
+                            <p class="mt-2 text-sm text-[#fd7272]"> - Little description is required.
+                            </p>
+                            }
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        @if(isLoading)
+                        {
+                        <button
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                            </span>
+                        </button>
+                        }
+
+                        @else{
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="updateCategory()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#c9d435] hover:bg-[#b7df49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Update
+                                </span>
+                            </span>
+
+                        </button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}
+
+@if(deleteCategoryModal)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div class="w-full p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-3xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Delete category
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+
+                <div aria-hidden="true" class="border-t text-[white] text-[17px] border-gray-700 p-4">
+                    <p class="underline text-xl font-bold text-[#d93030] mb-2"> Following things will happen if you
+                        delete a category :
+                    </p>
+                    <li>
+                        Selected category will be permanently deleted .
+                    </li>
+                    <li>
+                        All questions belonging to this category will also be permanently deleted .
+                    </li>
+                    <li>
+                        No questions cannot be recovered once deleted .
+                    </li>
+
+                    <p class="text-xl mt-4 font-bold text-[#d9bd30]"> Are you sure of deleting this category ? </p>
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        @if(isLoading)
+                        {
+                        <button
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                            </span>
+                        </button>
+                        }
+
+                        @else{
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="deleteCategory()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#eb3b35] hover:bg-[#e99257] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Delete
+                                </span>
+                            </span>
+
+                        </button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}
+
+
+<!-- Modal pop up using Angular View child , element ref -->
+@if(addQsModal)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div
+            class="w-full mt-4 p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-5xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Add New Question
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2 p-1 conatiner max-auto">
+                <div aria-hidden="true" class="border-t border-gray-700 px-2">
+
+                    <form [formGroup]="questionForm" class="p-2 container mx-auto">
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question </label>
+                            <input type="text" id="name" name="name" placeholder="Question Text"
+                                formControlName="questionText"
+                                class="text-[16px]  border bg-[#4d4c4c] placeholder-[white] placeholder-opacity-50 text-[white] border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                                @if(questionForm.controls['questionText'].errors &&
+                                questionForm.controls['questionText'].touched)
+                                {
+                                <p class="mt-2 text-sm text-[#fd7272]"> - Question is required and  must be of minimum 5 length.
+                                </p>
+                                }
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question image link (if any)
+                            </label>
+                            <input type="text" id="name" name="name" placeholder="Question image link here"
+                                formControlName="questionImageLink"
+                                class="text-[16px] border bg-[#4d4c4c] text-[white] placeholder-[white] placeholder-opacity-50 border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Select category</label>
+                            <select formControlName="category"
+                                class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 placeholder-opacity-50 text-white focus:ring-blue-500 focus:border-blue-500">
+
+                                @for(category of allCategories.categories; track $index)
+                                {
+                                <option class="p-4" [value]="category.categoryName"> {{category.categoryName}}
+                                </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="md:flex md:justify-evenly md:gap-5">
+                            <div class="mb-2">
+                                <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question Type</label>
+                                <select formControlName="questionType"
+                                    class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 placeholder-opacity-50 text-white focus:ring-blue-500 focus:border-blue-500">
+                                    @for(type of allQsTypes; track $index)
+                                    {
+                                    <option class="p-4" [value]="type.id"> {{type.value}}
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question level</label>
+                                <select formControlName="questionLevel"
+                                    class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 placeholder-opacity-50 text-white focus:ring-blue-500 focus:border-blue-500">
+                                    @for(lvl of allQsLevels; track $index)
+                                    {
+                                    <option class="p-4" [value]="lvl.id"> {{lvl.value}}
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="mb-2 block font-bold text-[#f3dede]">Add tags </label>
+
+                            <div
+                                class="mb-3 flex-row w-full rounded-md border border-gray-300 bg-[#4d4c4c] p-3 text-[16px] text-[white] placeholder-[white] placeholder-opacity-50 shadow">
+
+                                <div class="container flex-row  md:flex flex-wrap text-wrap content-center gap-2">
+                                    @for(tag of tags; track idx; let idx = $index)
+                                    {
+                                    <div (click)="removeTag(tag)"
+                                        class="mb-3 h-auto text-clip overflow-auto w-auto rounded-md bg-[#2092d9] p-3 text-[16px] text-[white] placeholder-[white] placeholder-opacity-50 shadow">
+                                        {{tag}}
+                                        <span class="p-2"> <fa-icon class="fa-sm p-1" style="color:#f51515;"
+                                                [icon]="close"></fa-icon> </span>
+                                    </div>
+                                    }
+
+                                </div>
+
+                                <input type="text" (keypress)="addTag($event)" id="name" formControlName="questionTags"
+                                    placeholder="Press enter or give ( , ) to add tags.."
+                                    class="mb-1 w-full rounded-md border placeholder-opacity-50 border-gray-300 bg-[#4d4c4c] p-3 text-[16px] text-[white] placeholder-[white] shadow" />
+                            </div>
+                        </div>
+
+                        <!-- Options section  -->
+
+                        <div class="flex justify-evenly gap-2 mb-1">
+                            <label for="name" class="block font-bold text-[#f3dede]"> Add Options </label>
+                            <button type="button" (click)="addOption()"
+                                class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#2eb9a2] hover:bg-[#b7df49] focus:bg-[green] focus:ring-offset-[green]">
+                                <span class="flex items-center gap-1">
+                                    <span class="">
+                                        Add option
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div class="md:flex md:flex-col md:justify-between md:gap-2 md:container md:mx-auto"
+                            formArrayName="options">
+                            @for(op of getOptions.controls; let i = $index; track i)
+                            {
+                            <div class="p-2" [formGroupName]="i">
+
+                                <div class="md:flex md:justify-start md:place-content-start md:gap-5">
+
+                                    <div class="w-full">
+                                        <label for="name" class="block mb-2 font-bold text-[#f3dede]">
+                                            Option {{i + 1}} text
+                                        </label>
+                                        <input type="text" id="name" name="name" formControlName="optionValue"
+                                            placeholder="Option text here ..."
+                                            class="text-[16px] border bg-[#4d4c4c] text-[white] placeholder-opacity-50 border-[gray] shadow p-3 rounded-md w-full mb-3">
+
+                                            @if(questionForm.controls['options'].errors &&
+                                            questionForm.controls['questionText'].touched)
+                                            {
+                                            <p class="mt-2 text-sm text-[#fd7272]"> - Answer Explanation is required and must be of minimum 3 length.
+                                            </p>
+                                            }
+                                    </div>
+
+
+                                    <div class="md:items-end md:content-center">
+                                        <button type="button" (click)="removeOption(i)">
+                                            <span class="">
+                                                <fa-icon class="fa-2x p-1" style="color:#d32222;"
+                                                    [icon]="close"></fa-icon>
+                                            </span>
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="flex flex-wrap justify-evenly gap-4">
+
+                                    <div class="w-full rounded-lg bg-[#4d4c4c] p-1 text-lg text-neutral-400">
+
+                                        <label
+                                            class="flex hover:cursor-pointer w-full rounded-lg bg-[#4d4c4c] p-1 text-lg text-neutral-400">
+
+                                            <span class="text-lg text-[#e7e6e6]">Is it correct option ?</span>
+
+                                            <input type="checkbox" formControlName="isAnswer"
+                                                class="ms-auto mt-0.5 shrink-0 placeholder-opacity-50 rounded text-blue-600" />
+                                        </label>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="">
+                                    <label for="name" class="block mb-2 font-bold text-[#f3dede]">Option {{i + 1}}
+                                        explanation (if any) </label>
+
+                                    <textarea type="text" formControlName="answerExplanation" rows="1"
+                                        (input)="onInput($event)"
+                                        class="border text-lg rounded-lg block mb-1 w-full p-3.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 placeholder-opacity-50 resize-none"
+                                        placeholder="If answer explanation is there, write here.." required>
+                                        </textarea>
+
+                                </div>
+
+                            </div>
+                            }
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        @if(isLoading)
+                        {
+                        <button
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                            </span>
+                        </button>
+                        }
+
+                        @else{
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="onAddQuestion()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#1e4580] hover:text-[black] hover:bg-[#b7df49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Add Question
+                                </span>
+                            </span>
+
+                        </button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}
+
+@if(editQsModal)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div
+            class="w-full mt-4 p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-5xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Update Question
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2 p-1 conatiner max-auto">
+                <div aria-hidden="true" class="border-t border-gray-700 px-2">
+
+                    <form [formGroup]="questionForm" class="p-2 container mx-auto">
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question </label>
+                            <input type="text" id="name" name="name" placeholder="Question Text"
+                                formControlName="questionText"
+                                class="text-[16px] border bg-[#4d4c4c] placeholder-[white] placeholder-opacity-50 text-[white] border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                                @if(questionForm.controls['questionText'].errors &&
+                                questionForm.controls['questionText'].touched)
+                                {
+                                <p class="mt-2 text-sm text-[#fd7272]"> - Question is required and must be of minimum 5 length.
+                                </p>
+                                }
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question image link (if any)
+                            </label>
+                            <input type="text" id="name" name="name" placeholder="Question image link here"
+                                formControlName="questionImageLink"
+                                class="text-[16px] border bg-[#4d4c4c] text-[white] placeholder-[white] placeholder-opacity-50 border-gray-300 shadow p-3 rounded-md w-full mb-3">
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="block mb-2 font-bold text-[#f3dede]">Select category</label>
+                            <select formControlName="category"
+                                class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 placeholder-opacity-50 text-white focus:ring-blue-500 focus:border-blue-500">
+
+                                @for(category of allCategories.categories; track $index)
+                                {
+                                <option class="p-4" [value]="category.categoryName"> {{category.categoryName}}
+                                </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="md:flex md:justify-evenly md:gap-5">
+                            <div class="mb-2">
+                                <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question Type</label>
+                                <select formControlName="questionType"
+                                    class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 placeholder-opacity-50 text-white focus:ring-blue-500 focus:border-blue-500">
+                                    @for(type of allQsTypes; track $index)
+                                    {
+                                    <option class="p-4" [value]="type.id"> {{type.value}}
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="name" class="block mb-2 font-bold text-[#f3dede]">Question level</label>
+                                <select formControlName="questionLevel"
+                                    class="border text-lg rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 placeholder-opacity-50 text-white focus:ring-blue-500 focus:border-blue-500">
+                                    @for(lvl of allQsLevels; track $index)
+                                    {
+                                    <option class="p-4" [value]="lvl.id"> {{lvl.value}}
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="name" class="mb-2 block font-bold text-[#f3dede]">Add tags </label>
+
+                            <div
+                                class="mb-3 flex-row w-full rounded-md border border-gray-300 bg-[#4d4c4c] p-3 text-[16px] text-[white] placeholder-[white] shadow">
+
+                                <div class="container flex-row  md:flex flex-wrap text-wrap content-center gap-2">
+                                    @for(tag of oldQsTags; track idx; let idx = $index)
+                                    {
+                                    <div (click)="removeTagOnEdit(tag)"
+                                        class="mb-3 h-auto text-clip overflow-auto w-auto rounded-md bg-[#2092d9] p-3 text-[16px] text-[white] placeholder-[white] placeholder-opacity-50 shadow">
+                                        {{tag}}
+                                        <span class="p-2"> <fa-icon class="fa-sm p-1" style="color:#f51515;"
+                                                [icon]="close"></fa-icon> </span>
+                                    </div>
+                                    }
+
+                                </div>
+
+                                <input type="text" (keypress)="addOldAndCurrentTag($event)" id="name"
+                                    formControlName="questionTags" placeholder="Press enter or give ( , ) to add tags.."
+                                    class="mb-1 w-full rounded-md border placeholder-opacity-50 border-gray-300 bg-[#4d4c4c] p-3 text-[16px] text-[white] placeholder-[white] shadow" />
+                            </div>
+                        </div>
+
+                        <!-- Options section  -->
+
+                        <div class="flex justify-evenly gap-2 mb-1">
+                            <label for="name" class="block font-bold text-[#f3dede]"> Add Options </label>
+                            <button type="button" (click)="addOption()"
+                                class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#2eb9a2] hover:bg-[#b7df49] focus:bg-[green] focus:ring-offset-[green]">
+                                <span class="flex items-center gap-1">
+                                    <span class="">
+                                        Add option
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div class="md:flex md:flex-col md:justify-between md:gap-2 md:container md:mx-auto"
+                            formArrayName="options">
+                            @for(op of getOptions.controls; let i = $index; track i)
+                            {
+                            <div class="p-2" [formGroupName]="i">
+
+                                <div class="md:flex md:justify-start md:place-content-start md:gap-5">
+
+                                    <div class="w-full">
+                                        <label for="name" class="block mb-2 font-bold text-[#f3dede]">
+                                            Option {{i + 1}} text
+                                        </label>
+                                        <input type="text" id="name" name="name" formControlName="optionValue"
+                                            placeholder="Add option "
+                                            class="text-[16px] border bg-[#4d4c4c] text-[white] border-[gray] shadow p-3 rounded-md w-full mb-3">
+                                            @if(questionForm.controls['options'].errors &&
+                                            questionForm.controls['options'].touched)
+                                            {
+                                            <p class="mt-2 text-sm text-[#fd7272]"> - Options should have an explanation .
+                                            </p>
+                                            }
+
+                                    </div>
+
+
+                                    <div class="md:items-end md:content-center">
+                                        <button type="button" (click)="removeOption(i)">
+                                            <span class="">
+                                                <fa-icon class="fa-2x p-1" style="color:#d32222;"
+                                                    [icon]="close"></fa-icon>
+                                            </span>
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="flex flex-wrap justify-evenly gap-4">
+
+                                    <div class="w-full rounded-lg bg-[#4d4c4c] p-1 text-lg text-neutral-400">
+
+                                        <label
+                                            class="flex hover:cursor-pointer w-full rounded-lg bg-[#4d4c4c] p-1 text-lg text-neutral-400">
+
+                                            <span class="text-lg text-[#e7e6e6]">Is it correct option ?</span>
+
+                                            <input type="checkbox" formControlName="isAnswer"
+                                                class="ms-auto mt-0.5 shrink-0 rounded text-blue-600" />
+                                        </label>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="">
+                                    <label for="name" class="block mb-2 font-bold text-[#f3dede]">Option {{i + 1}}
+                                        explanation (if any) </label>
+
+                                    <textarea type="text" formControlName="answerExplanation" rows="1"
+                                        (input)="onInput($event)"
+                                        class="border text-lg rounded-lg block mb-1 w-full p-3.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                        placeholder="If answer explanation is there, write here.." required>
+                                        </textarea>
+
+                                </div>
+
+                            </div>
+                            }
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        @if(isLoading)
+                        {
+                        <button
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                            </span>
+                        </button>
+                        }
+
+                        @else{
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="onUpdateQuestion()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#1e4580] hover:text-[black] hover:bg-[#b7df49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Update
+                                </span>
+                            </span>
+
+                        </button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}
+
+@if(deleteQsModal)
+{
+<div
+    class="fixed mt-4 inset-0 z-40 min-h-full backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex items-center transition-opacity duration-500">
+
+    <!-- Modal -->
+    <div class="relative container w-full cursor-pointer pointer-events-none transition my-auto p-4">
+        <div class="w-full p-2 cursor-default pointer-events-auto bg-gray-800 relative rounded-xl mx-auto max-w-3xl">
+
+            <button (click)="closeModal()" tabindex="-1" type="button"
+                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                <fa-icon class="fa-2x p-1" style="color:#d32222;" [icon]="close"></fa-icon>
+                <span class="sr-only">
+                    Close
+                </span>
+            </button>
+
+            <div class="space-y-2 p-2">
+                <div class="p-4 space-y-2 text-center text-white">
+                    <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                        Delete Question
+                    </h2>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+
+                <div aria-hidden="true" class="border-t text-[white] text-[17px] border-gray-700 p-4">
+                    <p class="underline text-xl font-bold text-[#d93030] mb-2"> Following things will happen if you
+                        delete a question :
+                    </p>
+                    <li>
+                        Selected question will be permanently deleted .
+                    </li>
+
+                    <p class="text-xl mt-4 font-bold text-[#d9bd30]"> Are you sure of deleting this question ? </p>
+                </div>
+
+                <!-- Buttons -->
+                <div class="px-6 py-2">
+                    <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                        @if(isLoading)
+                        {
+                        <button
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#3588d4] hover:bg-[#dcdf49] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <fa-icon class="fa-3x" style="color: #9ea5f3; --fa-animation-duration :0.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.5s"
+                                    [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#7b28c9;" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                            </span>
+                        </button>
+                        }
+
+                        @else{
+                        <button type="button" (click)="closeModal()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none  focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg  focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 bg-gray-800 hover:bg-gray-700 border-gray-600 hover:border-gray-500 text-gray-200 focus:text-primary-400 focus:border-primary-400 focus:bg-gray-800">
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="submit" (click)="deleteQuestion()"
+                            class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-2 focus:ring-inset focus:ring-offset-0 min-h-[2.25rem] px-4 text-lg text-white shadow focus:ring-white border-transparent bg-[#eb3b35] hover:bg-[#e99257] focus:bg-red-700 focus:ring-offset-red-700">
+
+                            <span class="flex items-center gap-1">
+                                <span class="">
+                                    Delete
+                                </span>
+                            </span>
+
+                        </button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+}

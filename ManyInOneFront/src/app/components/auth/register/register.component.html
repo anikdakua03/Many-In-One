@@ -46,20 +46,14 @@
                                 class="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                                 @if(isLoading)
                                 {
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="flex items-center justify-center animate-bounce animate-infinite animate-ease-in h-10 w-24"
-                                    viewBox="0 0 448 512">
-                                    <path fill="#b9c9f8"
-                                        d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-                                </svg>
+                                <fa-icon class="fa-3x" style="color: #84cc75; --fa-animation-duration :0.5s" [icon]="dots" animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                                    animation="bounce"></fa-icon>
+                                <fa-icon class="fa-3x ml-2" style="color:#b4a5c2; --fa-animation-duration : 1.5s" [icon]="dots"
+                                    animation="bounce"></fa-icon>
                                 }
                                 @else {
-                                <svg class="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                                    <circle cx="8.5" cy="7" r="4" />
-                                    <path d="M20 8v6M23 11h-6" />
-                                </svg>
+                                <fa-icon class="fa-lg" style="color: #dee4e7;" [icon]="user"></fa-icon>
                                 <span class="ml-3">
                                     Sign Up
                                 </span>
@@ -70,7 +64,9 @@
                         <div class="flex justify-center items-center mt-4">
                             <p class="inline-flex items-center text-gray-700 font-medium text-lg text-center">
                                 <span class="ml-2">Already have an account?<a routerLink="/login"
-                                        class="text-md ml-2 text-blue-500 font-semibold">Login now &rarr;</a>
+                                        class="text-md ml-2 text-blue-500 font-semibold">Login now <fa-icon
+                                            class="ml-2 fa-xs" [icon]="longRightArrow"
+                                            style="color: #2557e2;"></fa-icon></a>
                                 </span>
                             </p>
                         </div>
