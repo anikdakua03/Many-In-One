@@ -53,7 +53,7 @@ export class SearchPlayerComponent implements OnInit {
       if (data === null || data === undefined || JSON.parse(data!).tag !== pTag) {
         this.clashingService.getPlayer(pTag!).subscribe({
           next: res => {
-            if (res.data.result !== null) {
+            if (res.isSuccess) {
               this.isLoading = false;
               this.playerData = res.data.result;
               // storing in local storage for dev purpose to restrict api call

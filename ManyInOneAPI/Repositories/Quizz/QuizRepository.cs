@@ -12,10 +12,11 @@ namespace ManyInOneAPI.Repositories.Quizz
 {
     public class QuizRepository : IQuizRepository
     {
-        private readonly ManyInOneDbContext _dbContext;
+        //private readonly ManyInOneDbContext _dbContext;
+        private readonly ManyInOnePgDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public QuizRepository(ManyInOneDbContext context, IHttpContextAccessor httpContextAccessor)
+        public QuizRepository(ManyInOnePgDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = context;
             _httpContextAccessor = httpContextAccessor;
@@ -132,7 +133,7 @@ namespace ManyInOneAPI.Repositories.Quizz
             }
 
             var uploadFolder = $"{Directory.GetCurrentDirectory()}\\wwwroot\\Upload";
-            //'\\\\?\\E:\\Project\\KhichuriApp\\ManyInOneAPI\\wwwroot\\Upload\\code.xlsx'"
+            
             if (!Directory.Exists(uploadFolder))
             {
                 Directory.CreateDirectory(uploadFolder);
@@ -183,7 +184,7 @@ namespace ManyInOneAPI.Repositories.Quizz
                                         CategoryId = Guid.NewGuid(),
                                         CategoryName = categoryName,
                                         Description = "No description provided.",
-                                        UserId = Guid.Empty
+                                        UserId = Guid.Parse(userExists.Id)
                                     };
 
                                     _dbContext.Categories.Add(newCate);
@@ -330,7 +331,7 @@ namespace ManyInOneAPI.Repositories.Quizz
                                 qs.QuestionLevel = GetQuestionLevel(qsLevel!);
 
                                 var imgLink = reader.GetValue(15);
-                                qs.QuestionImageLink = imgLink is null ? "" : imgLink.ToString();
+                                qs.QuestionImageLink = imgLink is null ? "NA" : imgLink.ToString();
 
                                 var qsTags = reader.GetValue(16);
                                 var tags = qsTags is null ? new List<string>() : qsTags.ToString()!.Split(',').ToList();

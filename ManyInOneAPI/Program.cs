@@ -29,8 +29,8 @@ var builder = WebApplication.CreateBuilder(args);
     // adding healthcheck
     builder.Services.AddHealthChecks()
         //.AddCheck<DatabaseHealthCheck>("DatabasehealthCheck") // for custom check
-        .AddSqlServer(connectionString!)
-        //.AddNpgSql(pgConnectionString!)
+        //.AddSqlServer(connectionString!)
+        .AddNpgSql(pgConnectionString!)
         ;
     // Add services to the container.
     builder.Services.AddControllers();
@@ -85,7 +85,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.SignIn.RequireConfirmedPhoneNumber = false;
         options.SignIn.RequireConfirmedEmail = true;
 
-    }).AddEntityFrameworkStores<ManyInOneDbContext>(); //AddEntityFrameworkStores<ManyInOnePgDbContext>();
+    }).AddEntityFrameworkStores<ManyInOnePgDbContext>(); //.AddEntityFrameworkStores<ManyInOneDbContext>();
 
 
     // google authentication and jwt added together
@@ -141,7 +141,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.AddPolicy("Frontend", policyBuilder =>
         {
             policyBuilder
-                 .WithOrigins("http://localhost:4200", "https://localhost:7150", "https://localhost:8081") 
+                 .WithOrigins("http://localhost:4200", "https://localhost:7150", "https://localhost:8081")
                 .AllowAnyMethod()
                 .AllowCredentials()
                 .AllowAnyHeader();

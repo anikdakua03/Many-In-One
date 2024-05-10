@@ -164,12 +164,12 @@ export class QuizzerPlayComponent implements OnInit {
   }
 
   getQsTypeValue(typeId: string): string {
-    const matchingType = this.allQsTypes.find(type => type.id === typeId);
+    const matchingType = this.allQsTypes.find(type => type.id === typeId.toLowerCase());
     return matchingType ? matchingType.value : 'Any';
   }
 
   getQsLevelValue(lvlId: string): string {
-    const matchingType = this.allQsLevels.find(level => level.id === lvlId);
+    const matchingType = this.allQsLevels.find(level => level.id === lvlId.toLowerCase());
     return matchingType ? matchingType.value : 'Any';
   }
 
