@@ -8,7 +8,9 @@
                 <div class="p-2 m-2 rounded-t-md items-center ">
                     <p class="font-bold bg-[#c3c977] rounded-sm text-[#642323] text-center">
                         <span class="font-normal"> Category : </span>
-                        {{questionList[currentQuestion].categoryName}}
+                        <markdown class="text-wrap" [data]="questionList[currentQuestion].categoryName" lineNumbers lineHighlight katex
+                            [katexOptions]="options">
+                        </markdown>
                     </p>
                 </div>
 
@@ -54,13 +56,14 @@
                     {
                     <div
                         class="mt-6 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl hover:border-[3px] hover:border-[#f7f467] hover:bg-[orange] md:transform-none">
-                        <!-- (click)="storeAnswer(questionList[currentQuestion].questionId, op.optionValue, op.optionId)" -->
                         <div (click)="onSelectOption(questionList[currentQuestion]!.questionId, op)"
                             [ngClass]="op.optionSelected === true ? 'bg-sky-600 rounded-xl text-[white]' : ''"
                             class="p-2 hover:shadow-lg cursor-pointer ">
                             <h5
                                 class="block font-sans text-xl text-center antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
-                                {{op.optionValue}}
+                                <markdown class="text-wrap" [data]="op.optionValue" lineNumbers lineHighlight katex
+                                    [katexOptions]="options">
+                                </markdown>
                             </h5>
                         </div>
 

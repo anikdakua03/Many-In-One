@@ -20,8 +20,8 @@ namespace ManyInOneAPI.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        //private readonly ManyInOneDbContext _dbContext;
-        private readonly ManyInOnePgDbContext _dbContext;
+        private readonly ManyInOneDbContext _dbContext;
+        //private readonly ManyInOnePgDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AuthConfig _authConfig;
@@ -30,7 +30,7 @@ namespace ManyInOneAPI.Services.Auth
         private readonly UrlEncoder _urlEncoder;
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-        public AuthService(ManyInOnePgDbContext dbContext, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager, IOptionsMonitor<AuthConfig> optionsMonitor, SignInManager<IdentityUser> signInManager, IEmailService emailService, UrlEncoder urlEncoder)
+        public AuthService(ManyInOneDbContext dbContext, IHttpContextAccessor httpContextAccessor, UserManager<IdentityUser> userManager, IOptionsMonitor<AuthConfig> optionsMonitor, SignInManager<IdentityUser> signInManager, IEmailService emailService, UrlEncoder urlEncoder)
         {
             _dbContext = dbContext;
             _httpContextAccessor = httpContextAccessor;

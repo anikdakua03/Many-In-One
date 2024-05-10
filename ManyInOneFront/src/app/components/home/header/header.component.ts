@@ -20,6 +20,15 @@ export class HeaderComponent implements OnInit {
   isSidebarShowing: boolean = false;
   isLoading : boolean = false;
   dots = FAIcons.ELLIPSES;
+  close = FAIcons.CLOSE;
+  hamburger = FAIcons.HAMBURGER;
+  home = FAIcons.HOME;
+  quizzer = FAIcons.QUIZZ;
+  payment = FAIcons.CREDIT_CARD;
+  ai = FAIcons.MAGIC_SPARKLES;
+  c = FAIcons.C;
+  card = FAIcons.CREDIT_CARD;
+  o = FAIcons.O;
 
   constructor(protected authService: AuthenticationService, private router: Router, private toaster: ToastrService) {
 

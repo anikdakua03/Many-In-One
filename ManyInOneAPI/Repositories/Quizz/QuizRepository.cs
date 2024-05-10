@@ -12,11 +12,11 @@ namespace ManyInOneAPI.Repositories.Quizz
 {
     public class QuizRepository : IQuizRepository
     {
-        //private readonly ManyInOneDbContext _dbContext;
-        private readonly ManyInOnePgDbContext _dbContext;
+        private readonly ManyInOneDbContext _dbContext;
+        //private readonly ManyInOnePgDbContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public QuizRepository(ManyInOnePgDbContext context, IHttpContextAccessor httpContextAccessor)
+        public QuizRepository(ManyInOneDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = context;
             _httpContextAccessor = httpContextAccessor;
