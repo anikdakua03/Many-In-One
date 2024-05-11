@@ -1,218 +1,262 @@
-<nav class="absolute w-full top-4 left-0 h-screen z-50" [ngClass]="isSidebarShowing ?  'flex' : 'hidden'">
-    <div class="bg-[#226992] w-full md:max-w-sm shadow-2xl">
-        <div class="hidden justify-end p-5">
-            <svg (click)="closeSidebar()" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40"
-                viewBox="0 0 50 50">
-                <path
-                    d="M 7.7070312 6.2929688 L 6.2929688 7.7070312 L 23.585938 25 L 6.2929688 42.292969 L 7.7070312 43.707031 L 25 26.414062 L 42.292969 43.707031 L 43.707031 42.292969 L 26.414062 25 L 43.707031 7.7070312 L 42.292969 6.2929688 L 25 23.585938 L 7.7070312 6.2929688 z">
-                </path>
-            </svg>
-        </div>
-        <!-- All options -->
-        <div class="flex justify-center items-center">
-            <ul class="gap-3 p-8" (click)="closeSidebar()">
-                <a routerLink="/" class="text-2xl text-yellow-500 lg:text-2xl underline font-bold cursor-pointer">Many
-                    In
-                    One</a>
-                <li>
-                    <a routerLink="/home"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Home</a>
-                </li>
-                <li>
-                    <a routerLink="/payment-details"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Payment</a>
-                </li>
-                <li class="relative group">
-                    <a routerLink="/home"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600">Gen AI</a>
-                    <!-- <ul class="absolute bg-blue-400 rounded-md text-blue-800 text-lg top-[30px]  hidden group-hover:block w-56">
-                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold hover:scale-100">
-                        <a routerLink="genAI/textonly">
-                            Text Only
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-red-600 hover:text-green-200 px-6 py-2 font-bold">
-                        <a routerLink="genAI/textandimageonly" class="">
-                            Text and Image
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold">
-                        <a routerLink="genAI/summarize" class="">
-                            Summarize Text
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold">
-                        <a routerLink="genAI/text-to-image" class="">
-                            Text to Image
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-red-400 px-6 py-2 font-bold">
-                        <a routerLink="genAI/generate-speech" class="">
-                            Text to Speech
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-red-400 px-6 py-2 text-3xl font-bold">
-                        <a routerLink="genAI/conversation" class="font-bold">
-                            Question & Answer
-                        </a>
-                    </li>
-                    <li>
-                        <a routerLink="genAI/textandimageonly"
-                            class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Text
-                            and Image</a>
-                    </li>
-                </ul> -->
-                </li>
-                <li>
-                    <a routerLink="quizzer"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Quizzer</a>
-                </li>
-                <li>
-                    <a routerLink="clashOfClans"
-                        class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Clash
-                        of
-                        Clans</a>
-                </li>
-            </ul>
-        </div>
-        <div class="flex justify-evenly gap-3 p-5 mt-2" (click)="closeSidebar()">
-            @if(checkCurrUser)
+<!-- Another try of making responsive navbar -->
+<nav class="p-2 flex fixed w-[100%] top-0 z-[9999] bg-[#1f7bb8] justify-between items-center">
+
+    <a routerLink="/" class="ml-10 text-2xl text-yellow-500 lg:text-2xl hover:scale-x-[1.1] font-bold cursor-pointer">
+        Many In One
+    </a>
+
+    <!-- Nav items -->
+    <div class="hidden md:flex gap-4">
+        <a routerLink="/home"
+            class="text-neutral-200 cursor-pointer text-lg font-semibold hover:scale-x-[1.1] hover:text-yellow-600 transition-[1s]">Home</a>
+        <a routerLink="/payment-details"
+            class="text-neutral-200 cursor-pointer text-lg font-semibold hover:scale-x-[1.1] hover:text-yellow-600 transition-[1s]">
+            Payment
+        </a>
+
+        <li class="relative group list-none">
+            <button routerLink="/home"
+                class="text-neutral-200 cursor-pointer text-lg font-semibold hover:scale-x-[1.1] group-hover:text-yellow-600">Gen AI
+            </button>
+
+            <!-- Dropdown Menu With Links -->
+            <div
+                class="absolute top-0 transition group-hover:translate-y-5 translate-y-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-500 ease-in-out group-hover:transform z-50 w-[240px] min-w-[120px] transform">
+                <div class="relative mr-4 top-6 p-6 bg-[#2d6497] rounded-xl shadow-xl w-full">
+                    <!-- Cornered Tooltip -->
+                    <div
+                        class="size-12 bg-[#2d6497] transform rotate-45 absolute top-0 z-0 -translate-x-4 transition-transform group-hover:translate-x-1 duration-500 ease-in-out rounded-sm">
+                    </div>
+                    <!-- Cornered Tooltip -->
+
+                    <div class="relative z-10">
+                        <ul class="text-[#e4e4e4]">
+                            <li
+                                class="my-1 hover:bg-yellow-700 hover:rounded-xl hover:shadow-xl w-full hover:text-green-300 px-3 py-2 font-bold">
+                                <a routerLink="genAI/textonly">
+                                    Text Only
+                                </a>
+                            </li>
+                            <li
+                                class="my-1 hover:bg-yellow-700 hover:rounded-xl hover:shadow-xl w-full hover:text-green-300 px-3 py-2 font-bold">
+                                <a routerLink="genAI/textandimageonly" class="">
+                                    Text and Image
+                                </a>
+                            </li>
+                            <li
+                                class="my-1 hover:bg-yellow-700 hover:rounded-xl hover:shadow-xl w-full hover:text-green-300 px-3 py-2 font-bold">
+                                <a routerLink="genAI/summarize" class="">
+                                    Summarize Text
+                                </a>
+                            </li>
+                            <li
+                                class="my-1 hover:bg-yellow-700 hover:rounded-xl hover:shadow-xl w-full hover:text-green-300 px-3 py-2 font-bold">
+                                <a routerLink="genAI/text-to-image" class="">
+                                    Text to Image
+                                </a>
+                            </li>
+                            <li
+                                class="my-1 hover:bg-yellow-700 hover:rounded-xl hover:shadow-xl w-full hover:text-green-300 px-3 py-2 font-bold">
+                                <a routerLink="genAI/generate-speech" class="">
+                                    Text to Speech
+                                </a>
+                            </li>
+                            <li
+                                class="my-1 hover:bg-yellow-700 hover:rounded-xl hover:shadow-xl w-full hover:text-green-300 px-3 py-2 font-bold">
+                                <a routerLink="genAI/conversation" class="font-bold">
+                                    Question & Answer
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Dropdown Menu With Links -->
+        </li>
+
+        <a routerLink="quizzer"
+            class="text-neutral-200 cursor-pointer text-lg font-semibold hover:scale-x-[1.1] hover:text-yellow-600 transition-[1s]">Quizzer</a>
+        <a routerLink="clashOfClans"
+            class="text-neutral-200 cursor-pointer text-lg font-semibold hover:scale-x-[1.1] hover:text-yellow-600 transition-[1s]">Clash
+            of
+            Clans</a>
+    </div>
+
+    <!-- Login / Signup button -->
+    <div class="hidden md:flex gap-2 items-center" (click)="closeSidebar()">
+        @if(checkCurrUser)
+        {
+        <a routerLink="/manage"
+            class="hover:bg-gradient-to-r px-2 py-1 hover:from-blue-500 hover:to-purple-500 text-white rounded-md transition-transform transform-gpu hover:-translate-y-1 hover:shadow-md"><span
+                class="text-lg text-[white]">
+                Welcome ,
+                <strong>{{currUserName}}</strong></span>
+        </a>
+
+        <button (click)="onLogout()" [disabled]="isLoading"
+            class="bg-[#eb2e76] hover:bg-[red] px-2 py-1 text-gray-100 rounded-md cursor-pointer font-bold text-lg mr-4">
+            @if(isLoading)
             {
-            <div>
-                <a routerLink="/manage"><span>Welcome <strong>{{currUserName}}</strong></span></a>
-                &nbsp; | &nbsp;
-            </div>
-            <div>
-                <a (click)="onLogout()"
-                    class="bg-red-400 px-4 py-2 rounded text-white cursor-pointer font-bold hover:bg-indigo-500 text-sm mt-4">Log
-                    out</a>
-            </div>
+            <fa-icon class="fa-lg" style="color: #eff5a1; --fa-animation-duration :0.5s" [icon]="dots"
+                animation="bounce"></fa-icon>
+            <fa-icon class="fa-lg ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                animation="bounce"></fa-icon>
+            <fa-icon class="fa-lg ml-2" style="color:#72c0ec; --fa-animation-duration : 1.5s" [icon]="dots"
+                animation="bounce"></fa-icon>
             }
             @else {
-            <div>
-                <a routerLink="/login"
-                    class="text-gray-200 text-md font-semibold hover:bg-cyan-500 cursor-pointer">LOGIN</a>
+            Sign Out
+            }
+        </button>
+        }
+        @else {
+        <a routerLink="/login"
+            class="text-gray-200 hover:text-gray-800 px-2 py-1 hover:bg-yellow-400 hover:rounded-md text-lg font-semibold cursor-pointer">LOGIN</a>
+        <a routerLink="/register"
+            class="text-green-500 text-lg font-semibold px-2 py-1 cursor-pointer hover:rounded-md  hover:bg-indigo-500 hover:text-gray-800">SIGN
+            UP</a>
+        }
+    </div>
+
+    <button class="p-2 md:hidden" (click)="openSidebar()">
+        <fa-icon class="fa-lg" style="color: #b8e3ee;" [icon]="hamburger"></fa-icon>
+    </button>
+
+    <!-- Fixed for mobile menu -->
+    <div class="fixed block md:hidden z-[9999] bg-[#3164af] top-0 inset-0 px-2 py-1"
+        [ngClass]="isSidebarShowing ? '' : 'hidden'">
+
+        <div class="flex justify-between">
+            <a routerLink="/" class="ml-5 text-2xl text-yellow-500 lg:text-2xl font-bold cursor-pointer">
+                Many In One
+            </a>
+
+            <button class="p-2 md:hidden" (click)="closeSidebar()">
+                <fa-icon class="fa-lg" style="color: #bde9fa;" [icon]="close"></fa-icon>
+            </button>
+        </div>
+
+        <!-- Border -->
+        <div class="h-[1px] bg-[gray]"></div>
+
+        <!-- Nav items -->
+        <div class="mt-4 overflow-auto">
+            <a routerLink="/home" (click)="closeSidebar()"
+                class="text-[#f7cb84] m-3 p-2 flex justify-between cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s] rounded-lg bg-[#5db2f8] shadow-md">Home
+                <span class="">
+                    <fa-icon class="fa-lg" style="color: #0feb8f; --fa-animation-duration :1.2s" [icon]="home"
+                        animation="bounce"></fa-icon>
+                </span>
+            </a>
+
+            <a routerLink="/payment-details" (click)="closeSidebar()"
+                class="text-[#f0ba45] m-3 p-2 flex justify-between cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s] rounded-lg bg-[#5db2f8] shadow-md">Payment
+                <span class="">
+                    <fa-icon class="fa-lg" style="color: #462e9c; --fa-animation-duration :0.8s" [icon]="card"
+                        animation="bounce"></fa-icon>
+                </span>
+            </a>
+
+            <div class="">
+                <details class="">
+                    <summary
+                        class="text-[#d4e6fa] m-3 p-2 flex justify-between gap-2 cursor-pointer text-lg font-semibold hover:text-yellow-600 rounded-lg bg-[#5db2f8] shadow-md">
+                        <span class="font-semibold">Gen AI</span>
+                        <span class="">
+                            <fa-icon class="fa-lg" style="color: #e03de6; --fa-animation-duration :0.6s" [icon]="ai"
+                                animation="bounce"></fa-icon>
+                        </span>
+                    </summary>
+                    <div class="bg-inherit p-4">
+                        <ul class="text-[#e4e4e4] ml-4" (click)="closeSidebar()">
+                            <li
+                                class="my-1 w-full px-3 py-2 font-bold rounded-xl bg-yellow-700 text-green-300 shadow-xl">
+                                <a routerLink="genAI/textonly"> Text Only </a>
+                            </li>
+                            <li
+                                class="my-1 w-full px-3 py-2 font-bold rounded-xl bg-yellow-700 text-green-300 shadow-xl">
+                                <a routerLink="genAI/textandimageonly" class=""> Text and Image </a>
+                            </li>
+                            <li
+                                class="my-1 w-full px-3 py-2 font-bold rounded-xl bg-yellow-700 text-green-300 shadow-xl">
+                                <a routerLink="genAI/summarize" class=""> Summarize Text </a>
+                            </li>
+                            <li
+                                class="my-1 w-full px-3 py-2 font-bold rounded-xl bg-yellow-700 text-green-300 shadow-xl">
+                                <a routerLink="genAI/text-to-image" class=""> Text to Image </a>
+                            </li>
+                            <li
+                                class="my-1 w-full px-3 py-2 font-bold rounded-xl bg-yellow-700 text-green-300 shadow-xl">
+                                <a routerLink="genAI/generate-speech" class=""> Text to Speech </a>
+                            </li>
+                            <li
+                                class="my-1 w-full px-3 py-2 font-bold rounded-xl bg-yellow-700 text-green-300 shadow-xl">
+                                <a routerLink="genAI/conversation" class="font-bold"> Question & Answer </a>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
             </div>
-            <div>
-                <a routerLink="/register"
-                    class="text-green-500 text-md font-semibold cursor-pointer hover:bg-yellow-500 text-md">SIGN
-                    UP</a>
-            </div>
+
+            <a routerLink="quizzer" (click)="closeSidebar()"
+                class="text-[#a92fc2] m-3 my-1 p-2 flex justify-between cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s] rounded-lg bg-[#5db2f8] shadow-md">Quizzer
+                <span class="">
+                    <fa-icon class="fa-lg" style="color: #b95d06; --fa-animation-duration :0.5s" [icon]="quizzer"
+                        animation="bounce"></fa-icon>
+                </span>
+            </a>
+
+            <a routerLink="clashOfClans" (click)="closeSidebar()"
+                class="text-[#5e4719] m-3 p-2 flex justify-between cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s] rounded-lg bg-[#5db2f8] shadow-md">Clash
+                of
+                Clans
+                <span>
+                    <fa-icon class="fa-lg" style="color: #e4f30d; --fa-animation-duration :0.5s" [icon]="c"
+                        animation="bounce"></fa-icon>
+                    <fa-icon class="fa-lg ml-2" style="color:#95ebdc; --fa-animation-duration : 1.0s" [icon]="o"
+                        animation="bounce"></fa-icon>
+                    <fa-icon class="fa-lg ml-2" style="color:#f0ec12; --fa-animation-duration : 1.5s" [icon]="c"
+                        animation="bounce"></fa-icon>
+                </span>
+            </a>
+        </div>
+
+        <!-- Border -->
+        <div class="h-[1px] bg-[gray]"></div>
+
+        <!-- Login / Signup button -->
+        <div class="w-full gap-1 flex justify-evenly overflow-y-auto items-center mt-2 p-2" (click)="closeSidebar()">
+            @if(checkCurrUser)
+            {
+            <a routerLink="/manage"
+                class="hover:bg-gradient-to-r px-4 py-1 hover:from-blue-500 hover:to-purple-500 text-white rounded-sm transition-transform transform-gpu hover:-translate-y-1 hover:shadow-md"><span
+                    class="text-lg text-[white]">Welcome ,
+                    <strong>{{currUserName}}</strong></span>
+            </a>
+            <button (click)="onLogout()" [disabled]="isLoading"
+                class="bg-[#eb2e76] px-2 py-1 text-gray-100 rounded-md cursor-pointer font-bold text-lg mr-4">
+                @if(isLoading)
+                {
+                <fa-icon class="fa-lg" style="color: #eff5a1; --fa-animation-duration :0.5s" [icon]="dots"
+                    animation="bounce"></fa-icon>
+                <fa-icon class="fa-lg ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
+                    animation="bounce"></fa-icon>
+                <fa-icon class="fa-lg ml-2" style="color:#43c1f3; --fa-animation-duration : 1.5s" [icon]="dots"
+                    animation="bounce"></fa-icon>
+                }
+                @else {
+                Sign Out
+                }
+            </button>
+            }
+            @else {
+            <a routerLink="/login"
+                class="text-gray-200 hover:text-gray-800 px-2 py-1 hover:bg-yellow-400 hover:rounded-md text-lg font-semibold cursor-pointer">LOGIN</a>
+            <a routerLink="/register"
+                class="text-green-500 text-lg font-semibold px-2 py-1 cursor-pointer hover:rounded-md  hover:bg-indigo-500 hover:text-gray-800">SIGN
+                UP</a>
             }
         </div>
-    </div>
-    <div (click)="closeSidebar()" class="bg-gray-800 hidden md:block md:w-full opacity-100">
     </div>
 </nav>
-<header class="fixed w-full bg-blue-800 z-50 top-0">
-    <!-- Logo + nav items -->
-    <div class="flex justify-between items-center gap-8 ml-10 p-2 rounded-md shadow-md">
-        <a routerLink="/" class="text-xl text-yellow-500 lg:text-2xl font-bold cursor-pointer">Many In
-            One</a>
-        <!-- Mobile or other small / medium device -->
-        <div class="md:hidden cursor-pointer">
-            <svg (click)="openSidebar()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                class="w-6 h-6">
-                <path fill-rule="evenodd"
-                    d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z"
-                    clip-rule="evenodd" />
-            </svg>
-        </div>
-        <ul class="hidden md:flex md:justify-center md:items-center md:gap-3">
-            <li>
-                <a routerLink="/home"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Home</a>
-            </li>
-            <li>
-                <a routerLink="/payment-details"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Payment</a>
-            </li>
-            <li class="relative group">
-                <a routerLink="/home"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600">Gen AI</a>
-                <ul
-                    class="absolute bg-blue-800 shadow-md rounded-md text-gray-200 text-lg top-[30px]  hidden group-hover:block w-56">
-                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold hover:scale-100">
-                        <a routerLink="genAI/textonly">
-                            Text Only
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
-                        <a routerLink="genAI/textandimageonly" class="">
-                            Text and Image
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
-                        <a routerLink="genAI/summarize" class="">
-                            Summarize Text
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
-                        <a routerLink="genAI/text-to-image" class="">
-                            Text to Image
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
-                        <a routerLink="genAI/generate-speech" class="">
-                            Text to Speech
-                        </a>
-                    </li>
-                    <li class="my-1 hover:bg-yellow-700 hover:text-green-300 px-6 py-2 font-bold">
-                        <a routerLink="genAI/conversation" class="font-bold">
-                            Question & Answer
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a routerLink="quizzer"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Quizzer</a>
-            </li>
-            <li>
-                <a routerLink="clashOfClans"
-                    class="text-neutral-200 cursor-pointer text-lg font-semibold hover:text-yellow-600 transition-[1s]">Clash
-                    of
-                    Clans</a>
-            </li>
-        </ul>
-        <ul class="hidden md:flex md:justify-center md:items-center ">
-            @if(checkCurrUser)
-            {
-            <li>
-                <a routerLink="/manage" class="px-6 py-2 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 text-white rounded-sm transition-transform transform-gpu hover:-translate-y-1 hover:shadow-md"><span class="text-lg text-[white]">Welcome &nbsp;
-                        <strong>{{currUserName}}</strong></span></a>
-                &nbsp; | &nbsp;
-            </li>
-            <li>
-                <button (click)="onLogout()" [disabled]="isLoading"
-                    class="hover:bg-red-600 hover:text-gray-100 px-4 py-2 rounded text-red-400 cursor-pointer font-bold text-lg mr-4">
-                    @if(isLoading)
-                    {
-                        <fa-icon class="fa-lg" style="color: #eff5a1; --fa-animation-duration :0.5s" [icon]="dots" animation="bounce"></fa-icon>
-                        <fa-icon class="fa-lg ml-2" style="color:#81c5ba; --fa-animation-duration : 1.0s" [icon]="dots"
-                            animation="bounce"></fa-icon>
-                        <fa-icon class="fa-lg ml-2" style="color:#ee3069; --fa-animation-duration : 1.5s" [icon]="dots"
-                            animation="bounce"></fa-icon>
-                    }
-                    @else {
-                    Sign Out
-                    }
-                </button>
-            </li>
-            }
-            @else {
-            <div class="flex justify-center gap-3 mr-4">
-                <li>
-                    <a routerLink="/login"
-                        class="text-gray-200 hover:text-gray-800 p-2.5 hover:bg-yellow-400 hover:rounded-md text-lg font-semibold cursor-pointer">LOGIN</a>
-                </li>
-                <li>
-                    <a routerLink="/register"
-                        class="text-green-500 text-lg font-semibold p-2 cursor-pointer hover:rounded-md  hover:bg-indigo-500 hover:text-gray-800">SIGN
-                        UP</a>
-                </li>
-            </div>
-            }
-        </ul>
-    </div>
-</header>

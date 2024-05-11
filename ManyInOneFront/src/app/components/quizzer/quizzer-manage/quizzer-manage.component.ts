@@ -300,6 +300,8 @@ export class QuizzerManageComponent implements OnInit {
                 next: res => {
                     if (res.isSuccess) {
                         // toaster success
+                        this.quizService.getOwnCategories(); // refreshes
+                        this.allCategories = this.quizService.allCategory$.getValue();
                         this.quizService.getAllQuestions();
                         this.allQuestions = this.quizService.allQss$.getValue();
                         // with toaster
@@ -475,6 +477,8 @@ export class QuizzerManageComponent implements OnInit {
                     if (res.isSuccess) {
                         this.quizService.getOwnCategories(); // refreshes
                         this.allCategories = this.quizService.allCategory$.getValue();
+                        this.quizService.getAllQuestions(); // refreshes
+                        this.allQuestions = this.quizService.allQss$.getValue();
                         // with toaster
                         this.toaster.success(res.data, "Category Updation.")
                     }
@@ -504,6 +508,8 @@ export class QuizzerManageComponent implements OnInit {
                     if (res.isSuccess) {
                         this.quizService.getOwnCategories(); // refreshes
                         this.allCategories = this.quizService.allCategory$.getValue();
+                        this.quizService.getAllQuestions(); // refreshes
+                        this.allQuestions = this.quizService.allQss$.getValue();
                         // with toaster
                         this.toaster.success(res.data, "Category Deletion.")
                     }

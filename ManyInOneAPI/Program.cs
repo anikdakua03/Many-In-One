@@ -85,7 +85,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.SignIn.RequireConfirmedPhoneNumber = false;
         options.SignIn.RequireConfirmedEmail = true;
 
-    }).AddEntityFrameworkStores<ManyInOnePgDbContext>(); //.AddEntityFrameworkStores<ManyInOneDbContext>();
+    }).AddEntityFrameworkStores<ManyInOneDbContext>(); //.AddEntityFrameworkStores<ManyInOnePgDbContext>();
 
 
     // google authentication and jwt added together

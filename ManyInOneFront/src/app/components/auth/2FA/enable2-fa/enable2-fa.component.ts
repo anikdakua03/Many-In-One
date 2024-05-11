@@ -28,14 +28,17 @@ export class Enable2FAComponent {
   {
     // if two factor is not enabled , then will show and load qr and then cod eto verify
     this.is2FAEnabled = authService.CheckUser2FA();
-    if (!this.is2FAEnabled)
+
+    if (this.is2FAEnabled !== true)
     {
-      // call the load and share qr ;
       const userid = JSON.parse(cookie.get("x-app-user")) || "";
       this.authService.loadAndShareQR(userid).subscribe({
         next : res => {
           this.sharedKey = res.data.sharedKey;
           this.qrURI = res.data.qr;
+        },
+        error : err => {
+          toaster.error("Unable to generate qr code, please try again after some time.", "QR code loading failed.")
         }
       });
     }
