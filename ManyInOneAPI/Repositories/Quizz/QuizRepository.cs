@@ -33,7 +33,7 @@ namespace ManyInOneAPI.Repositories.Quizz
                 return Result<List<QuestionResponse>>.Failure(Error.NotFound("Not Found", "User doesn't exists or Invalid user."));
             }
 
-            var categoryList = await _dbContext.Categories.Where(a => a.UserId == Guid.Parse(userExists.Id)).ToListAsync();
+            var categoryList = await _dbContext.Categories.AsNoTracking().Where(a => a.UserId == Guid.Parse(userExists.Id)).ToListAsync();
 
             if (categoryList.Count == 0)
             {
@@ -175,7 +175,7 @@ namespace ManyInOneAPI.Repositories.Quizz
                                 var cateGoryObj = reader.GetValue(0);
                                 var categoryName = cateGoryObj is null ? "Default Category" : cateGoryObj.ToString()!.Trim();
 
-                                var category = await _dbContext.Categories.FirstOrDefaultAsync(a => a.CategoryName == categoryName);
+                                var category = await _dbContext.Categories.FirstOrDefaultAsync(a => a.CategoryName == categoryName && a.UserId == Guid.Parse(userExists.Id));
 
                                 if (category is null)
                                 {
@@ -363,9 +363,16 @@ namespace ManyInOneAPI.Repositories.Quizz
 
             int rowCount = 2; // as pers row starts in excel
 
+            var oldQss = await GetQuestions();
+
             foreach (var qs in allQss)
             {
-                var dupQs = await _dbContext.Questions.FirstOrDefaultAsync(a => a.QuestionText == qs.QuestionText);
+                if(oldQss.Data is null || oldQss.Data.Count is 0)
+                {
+                    break; // no need to check duplicate further.
+                }
+
+                var dupQs = oldQss.Data.FirstOrDefault(a => a.QuestionText == qs.QuestionText);
 
                 if (dupQs is not null)
                 {
