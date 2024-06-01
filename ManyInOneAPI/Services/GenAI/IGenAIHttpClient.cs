@@ -11,6 +11,8 @@ namespace ManyInOneAPI.Services.GenAI
         //Multi-turn conversations / chat --> (Will use gemini-pro model)
         public Task<Result<GenAIResponse>> MultiTurnConversation(Conversation inputText, CancellationToken cancellationToken = default);
 
+        public Task<Result<GenAIResponse>> StreamedContent(string inputText, CancellationToken cancellationToken = default);
+
         //Text and image input --> (Will use gemini-pro-vision model)
         public Task<Result<GenAIResponse>> TextAndImageAsInput(IFormFile formFile, string inputText, CancellationToken cancellationToken = default);
 

@@ -85,6 +85,18 @@ var builder = WebApplication.CreateBuilder(args);
         options.SignIn.RequireConfirmedPhoneNumber = false;
         options.SignIn.RequireConfirmedEmail = true;
 
+        options.Password.RequiredLength = 8;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireDigit = true;
+
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+
+        options.User.RequireUniqueEmail = true;
+
     }).AddEntityFrameworkStores<ManyInOneDbContext>(); //.AddEntityFrameworkStores<ManyInOnePgDbContext>();
 
 

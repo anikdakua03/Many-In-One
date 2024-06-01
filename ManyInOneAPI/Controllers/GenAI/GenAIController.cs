@@ -57,6 +57,15 @@ namespace ManyInOneAPI.Controllers.GenAI
             return Ok(res);
         }
 
+        [HttpPost("StreamingResponse")]
+        [EnableRateLimiting("fixed")]
+        public async Task<IActionResult> StreamContent([Required] string input)
+        {
+            var res = await _genAIHttpClient.StreamedContent(input, HttpContext.RequestAborted);
+
+            return Ok(res);
+        }
+
         [HttpPost("TextSummarize")]
         public async Task<IActionResult> SummarizeText([Required] TextOnly longText)
         {

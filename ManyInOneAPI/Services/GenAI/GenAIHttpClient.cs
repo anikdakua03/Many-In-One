@@ -152,6 +152,49 @@ namespace ManyInOneAPI.Services.GenAI
             }
         }
 
+        public async Task<Result<GenAIResponse>> StreamedContent(string inputText, CancellationToken cancellationToken = default)
+        {
+            // Create JSON request content
+            var requestContent = new
+            {
+                contents = new[]
+                {
+                    new
+                    {
+                        parts = new[]
+                        {
+                            new
+                            {
+                                text = inputText
+                            }
+                        }
+                    }
+                }
+            };
+
+            var requestJson = JsonSerializer.Serialize(requestContent);
+
+            // Set request headers
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            // Send POST request with error handling
+            var address = $"{AppConstant.GenAIBaseUrl}:streamGenerateContent?alt=sse&key={_genAiConfig.API_KEY}";
+
+            var response = await _httpClient.PostAsync(address, new StringContent(requestJson, Encoding.UTF8, "application/json"), cancellationToken); 
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+                responseString.Split("").ToList();
+                return Result<GenAIResponse>.Success(new GenAIResponse() { ResponseMessage = responseString, Succeed = true });
+            }
+            else
+            {
+                return Result<GenAIResponse>.Failure(Error.Failure("Error", $"Failed with status code :--> {response.StatusCode}"));
+            }
+        }
+
         // Text summarization
         public async Task<Result<GenAIResponse>> TextSummarize(TextOnly longText, CancellationToken cancellationToken = default)
         {
