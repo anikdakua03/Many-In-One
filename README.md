@@ -1,6 +1,10 @@
 # Many In One
 
-It is a fully functional web application written in .NET and Angular frameworks.
+It is a fully functional web application written in .NET and Angular frameworks where we can use secure login/registeration with two factor authentication, some useful generative AI functionalities, quiz maker with ability to play etc. 
+
+[Live URL](https://manyinone-gq6db2ujvq-ue.a.run.app)
+
+[GitHub](https://github.com/anikdakua03/Many-In-One)
 
 ## Table of Content : 
 
@@ -14,6 +18,8 @@ It is a fully functional web application written in .NET and Angular frameworks.
   - [🔗Ref Links](#ref-links-)
   - [Things can be added](#things-can-be-added-)
 
+![Home](https://github.com/anikdakua03/Many-In-One/assets/83277115/cf3d5889-0e88-4350-ab4e-060366b94671)
+
 
 ## Tech Stack :
 
@@ -26,36 +32,70 @@ It is a fully functional web application written in .NET and Angular frameworks.
 ## Available features with some screenshots :
 
 1. Secure Login / Registration with two factor authentication .
-    a. login 
-    b. registration
+    - Login
+      ![Login](https://github.com/anikdakua03/Many-In-One/assets/83277115/dbfb6751-0b5a-479e-8eb7-a4c5c8c6a9b1)
+
+    - Registration
+      ![Sign Up](https://github.com/anikdakua03/Many-In-One/assets/83277115/641007b9-e99b-4ca3-ac38-1f138f0371c7)
+
     
-2. User profile and other details maangement
-    a. enable two factor
-    b. disable two factor
-    c. delete all user data
-    d. quiz management
-        i. add / update / delete category
-        ii. add / update / delete question
-        iii. add multiple questions after filling the provided question template and upload
+2. User profile and other details management
+    - Enable two factor
+      ![Enable 2fa](https://github.com/anikdakua03/Many-In-One/assets/83277115/02972a85-12e6-4b99-ab36-1a482f695772)
+      
+    - Disable two factor
+      ![Disable 2fa](https://github.com/anikdakua03/Many-In-One/assets/83277115/153ef762-ec7a-4d96-9a46-e0b0f06dfafc)
 
-3. CRUD operation 
-    - like simple payment card addition / deleteion / updation
+    - Delete all user data
+      ![20  delete all](https://github.com/anikdakua03/Many-In-One/assets/83277115/4a707976-7864-4dfa-a210-c96caef12baf)
 
-4. Use some generative AI tools 
-    a. provide your query and get answer to it
-    b. provide image and its related question and get answer
-    c. summarize long text
-    d. describe your thoughts in a text to generate image
-    e. provide some text to convert to audio
-    f. conversation like qna with gen AI
+    - Quiz management
+       ![Category list](https://github.com/anikdakua03/Many-In-One/assets/83277115/7b94e9d4-42de-4aeb-96cc-c1637e19de6e)
 
-5. Quiz maker and play quiz 
-    a. can create quiz of any available categories and play that.
-    b. otherwise first create your own set of quiz questions and then play with it.
+        - Add / update / delete category
+           ![Category add](https://github.com/anikdakua03/Many-In-One/assets/83277115/0f72e131-a49d-4780-a100-bab8318aab5a)
 
-6. Check some clash of clan details
-    a. search player and see details.
-    b. search clan by tag or search clans with some filters 
+        - Add / update / delete question
+          ![Add-edit](https://github.com/anikdakua03/Many-In-One/assets/83277115/204ee3b4-f7d4-41a1-a293-483026c6d9fd)
+
+        - Add multiple questions after filling the provided question template and upload
+          ![Qs list](https://github.com/anikdakua03/Many-In-One/assets/83277115/84e7c819-c42c-43ec-ac3d-6ac33dadd11c)
+
+4. CRUD operation 
+    - Like simple payment card addition / deleteion / updation
+      ![Payment CRUD](https://github.com/anikdakua03/Many-In-One/assets/83277115/420eb72c-2674-499b-aae8-39fc1c13e006)
+
+
+5. Use some generative AI tools
+   ![Gen AI options](https://github.com/anikdakua03/Many-In-One/assets/83277115/6c04123d-6f2e-49d5-ab8c-17bcbdd70507)
+
+    - Provide your query and get answer to it
+    - Provide image and its related question and get answer
+    - Summarize long text
+    - Describe your thoughts in a text to generate image
+    - Provide some text to convert to audio
+    - Conversation like qna with gen AI
+      
+      ![Gen AI text](https://github.com/anikdakua03/Many-In-One/assets/83277115/778c1892-7926-4c6c-a9aa-73d278ee0bb1)
+
+
+7. Quiz maker and play quiz 
+    - Can create quiz of any available categories and play that.
+      ![Quiz creation](https://github.com/anikdakua03/Many-In-One/assets/83277115/63b7cefd-50bb-464d-b466-3e1a8a396cde)
+
+    - Otherwise first create your own set of quiz questions and then play with it.
+      ![Quiz score](https://github.com/anikdakua03/Many-In-One/assets/83277115/3e76401a-3a44-428e-a4e5-bc0f6aa71e8c)
+
+8. Check some clash of clan details
+   ![COC options](https://github.com/anikdakua03/Many-In-One/assets/83277115/9ec79672-4b43-443d-8935-523a5488cf01)
+
+    - Search player and see details.
+      ![Player](https://github.com/anikdakua03/Many-In-One/assets/83277115/9e4c4661-4acc-4f2b-b476-7e6ea024b1fc)
+
+    - Search clan by tag or search clans with some filters 
+      ![Clan search](https://github.com/anikdakua03/Many-In-One/assets/83277115/a1c61462-bf4c-45bf-8b0a-b02da3afb1b7)
+      
+      ![Clans](https://github.com/anikdakua03/Many-In-One/assets/83277115/a445ac6d-8a4c-4e66-a323-3acaefc2b471)
 
 
 ## Things used :
@@ -80,6 +120,7 @@ It is a fully functional web application written in .NET and Angular frameworks.
 3. Next Added those two image in the CGP's **Artifact Registry**, so that I can use those two image for creating a service which will be running on **Cloud Run**.
 
 > There are steps where we can set up our environment variable in cloud run.
+> > Project [live URL](https://manyinone-gq6db2ujvq-ue.a.run.app) may not work due to expiration of billing.
 
 ## Steps to run locally :
 
@@ -129,9 +170,15 @@ Command to create dotnet secrets :
     "Auth:PgConnection": ""
  ```
 
-5. Build dotnet project by using `dotnet build` and before running angular , make sure to run `npm install` and then `ng build`.
+5. Also apply database migration --
+   ```cs
+   dotnet ef migrations add "MIGRATION_NAME"
+   // then update databse
+   dotnet ef database update
+   ```
+7. Now try building dotnet project by using `dotnet build` and before running angular , make sure to run `npm install` and then `ng build`.
 
-6. If any error occurrs , try checking those .
+8. If any error occurrs , try checking the console .
 
 
 ## 🔗Ref Links :
